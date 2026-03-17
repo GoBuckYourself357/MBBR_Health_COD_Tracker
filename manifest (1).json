@@ -1,0 +1,14 @@
+{
+  "background_color": "#217359",
+  "dir": "ltr",
+  "display": "standalone",
+  "name": "MBBR/COD",
+  "orientation": "any",
+  "scope": "/",
+  "short_name": "MBBR Health",
+  "start_url": "/https://gobuckyourself357.github.io/MBBR_Health_COD_Tracker/",
+  "theme_color": "#06241c",
+  "id": "calculatorformbbrhealth",
+  "description": "This app is for estimating and tracking the health of your MBBR system",
+  "lang": "en"
+}
