@@ -1,0 +1,2932 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="MBBR Calc">
+<meta name="theme-color" content="#0d1f1a">
+<title>MBBR Wastewater Calculator</title>
+<style>
+:root{
+  --bg:#0d1f1a;
+  --bg2:#122920;
+  --bg3:#1a3628;
+  --surface:#1e3d2e;
+  --surface2:#254836;
+  --border:rgba(29,158,117,0.18);
+  --border2:rgba(29,158,117,0.35);
+  --green:#1D9E75;
+  --green2:#5DCAA5;
+  --green3:#0F6E56;
+  --amber:#EF9F27;
+  --red:#E24B4A;
+  --blue:#378ADD;
+  --text:#e8f5f0;
+  --text2:#9fc5b5;
+  --text3:#5d8a78;
+  --nav-h:64px;
+  --safe-bottom:env(safe-area-inset-bottom, 0px);
+  --safe-top:env(safe-area-inset-top, 0px);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',sans-serif}
+.app-shell{display:flex;flex-direction:column;height:100%;height:-webkit-fill-available}
+
+/* HEADER */
+.app-header{
+  background:var(--bg2);
+  border-bottom:1px solid var(--border);
+  padding:calc(var(--safe-top) + 10px) 16px 10px;
+  flex-shrink:0;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.app-title{font-size:17px;font-weight:600;color:var(--green2);letter-spacing:-.3px}
+.app-subtitle{font-size:11px;color:var(--text3);margin-top:1px}
+.header-badge{background:var(--green3);color:var(--green2);font-size:10px;font-weight:600;padding:3px 8px;border-radius:20px;letter-spacing:.05em}
+
+/* SCROLL AREA */
+.scroll-area{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding-bottom:calc(var(--nav-h) + var(--safe-bottom) + 16px)}
+
+/* BOTTOM NAV */
+.bottom-nav{
+  position:fixed;bottom:0;left:0;right:0;
+  height:calc(var(--nav-h) + var(--safe-bottom));
+  padding-bottom:var(--safe-bottom);
+  background:var(--bg2);
+  border-top:1px solid var(--border);
+  display:flex;align-items:stretch;
+  z-index:100;
+}
+.nav-btn{
+  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  border:none;background:none;color:var(--text3);font-size:9px;font-weight:500;
+  cursor:pointer;gap:3px;padding:6px 2px;transition:color 0.15s;
+  letter-spacing:.02em;
+}
+.nav-btn.active{color:var(--green2)}
+.nav-btn svg{width:20px;height:20px;stroke-width:1.8}
+.nav-dot{width:4px;height:4px;border-radius:50%;background:var(--red);position:absolute;top:6px;right:calc(50% - 14px)}
+
+/* PANELS */
+.panel{display:none;padding:16px}.panel.active{display:block}
+
+/* CARDS */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:12px}
+.card-title{font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px}
+.section-label{font-size:13px;font-weight:600;color:var(--text2);margin:16px 0 8px;padding-left:2px}
+
+/* INPUTS */
+.field-group{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.field-group.cols3{grid-template-columns:1fr 1fr 1fr}
+.field-group.cols1{grid-template-columns:1fr}
+.field label{font-size:12px;color:var(--text3);display:block;margin-bottom:5px;font-weight:500}
+.field input[type=number]{
+  width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:10px;
+  color:var(--text);font-size:16px;padding:11px 12px;outline:none;
+  -webkit-appearance:none;appearance:none;
+}
+.field input[type=number]:focus{border-color:var(--green);background:var(--bg2)}
+.field input[type=number]::placeholder{color:var(--text3)}
+
+/* RANGE SLIDER */
+input[type=range]{width:100%;accent-color:var(--green);height:4px;margin:8px 0}
+
+/* BUTTONS */
+.btn-primary{
+  width:100%;background:var(--green);color:#fff;border:none;border-radius:12px;
+  font-size:16px;font-weight:600;padding:14px;cursor:pointer;transition:background .15s;
+  letter-spacing:-.2px;
+}
+.btn-primary:active{background:var(--green3)}
+.btn-secondary{
+  background:var(--surface2);color:var(--text2);border:1px solid var(--border);
+  border-radius:10px;font-size:14px;font-weight:500;padding:10px 16px;cursor:pointer;
+}
+.btn-secondary:active{background:var(--bg3)}
+.btn-row{display:flex;gap:10px;margin-top:4px}
+.btn-row .btn-primary{flex:1}.btn-row .btn-secondary{flex-shrink:0}
+
+/* RESULT ROWS */
+.result-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);font-size:14px}
+.result-row:last-child{border-bottom:none}
+.rname{color:var(--text2);flex:1;padding-right:8px}
+.rval{font-weight:600;color:var(--text);text-align:right;font-size:14px}
+.runit{font-size:11px;color:var(--text3);font-weight:400;margin-left:3px}
+
+/* BADGES */
+.badge{display:inline-block;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600;margin-left:6px}
+.b-ok{background:rgba(29,158,117,.2);color:var(--green2)}
+.b-warn{background:rgba(239,159,39,.18);color:var(--amber)}
+.b-bad{background:rgba(226,75,74,.18);color:var(--red)}
+.b-info{background:rgba(55,138,221,.18);color:var(--blue)}
+
+/* ALERTS */
+.alert{padding:11px 14px;border-radius:10px;font-size:13px;margin-bottom:10px;line-height:1.5}
+.a-ok{background:rgba(29,158,117,.12);color:var(--green2);border-left:3px solid var(--green)}
+.a-warn{background:rgba(239,159,39,.12);color:var(--amber);border-left:3px solid var(--amber)}
+.a-bad{background:rgba(226,75,74,.12);color:var(--red);border-left:3px solid var(--red)}
+.a-info{background:rgba(55,138,221,.12);color:var(--blue);border-left:3px solid var(--blue)}
+
+/* FORMULA BOX */
+.formula{background:var(--bg3);border-left:3px solid var(--green);border-radius:0 10px 10px 0;padding:10px 12px;font-family:'Menlo','Courier New',monospace;font-size:12px;color:var(--text2);margin:8px 0;line-height:1.6}
+.formula.blue{border-left-color:var(--blue)}
+
+/* METRIC CARDS */
+.metric-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.metric-card{background:var(--bg3);border-radius:12px;padding:14px;border:1px solid var(--border)}
+.metric-label{font-size:11px;color:var(--text3);font-weight:500;margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em}
+.metric-value{font-size:24px;font-weight:700;color:var(--text)}
+.metric-unit{font-size:12px;color:var(--text3);margin-top:2px}
+
+/* PERMIT ROWS */
+.permit-card{border-radius:12px;padding:14px;margin-bottom:10px;border:1px solid}
+.permit-pass{background:rgba(29,158,117,.1);border-color:rgba(29,158,117,.3)}
+.permit-fail{background:rgba(226,75,74,.1);border-color:rgba(226,75,74,.35)}
+.permit-name{font-weight:600;font-size:15px;color:var(--text)}
+.permit-detail{font-size:12px;color:var(--text3);margin-top:2px}
+.permit-bottom{display:flex;justify-content:space-between;align-items:center;margin-top:10px}
+.permit-value{font-size:18px;font-weight:700;color:var(--text)}
+.permit-limit{font-size:11px;color:var(--text3)}
+
+/* WEEKLY TRACKER */
+.week-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin:12px 0}
+.week-grid input{background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:14px;padding:10px 4px;text-align:center;outline:none;width:100%}
+.week-grid input:focus{border-color:var(--green)}
+.week-day{font-size:10px;color:var(--text3);text-align:center;margin-bottom:4px;font-weight:600}
+.bar-bg{background:var(--bg3);border-radius:4px;height:8px;overflow:hidden;margin:6px 0 3px}
+.bar-fill{height:8px;border-radius:4px;transition:width .3s}
+.tracker-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:10px}
+.tracker-stat .t-label{font-size:11px;color:var(--text3);margin-bottom:4px}
+.tracker-stat .t-val{font-size:20px;font-weight:700;color:var(--text)}
+.tracker-stat .t-unit{font-size:12px;color:var(--text3);margin-left:3px}
+.tracker-note{font-size:11px;color:var(--text3);line-height:1.6}
+
+/* BIG STATS */
+.big-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px}
+.big-stat{background:var(--bg3);border-radius:12px;padding:12px 10px;border:1px solid var(--border)}
+.bs-label{font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
+.bs-val{font-size:20px;font-weight:700;color:var(--text);line-height:1}
+.bs-unit{font-size:11px;color:var(--text3);margin-top:3px}
+.bs-note{font-size:10px;color:var(--text3);margin-top:4px}
+
+/* DIVIDER */
+.divider{height:1px;background:var(--border);margin:14px 0}
+
+/* LOG TABLE */
+.log-scroll{overflow:auto;-webkit-overflow-scrolling:touch;max-height:260px}
+.log-table{width:100%;border-collapse:collapse;font-size:12px;min-width:640px}
+.log-table th{text-align:left;padding:8px 10px;color:var(--text3);font-size:11px;font-weight:600;border-bottom:1px solid var(--border);white-space:nowrap;position:sticky;top:0;background:var(--surface);z-index:1}
+.log-table td{padding:8px 10px;border-bottom:1px solid var(--border);color:var(--text2);white-space:nowrap}
+.log-table tbody tr:hover{background:var(--bg3);}
+.del-btn{background:none;border:none;color:var(--red);font-size:18px;cursor:pointer;padding:2px 6px;opacity:.7}
+.del-btn:active{opacity:1}
+
+/* NOTE */
+.note{font-size:12px;color:var(--text3);line-height:1.6;margin-top:8px}
+
+/* COD HIGHLIGHTS */
+.cod-highlights{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px}
+.cod-hl{background:var(--bg3);border-radius:12px;padding:12px 10px;border:1px solid var(--border)}
+.chl-label{font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
+.chl-val{font-size:20px;font-weight:700;color:var(--text)}
+.chl-unit{font-size:11px;color:var(--text3);margin-left:3px}
+.chl-note{font-size:10px;color:var(--text3);margin-top:4px}
+
+/* CUSTOM CALC */
+.custom-calc{background:var(--bg3);border-radius:12px;padding:16px;border:1px solid var(--border)}
+.custom-result-box{background:var(--surface);border-radius:10px;padding:12px 14px;margin-top:10px;text-align:center}
+.custom-result-val{font-size:28px;font-weight:700;color:var(--green2)}
+.custom-result-unit{font-size:13px;color:var(--text3)}
+
+/* SUMMARY STATUS BAR */
+.status-bar{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.status-pill{display:flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:6px 12px;font-size:12px;font-weight:500;color:var(--text2)}
+.status-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.sd-ok{background:var(--green)}
+.sd-warn{background:var(--amber)}
+.sd-bad{background:var(--red)}
+
+/* CHART CANVAS */
+.chart-wrap{position:relative;width:100%;margin:8px 0}
+
+/* BIODEGRAD DISPLAY */
+.biodegrad-display{background:var(--bg3);border-radius:10px;padding:11px 12px;font-size:14px;font-weight:600;color:var(--text)}
+
+/* HAMBURGER MENU */
+.hamburger{background:none;border:none;cursor:pointer;padding:6px;color:var(--text2);display:flex;flex-direction:column;gap:5px;justify-content:center}
+.hamburger span{display:block;width:22px;height:2px;background:currentColor;border-radius:2px}
+.side-menu{position:fixed;top:0;left:-280px;width:280px;height:100%;background:var(--bg2);border-right:1px solid var(--border);z-index:200;transition:left .25s ease;display:flex;flex-direction:column}
+.side-menu.open{left:0}
+.side-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:199;display:none}
+.side-overlay.open{display:block}
+.side-menu-header{padding:calc(var(--safe-top) + 16px) 16px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.side-menu-title{font-size:15px;font-weight:600;color:var(--green2)}
+.side-close{background:none;border:none;color:var(--text3);font-size:24px;cursor:pointer;padding:2px 8px;line-height:1}
+.menu-item{display:flex;align-items:center;gap:14px;padding:16px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .15s;text-decoration:none}
+.menu-item:active,.menu-item.active-unit{background:var(--bg3)}
+.menu-icon{width:42px;height:42px;border-radius:10px;background:var(--surface);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.menu-icon svg{width:20px;height:20px;stroke:var(--green2);stroke-width:1.8;fill:none}
+.menu-name{font-size:14px;font-weight:600;color:var(--text)}
+.menu-desc{font-size:11px;color:var(--text3);margin-top:2px}
+.menu-dot{width:8px;height:8px;border-radius:50%;background:var(--green);margin-left:auto;flex-shrink:0;display:none}
+.active-unit .menu-dot{display:block}
+.unit-shell{display:none;flex-direction:column;height:100%;height:-webkit-fill-available;flex:1;overflow:hidden}
+.unit-shell.active{display:flex}
+
+/* SCROLLBAR hide */
+.scroll-area::-webkit-scrollbar{display:none}
+
+/* PRINT / PDF EXPORT */
+@media print{
+  body *{visibility:hidden}
+  #pdf-overlay,#pdf-overlay *{visibility:visible}
+  #pdf-overlay{position:fixed;inset:0;overflow:visible;background:#fff}
+  #pdf-overlay>div:first-child{display:none}
+}
+
+/* GROWTH PHASE */
+.phase-banner{border-radius:14px;padding:18px;margin-bottom:12px;text-align:center;border:1px solid}
+.phase-name{font-size:22px;font-weight:700;letter-spacing:-.3px;margin-bottom:4px}
+.phase-sub{font-size:13px;opacity:.8}
+.phase-exp{background:rgba(29,158,117,.12);border-color:rgba(29,158,117,.4)}
+.phase-lag{background:rgba(55,138,221,.12);border-color:rgba(55,138,221,.4)}
+.phase-stat{background:rgba(239,159,39,.12);border-color:rgba(239,159,39,.4)}
+.phase-dec{background:rgba(226,75,74,.12);border-color:rgba(226,75,74,.4)}
+.phase-exp .phase-name{color:var(--green2)}
+.phase-lag .phase-name{color:var(--blue)}
+.phase-stat .phase-name{color:var(--amber)}
+.phase-dec .phase-name{color:var(--red)}
+.monod-visual{display:flex;align-items:flex-end;gap:3px;height:60px;margin:12px 0 6px}
+.monod-bar{flex:1;border-radius:4px 4px 0 0;transition:height .4s;min-height:3px}
+.monod-label{font-size:9px;color:var(--text3);text-align:center;margin-top:4px}
+.growth-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.growth-stat{background:var(--bg3);border-radius:12px;padding:12px;border:1px solid var(--border)}
+.gs-label{font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
+.gs-val{font-size:20px;font-weight:700;color:var(--text);line-height:1}
+.gs-unit{font-size:11px;color:var(--text3);margin-top:3px}
+.rec-card{background:var(--surface2);border-radius:12px;padding:14px;margin-bottom:8px;border-left:3px solid var(--green)}
+.rec-card.warn{border-left-color:var(--amber)}
+.rec-card.bad{border-left-color:var(--red)}
+.rec-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px}
+.rec-body{font-size:12px;color:var(--text2);line-height:1.6}
+.biomass-gauge{position:relative;height:12px;background:var(--bg3);border-radius:6px;overflow:hidden;margin:8px 0 4px}
+.biomass-fill{height:100%;border-radius:6px;transition:width .4s}
+
+/* DIAGNOSTICS */
+.health-ring{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px 0 12px}
+.health-score-num{font-size:56px;font-weight:800;line-height:1;letter-spacing:-2px}
+.health-score-label{font-size:12px;color:var(--text3);margin-top:4px;font-weight:500;text-transform:uppercase;letter-spacing:.08em}
+.health-status{font-size:15px;font-weight:600;margin-top:8px}
+.stress-bar-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px}
+.stress-bar-row:last-child{border-bottom:none}
+.stress-bar-name{color:var(--text2);width:130px;flex-shrink:0;font-size:12px}
+.stress-bar-track{flex:1;height:8px;background:var(--bg3);border-radius:4px;overflow:hidden}
+.stress-bar-fill{height:8px;border-radius:4px;transition:width .35s}
+.stress-bar-val{width:44px;text-align:right;font-size:12px;font-weight:600;color:var(--text);flex-shrink:0}
+.chem-card{background:var(--bg3);border-radius:12px;padding:14px;border:1px solid var(--border);margin-bottom:10px}
+.chem-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.chem-name{font-size:14px;font-weight:600;color:var(--text)}
+.chem-status{font-size:12px}
+.event-row{display:flex;justify-content:space-between;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--border);font-size:13px}
+.event-row:last-child{border-bottom:none}
+.event-left{flex:1}
+.event-date{font-size:11px;color:var(--text3);margin-bottom:2px}
+.event-desc{color:var(--text2);line-height:1.4}
+.event-right{flex-shrink:0;margin-left:10px}
+.diag-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.diag-stat{background:var(--bg3);border-radius:12px;padding:12px;border:1px solid var(--border);text-align:center}
+.diag-val{font-size:22px;font-weight:700;color:var(--text);line-height:1}
+.diag-lbl{font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-top:4px}
+</style>
+</head>
+<body>
+<div class="app-shell">
+
+<!-- SIDE MENU OVERLAY -->
+<div class="side-overlay" id="side-overlay" onclick="closeMenu()"></div>
+
+<!-- SIDE MENU -->
+<div class="side-menu" id="side-menu">
+  <div class="side-menu-header">
+    <div class="side-menu-title">Dairy Wastewater System</div>
+    <button class="side-close" onclick="closeMenu()">×</button>
+  </div>
+  <div class="menu-item active-unit" id="menu-mbbr" onclick="switchUnit('mbbr')">
+    <div class="menu-icon"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M7 6V4M12 6V4M17 6V4"/><path d="M3 11h18"/></svg></div>
+    <div><div class="menu-name">MBBR</div><div class="menu-desc">Moving Bed Biofilm Reactor</div></div>
+    <div class="menu-dot"></div>
+  </div>
+  <div class="menu-item" id="menu-saf" onclick="switchUnit('saf')">
+    <div class="menu-icon"><svg viewBox="0 0 24 24"><ellipse cx="12" cy="12" rx="9" ry="5"/><path d="M3 12v5c0 2.76 4.03 5 9 5s9-2.24 9-5v-5"/><path d="M3 7v5"/><path d="M21 7v5"/></svg></div>
+    <div><div class="menu-name">Daily COD Test</div><div class="menu-desc">WW · Primary Eff. · BOD · City</div></div>
+    <div class="menu-dot"></div>
+  </div>
+  <div style="padding:16px;margin-top:auto;border-top:1px solid var(--border)">
+    <button onclick="exportPDF();closeMenu();" style="width:100%;background:var(--green3);color:var(--green2);border:1px solid rgba(29,158,117,.4);border-radius:10px;padding:12px;font-size:14px;font-weight:600;cursor:pointer;margin-bottom:8px;display:flex;align-items:center;justify-content:center;gap:8px">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+      Export to PDF
+    </button>
+    <button onclick="exportBackup();closeMenu();" style="width:100%;background:var(--bg3);color:var(--text2);border:1px solid var(--border);border-radius:10px;padding:10px;font-size:13px;font-weight:600;cursor:pointer;margin-bottom:6px;display:flex;align-items:center;justify-content:center;gap:8px">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Export backup (.json)
+    </button>
+    <button onclick="document.getElementById('backup-file-input').click();closeMenu();" style="width:100%;background:var(--bg3);color:var(--text2);border:1px solid var(--border);border-radius:10px;padding:10px;font-size:13px;font-weight:600;cursor:pointer;margin-bottom:10px;display:flex;align-items:center;justify-content:center;gap:8px">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      Import backup (.json)
+    </button>
+    <input type="file" id="backup-file-input" accept=".json" style="display:none" onchange="importBackup(event)">
+    <div id="backup-storage-info" style="font-size:11px;color:var(--text3);margin-bottom:10px;line-height:1.7"></div>
+    <div style="font-size:11px;color:var(--text3);line-height:1.6">Dairy Wastewater Calculator<br>Both units share permit limits:<br>BOD max 800 lbs/day · avg 650 lbs/day<br>pH 6.5 – 9.5</div>
+  </div>
+</div>
+
+<!-- MBBR UNIT -->
+<div class="unit-shell active" id="unit-mbbr">
+
+<!-- HEADER -->
+<div class="app-header">
+  <button class="hamburger" onclick="openMenu()" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+  <div style="flex:1;margin-left:10px">
+    <div class="app-title" id="mbbr-title">MBBR Calculator</div>
+    <div class="app-subtitle">Dairy wastewater — moving bed biofilm reactor</div>
+  </div>
+  <div class="header-badge">MBBR</div>
+</div>
+
+<!-- SCROLL AREA -->
+<div class="scroll-area" id="scroll-area">
+
+  <!-- PANEL: INPUT -->
+  <div class="panel active" id="panel-input">
+    <div class="section-label">Flow & system setup</div>
+    <div class="card">
+      <div class="card-title">MBBR configuration</div>
+      <div class="field-group">
+        <div class="field"><label>Flow (MGD)</label><input type="number" id="flow_mgd" value="" step="0.01" min="0" placeholder="0.000"></div>
+        <div class="field"><label>Flow (GPD)</label><input type="number" id="flow_gpd" value="" step="1000" min="0" placeholder="0"></div>
+        <div class="field"><label>MBBR volume (gal)</label><input type="number" id="mbbr_vol" value="62891.5" step="1" min="0"></div>
+        <div class="field"><label>Media fill (%)</label><input type="number" id="media_fill" value="50" step="1" min="0" max="70"></div>
+        <div class="field"><label>Media SSA (m²/m³)</label><input type="number" id="media_ssa" value="500" step="10"></div>
+        <div class="field"><label>Temp (°C)</label><input type="number" id="temp" value="20" step="0.5"></div>
+      </div>
+    </div>
+
+    <div class="section-label">MBBR nitrogen readings</div>
+    <div class="card">
+      <div class="field-group">
+        <div class="field"><label>NH₃-N (mg/L)</label><input type="number" id="eff_nh3" value="" step="0.1" min="0" placeholder="0.00" oninput="sv('inf_nh3',this.value)"></div>
+        <div class="field"><label>NO₂-N (mg/L)</label><input type="number" id="eff_no2" value="" step="0.1" min="0" placeholder="0.00" oninput="sv('inf_no2',this.value)"></div>
+        <div class="field"><label>NO₃-N (mg/L)</label><input type="number" id="eff_no3" value="" step="0.1" min="0" placeholder="0.00" oninput="sv('inf_no3',this.value)"></div>
+        <div class="field"><label>TKN (mg/L)</label><input type="number" id="eff_tkn" value="" step="0.5" min="0" placeholder="0.00" oninput="sv('inf_tkn',this.value)"></div>
+      </div>
+    </div>
+    <input type="hidden" id="inf_nh3" value="0">
+    <input type="hidden" id="inf_no2" value="0">
+    <input type="hidden" id="inf_no3" value="0">
+    <input type="hidden" id="inf_tkn" value="0">
+
+    <div class="section-label">COD & BOD</div>
+    <div class="card">
+      <div class="field-group">
+        <div class="field"><label>COD influent (mg/L)</label><input type="number" id="inf_cod" value="" step="1" min="0" placeholder="0"></div>
+        <div class="field"><label>COD effluent (mg/L)</label><input type="number" id="eff_cod" value="" step="1" min="0" placeholder="0"></div>
+      </div>
+      <div class="field-group">
+        <div class="field"><label>BOD/COD ratio (%)</label><input type="number" id="bod_cod_pct" value="23" step="1" min="1" max="100"></div>
+        <div class="field"><label>Biodegradability</label><div class="biodegrad-display" id="biodegrad_label">—</div></div>
+      </div>
+    </div>
+    <input type="hidden" id="inf_bod" value="0">
+    <input type="hidden" id="eff_bod" value="0">
+
+    <div class="section-label">Tank chemistry</div>
+    <div class="card">
+      <div class="field-group">
+        <div class="field"><label>pH</label><input type="number" id="eff_ph" value="" step="0.1" min="0" max="14" placeholder="0.00" oninput="sv('inf_ph',this.value)"></div>
+        <div class="field"><label>DO (mg/L)</label><input type="number" id="eff_do" value="" step="0.1" placeholder="0.00" oninput="sv('inf_do',this.value)"></div>
+        <div class="field"><label>Alkalinity (mg/L CaCO₃)</label><input type="number" id="eff_alk" value="" step="1" placeholder="0" oninput="sv('inf_alk',this.value)"></div>
+        <div class="field"><label>Phosphorus (mg/L)</label><input type="number" id="eff_p" value="" step="0.1" placeholder="0.00" oninput="sv('inf_p',this.value)"></div>
+        <div class="field"><label>Volatile acids (mg/L)</label><input type="number" id="vol_acids" value="" step="1" placeholder="0"></div>
+      </div>
+    </div>
+    <input type="hidden" id="inf_ph" value="0">
+    <input type="hidden" id="inf_do" value="0">
+    <input type="hidden" id="inf_alk" value="0">
+    <input type="hidden" id="inf_p" value="0">
+
+    <div class="section-label">Solids</div>
+    <div class="card">
+      <div class="field-group">
+        <div class="field"><label>TSS (mg/L)</label><input type="number" id="eff_tss" value="" step="1" placeholder="0" oninput="sv('inf_tss',this.value)"></div>
+        <div class="field"><label>VSS (mg/L)</label><input type="number" id="eff_vss" value="" step="1" placeholder="0" oninput="sv('inf_vss',this.value)"></div>
+        <div class="field"><label>Imhoff cone (mL/L)</label><input type="number" id="imhoff" value="" step="0.5" min="0" placeholder="0.00"></div>
+      </div>
+    </div>
+    <input type="hidden" id="inf_tss" value="0">
+    <input type="hidden" id="inf_vss" value="0">
+
+    <div class="btn-row">
+      <button class="btn-primary" onclick="calculate()">Calculate all parameters</button>
+      <button class="btn-secondary" onclick="saveToLog()">+ Log</button>
+      <button class="btn-secondary" onclick="clearInputs()">Clear</button>
+    </div>
+  </div>
+
+  <!-- PANEL: RESULTS -->
+  <div class="panel" id="panel-results">
+    <div id="summary-alerts-mobile" style="margin-bottom:4px"></div>
+
+    <div class="section-label">Permit compliance</div>
+    <div id="compliance-mobile"></div>
+
+    <div class="section-label">Performance overview</div>
+    <div class="metric-grid" id="summary-metrics-mobile"></div>
+
+    <div class="section-label">BOD discharge to city</div>
+    <div class="card">
+      <div class="cod-highlights" id="bod-highlights"></div>
+      <div id="bod-alerts-mobile"></div>
+    </div>
+
+    <div class="section-label">Weekly BOD tracker</div>
+    <div class="card">
+      <p class="note" style="margin-bottom:12px;margin-top:0">Enter each day's BOD discharge (lbs/day) to track against the 650 lbs/day weekly average permit limit.</p>
+      <div id="weekly-day-labels" class="week-grid" style="margin-bottom:0"></div>
+      <div class="week-grid" id="weekly-inputs-mobile"></div>
+      <div id="weekly-results-mobile"></div>
+    </div>
+
+    <div class="section-label">Nitrification</div>
+    <div class="card"><div id="nitri-alerts-mobile" style="margin-bottom:8px"></div><div id="nitri-metrics-mobile"></div></div>
+
+    <div class="section-label">Solids & TSS</div>
+    <div class="metric-grid" id="solids-metrics-mobile"></div>
+    <div class="card"><div id="tss-results-mobile"></div></div>
+
+    <div class="section-label">Alkalinity & volatile acids</div>
+    <div class="card"><div id="alk-alerts-mobile" style="margin-bottom:8px"></div><div id="alk-results-mobile"></div></div>
+
+    <div class="section-label">Phosphorus</div>
+    <div class="card"><div id="phos-results-mobile"></div></div>
+
+    <div class="section-label">Nutrient ratio — BOD : N : P</div>
+    <div class="card"><div id="nutrient-ratio-results"></div></div>
+
+    <div class="section-label">Carbon — TOC estimate & C:N ratio</div>
+    <div class="card"><div id="carbon-results"></div></div>
+
+    <div class="section-label">O₂ demand</div>
+    <div class="card"><div id="o2-results-mobile"></div></div>
+  </div>
+
+  <!-- PANEL: COD/BOD -->
+  <div class="panel" id="panel-cod">
+    <div class="section-label">How it works</div>
+    <div class="card">
+      <div class="formula blue">BOD (mg/L) = COD × (ratio ÷ 100)</div>
+      <div class="formula">BOD lbs/day = BOD × Flow (MGD) × 8.34</div>
+      <p class="note">Direct BOD entries take priority over ratio estimate. Typical dairy BOD/COD: 0.20–0.35. This is lower than municipal wastewater (0.50–0.65) due to fats and refractory organics in dairy effluent.</p>
+    </div>
+
+    <div class="section-label">Concentration summary</div>
+    <div class="card"><div id="cod-conc-m"></div></div>
+
+    <div class="section-label">Mass loading (lbs/day)</div>
+    <div class="card">
+      <div class="card-title">Influent</div><div id="cod-inf-m"></div>
+      <div class="divider"></div>
+      <div class="card-title">Effluent to city</div><div id="cod-eff-m"></div>
+    </div>
+
+    <div class="section-label">BOD ratio guidance</div>
+    <div class="card">
+      <div id="cod-ratio-m"></div>
+      <div class="divider"></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <span style="font-size:13px;color:var(--text2);font-weight:500">BOD/COD ratio</span>
+        <span style="font-size:16px;font-weight:700;color:var(--green2)" id="ratio-slider-val-m">23%</span>
+      </div>
+      <input type="range" min="10" max="95" value="23" id="ratio-slider-m">
+      <div id="ratio-slider-results-m" style="margin-top:10px"></div>
+    </div>
+  </div>
+
+  <!-- PANEL: POUNDS -->
+  <div class="panel" id="panel-pounds">
+    <div class="section-label">Formula</div>
+    <div class="card">
+      <div class="formula">Lbs/day = Conc (mg/L) × Flow (MGD) × 8.34</div>
+      <p class="note">8.34 = weight of one gallon of water in lbs. Converts mg/L + MGD to mass per day.</p>
+    </div>
+
+    <div class="section-label">Custom calculator</div>
+    <div class="custom-calc">
+      <div class="field-group">
+        <div class="field"><label>Concentration (mg/L)</label><input type="number" id="custom_conc" value="" placeholder="0.00" step="0.1"></div>
+        <div class="field"><label>Flow (MGD)</label><input type="number" id="custom_flow" value="" placeholder="0.000" step="0.01"></div>
+      </div>
+      <div class="custom-result-box">
+        <div class="custom-result-val" id="custom_result">20.9</div>
+        <div class="custom-result-unit">lbs / day</div>
+      </div>
+    </div>
+
+    <div class="section-label">Influent loading</div>
+    <div class="card"><div id="inf-pounds-m"></div></div>
+    <div class="section-label">Effluent loading</div>
+    <div class="card"><div id="eff-pounds-m"></div></div>
+    <div class="section-label">Mass removal</div>
+    <div class="card"><div id="removal-pounds-m"></div></div>
+  </div>
+
+  <!-- PANEL: BACTERIAL GROWTH -->
+  <div class="panel" id="panel-bio">
+    <div id="growth-phase-banner"></div>
+
+    <div class="section-label">Monod kinetics — substrate utilization</div>
+    <div class="card">
+      <div class="card-title">Specific growth rate (μ)</div>
+      <div class="formula">μ = μ_max × S ÷ (Ks + S) × DO ÷ (Ko + DO)</div>
+      <div id="monod-bars" style="margin-top:12px"></div>
+      <div id="monod-results"></div>
+    </div>
+
+    <div class="section-label">Biofilm health metrics</div>
+    <div class="growth-grid" id="growth-metrics"></div>
+
+    <div class="section-label">Nitrifier population status</div>
+    <div class="card"><div id="nitrifier-status"></div></div>
+
+    <div class="section-label">Biomass balance</div>
+    <div class="card">
+      <div class="card-title">Net growth prediction</div>
+      <div id="biomass-balance"></div>
+    </div>
+
+    <div class="section-label">Operational inputs</div>
+    <div class="card">
+      <div class="card-title">Growth parameters (editable)</div>
+      <div class="field-group">
+        <div class="field"><label>Max bacteria growth speed (hr⁻¹)</label><input type="number" id="mu_max" value="0.8" step="0.05" min="0"></div>
+        <div class="field"><label>Ammonia half-saturation — mg/L where growth is half speed</label><input type="number" id="ks_nh3" value="0.5" step="0.05" min="0"></div>
+        <div class="field"><label>Oxygen half-saturation — mg/L where growth is half speed</label><input type="number" id="ko_do" value="0.5" step="0.05" min="0"></div>
+        <div class="field"><label>Bacteria die-off rate (hr⁻¹)</label><input type="number" id="kd" value="0.05" step="0.005" min="0"></div>
+        <div class="field"><label>Sludge age — auto-calculated from your flow &amp; volume (days)</label><input type="number" id="srt" value="15" step="1" min="1" readonly style="opacity:0.6;cursor:not-allowed;background:var(--bg)"></div>
+        <div class="field"><label>Biomass yield — lbs of bacteria grown per lb of waste eaten</label><input type="number" id="yield_coeff" value="0.45" step="0.01" min="0"></div>
+      </div>
+      <button class="btn-primary" onclick="calcGrowth()" style="margin-top:8px">Recalculate growth</button>
+    </div>
+
+    <div class="section-label">Recommendations</div>
+    <div id="growth-recs"></div>
+  </div>
+
+  <!-- PANEL: DIAGNOSTICS -->
+  <div class="panel" id="panel-diag">
+
+    <div class="section-label">System health index</div>
+    <div class="card">
+      <div class="health-ring">
+        <div class="health-score-num" id="health-score-num">—</div>
+        <div class="health-score-label">Health score / 100</div>
+        <div class="health-status" id="health-status-label">—</div>
+      </div>
+      <div id="stress-bars"></div>
+    </div>
+
+    <div class="section-label">Shock load detection</div>
+    <div class="card"><div id="shock-results"></div></div>
+
+    <div class="section-label">Chemical disinfectant tracking</div>
+    <div class="card">
+      <div class="card-title">PAA — peracetic acid</div>
+
+      <div style="font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Step 1 — influent titration</div>
+      <div class="field-group">
+        <div class="field"><label>PAA residual titrated (mg/L)</label><input type="number" id="paa_residual" value="" placeholder="0.00" step="0.01" min="0" oninput="calcDiag()"></div>
+        <div class="field"><label>Flow at dosing point (GPM)</label><input type="number" id="paa_gpm" value="130" step="1" min="0" oninput="calcDiag()"></div>
+      </div>
+      <div class="field-group cols1">
+        <div class="field"><label>Neutralization agent</label>
+          <select id="paa_neutralizer" onchange="calcDiag()">
+            <option value="sodium_thiosulfate">Sodium thiosulfate</option>
+            <option value="sodium_bisulfite">Sodium bisulfite</option>
+            <option value="ascorbic_acid">Ascorbic acid</option>
+            <option value="none">None / not neutralized</option>
+          </select>
+        </div>
+      </div>
+
+      <div style="height:0.5px;background:var(--border);margin:12px 0 10px"></div>
+      <div style="font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Step 2 — suggested neutralizer dose</div>
+      <div id="paa-result"></div>
+
+      <div style="height:0.5px;background:var(--border);margin:12px 0 10px"></div>
+      <div style="font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Step 3 — neutralizer pump setting → residual after treatment</div>
+      <div class="field-group">
+        <div class="field"><label>Neutralizer pump output (mL/min)</label><input type="number" id="paa_pump_ml_min" value="" placeholder="0.00" step="0.1" min="0" oninput="calcNeutResidual('paa')"></div>
+        <div class="field"><label>Neutralizer stock conc (mg/mL)</label><input type="number" id="paa_stock_conc" value="125" step="1" min="1" oninput="calcNeutResidual('paa')"></div>
+      </div>
+      <div id="paa-pump-result"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Chlorine</div>
+
+      <div style="font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Step 1 — influent titration</div>
+      <div class="field-group">
+        <div class="field"><label>Cl₂ residual titrated (mg/L)</label><input type="number" id="cl2_residual" value="" placeholder="0.00" step="0.01" min="0" oninput="calcDiag()"></div>
+        <div class="field"><label>Flow at dosing point (GPM)</label><input type="number" id="cl2_gpm" value="130" step="1" min="0" oninput="calcDiag()"></div>
+      </div>
+      <div class="field-group cols1">
+        <div class="field"><label>Neutralization agent</label>
+          <select id="cl2_neutralizer" onchange="calcDiag()">
+            <option value="sodium_thiosulfate">Sodium thiosulfate</option>
+            <option value="sodium_bisulfite">Sodium bisulfite</option>
+            <option value="ascorbic_acid">Ascorbic acid</option>
+            <option value="none">None / not neutralized</option>
+          </select>
+        </div>
+      </div>
+
+      <div style="height:0.5px;background:var(--border);margin:12px 0 10px"></div>
+      <div style="font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Step 2 — suggested neutralizer dose</div>
+      <div id="cl2-result"></div>
+
+      <div style="height:0.5px;background:var(--border);margin:12px 0 10px"></div>
+      <div style="font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Step 3 — neutralizer pump setting → residual after treatment</div>
+      <div class="field-group">
+        <div class="field"><label>Neutralizer pump output (mL/min)</label><input type="number" id="cl2_pump_ml_min" value="" placeholder="0.00" step="0.1" min="0" oninput="calcNeutResidual('cl2')"></div>
+        <div class="field"><label>Neutralizer stock conc (mg/mL)</label><input type="number" id="cl2_stock_conc" value="125" step="1" min="1" oninput="calcNeutResidual('cl2')"></div>
+      </div>
+      <div id="cl2-pump-result"></div>
+    </div>
+
+    <div class="section-label">Toxicity & inhibition assessment</div>
+    <div class="card"><div id="toxicity-results"></div></div>
+
+    <div class="section-label">Log a stress event</div>
+    <div class="card">
+      <div class="field-group cols1">
+        <div class="field"><label>Event type</label>
+          <select id="event-type">
+            <option value="hydraulic_shock">Hydraulic shock load</option>
+            <option value="organic_shock">Organic shock load</option>
+            <option value="nitrogen_shock">Nitrogen shock load</option>
+            <option value="paa_exposure">PAA exposure</option>
+            <option value="chlorine_exposure">Chlorine exposure</option>
+            <option value="low_do">Low DO event</option>
+            <option value="ph_excursion">pH excursion</option>
+            <option value="temp_shock">Temperature shock</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+      </div>
+      <div class="field-group cols1">
+        <div class="field"><label>Notes</label><input type="text" id="event-notes" placeholder="Describe what happened..." style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:15px;padding:11px 12px;outline:none"></div>
+      </div>
+      <button class="btn-primary" onclick="logStressEvent()" style="margin-top:4px">Log stress event</button>
+    </div>
+
+    <div class="section-label">Stress event history</div>
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <span style="font-size:12px;color:var(--text3)" id="event-count">0 events logged</span>
+        <button class="btn-secondary" style="font-size:12px;padding:6px 12px" onclick="clearEvents()">Clear</button>
+      </div>
+      <div id="event-history"><p style="font-size:13px;color:var(--text3);text-align:center;padding:16px">No events logged yet.</p></div>
+    </div>
+
+  </div>
+
+  <!-- PANEL: INFO -->
+  <div class="panel" id="panel-info">
+
+    <div class="section-label">Dairy MBBR — quick reference</div>
+
+    <div class="card" style="margin-bottom:12px">
+      <div class="card-title">Dairy wastewater characteristics</div>
+      <div class="result-row"><span class="rname">COD — typical range</span><span class="rval">1,000 – 10,000 mg/L (highly variable — CIP cycles spike it)</span></div>
+      <div class="result-row"><span class="rname">BOD₅</span><span class="rval">500 – 5,000 mg/L &nbsp;·&nbsp; BOD/COD ratio typically 0.20–0.35 for dairy</span></div>
+      <div class="result-row"><span class="rname">Main organics</span><span class="rval">Lactose, milk fat, whey proteins, casein — all highly biodegradable</span></div>
+      <div class="result-row"><span class="rname">Fat / oil / grease (FOG)</span><span class="rval">Can coat biofilm media and block O₂ transfer — monitor closely</span></div>
+      <div class="result-row"><span class="rname">CIP (clean-in-place) events</span><span class="rval">High pH, high COD, PAA or Cl₂ spikes — biggest shock load source in dairy</span></div>
+      <div class="result-row"><span class="rname">Ammonia source</span><span class="rval">Protein breakdown (casein, whey) — NH₃ loading directly tied to protein content</span></div>
+      <div class="result-row"><span class="rname">Phosphorus source</span><span class="rval">Milk naturally high in P — dairy wastewater typically 10–50 mg/L</span></div>
+    </div>
+
+    <div class="card" style="margin-bottom:12px">
+      <div class="card-title">Nitrogen — dairy-specific</div>
+      <div class="result-row"><span class="rname">NH₃-N in MBBR</span><span class="rval"><span class="badge b-ok">&lt; 1 mg/L</span> excellent &nbsp;<span class="badge b-warn">1–5 mg/L</span> acceptable &nbsp;<span class="badge b-bad">&gt; 5 mg/L</span> concern</span></div>
+      <div class="result-row"><span class="rname">NO₂-N</span><span class="rval"><span class="badge b-ok">&lt; 0.5 mg/L</span> normal &nbsp;<span class="badge b-warn">0.5–1 mg/L</span> elevated &nbsp;<span class="badge b-bad">&gt; 1 mg/L</span> nitrite lock</span></div>
+      <div class="result-row"><span class="rname">NO₃-N</span><span class="rval">Rises as NH₃ is oxidized — expected 10–30 mg/L in active nitrification</span></div>
+      <div class="result-row"><span class="rname">Dairy TKN</span><span class="rval">Typically 50–200 mg/L raw — much higher than municipal due to protein load</span></div>
+      <div class="result-row"><span class="rname">Nitrification competition</span><span class="rval">High COD dairy wastewater — heterotrophs outcompete nitrifiers for O₂. Keep DO high.</span></div>
+    </div>
+
+    <div class="card" style="margin-bottom:12px">
+      <div class="card-title">Dissolved oxygen — dairy MBBR</div>
+      <div class="result-row"><span class="rname">DO for nitrification</span><span class="rval"><span class="badge b-ok">≥ 3–4 mg/L</span> ideal &nbsp;<span class="badge b-warn">2–3 mg/L</span> marginal &nbsp;<span class="badge b-bad">&lt; 2 mg/L</span> limiting</span></div>
+      <div class="result-row"><span class="rname">DO for high-COD dairy</span><span class="rval">May need 4–6 mg/L due to high O₂ demand from fat and protein oxidation</span></div>
+      <div class="result-row"><span class="rname">FOG impact on O₂</span><span class="rval">Fats and oils reduce O₂ transfer efficiency — surface foam is a warning sign</span></div>
+      <div class="result-row"><span class="rname">DO saturation at 20°C</span><span class="rval">9.1 mg/L (decreases with rising temp and increasing salinity)</span></div>
+      <div class="result-row"><span class="rname">O₂ demand from dairy COD</span><span class="rval">~1.0–1.5 g O₂ per g COD removed</span></div>
+    </div>
+
+    <div class="card" style="margin-bottom:12px">
+      <div class="card-title">pH — dairy considerations</div>
+      <div class="result-row"><span class="rname">Nitrifier optimum</span><span class="rval"><span class="badge b-ok">7.5 – 8.0</span></span></div>
+      <div class="result-row"><span class="rname">Acceptable range</span><span class="rval"><span class="badge b-warn">6.8 – 8.5</span></span></div>
+      <div class="result-row"><span class="rname">Permit range</span><span class="rval"><span class="badge b-info">6.5 – 9.5</span></span></div>
+      <div class="result-row"><span class="rname">CIP acid wash risk</span><span class="rval">Nitric acid or phosphoric acid CIP can crash pH below 6.5 — nitrification stops</span></div>
+      <div class="result-row"><span class="rname">CIP caustic wash risk</span><span class="rval">NaOH CIP can spike pH above 9.5 — free ammonia toxicity and permit violation</span></div>
+      <div class="result-row"><span class="rname">Lactose fermentation</span><span class="rval">Organic acids from lactose breakdown naturally drop pH — monitor during high-load periods</span></div>
+    </div>
+
+    <div class="card" style="margin-bottom:12px">
+      <div class="card-title">Alkalinity — dairy MBBR</div>
+      <div class="result-row"><span class="rname">Healthy residual</span><span class="rval"><span class="badge b-ok">≥ 120 mg/L CaCO₃</span></span></div>
+      <div class="result-row"><span class="rname">Minimum for stability</span><span class="rval"><span class="badge b-warn">80 – 120 mg/L</span></span></div>
+      <div class="result-row"><span class="rname">Critical — supplement now</span><span class="rval"><span class="badge b-bad">&lt; 80 mg/L</span></span></div>
+      <div class="result-row"><span class="rname">Consumed per mg/L NH₃ nitrified</span><span class="rval">7.14 mg/L CaCO₃</span></div>
+      <div class="result-row"><span class="rname">Dairy alkalinity note</span><span class="rval">Raw dairy wastewater is often low in alkalinity — supplementation commonly required for stable nitrification</span></div>
+      <div class="result-row"><span class="rname">Common supplements</span><span class="rval">Sodium bicarbonate (safest), lime, soda ash</span></div>
+    </div>
+
+    <div class="card" style="margin-bottom:12px">
+      <div class="card-title">Temperature</div>
+      <div class="result-row"><span class="rname">Optimal nitrification</span><span class="rval"><span class="badge b-ok">20 – 28°C</span></span></div>
+      <div class="result-row"><span class="rname">Dairy wastewater temp</span><span class="rval">Often arrives warm (30–40°C from pasteurization / CIP) — may need cooling before MBBR</span></div>
+      <div class="result-row"><span class="rname">Above 35°C</span><span class="rval"><span class="badge b-warn">Nitrifier activity begins to decline — AOB more sensitive than heterotrophs</span></span></div>
+      <div class="result-row"><span class="rname">Impaired (&lt; 10°C)</span><span class="rval"><span class="badge b-bad">Significant rate reduction — common in winter dairy operations</span></span></div>
+      <div class="result-row"><span class="rname">Temperature correction</span><span class="rval">Rate changes ~5.8% per °C from 20°C baseline (θ = 1.058)</span></div>
+    </div>
+
+    <div class="card" style="margin-bottom:12px">
+      <div class="card-title">COD & organic loading — dairy</div>
+      <div class="result-row"><span class="rname">Typical dairy influent COD</span><span class="rval">1,000 – 10,000 mg/L (vs 200–800 mg/L for municipal)</span></div>
+      <div class="result-row"><span class="rname">BOD/COD ratio for dairy</span><span class="rval"><span class="badge b-info">0.20 – 0.35</span> — lower than municipal due to fats and refractory organics</span></div>
+      <div class="result-row"><span class="rname">Surface area loading rate (SALR)</span><span class="rval"><span class="badge b-ok">5 – 15 g COD/m²·day</span> dairy design range (higher than municipal)</span></div>
+      <div class="result-row"><span class="rname">Nitrification SALR</span><span class="rval"><span class="badge b-ok">0.5 – 2.0 g NH₃-N/m²·day</span></span></div>
+      <div class="result-row"><span class="rname">FOG loading concern</span><span class="rval">Fats &gt; 100 mg/L can foul media and reduce effective surface area — pre-treatment DAF recommended</span></div>
+      <div class="result-row"><span class="rname">Whey / high-lactose events</span><span class="rval">Can double or triple COD overnight — use shock load detection alerts</span></div>
+    </div>
+
+    <div class="card" style="margin-bottom:12px">
+      <div class="card-title">Solids & biofilm</div>
+      <div class="result-row"><span class="rname">TSS in dairy MBBR</span><span class="rval">Typically 100–500 mg/L — higher than municipal due to organic solids</span></div>
+      <div class="result-row"><span class="rname">VSS/TSS volatile fraction</span><span class="rval"><span class="badge b-ok">70 – 85%</span> healthy active biomass</span></div>
+      <div class="result-row"><span class="rname">Imhoff cone (60 min)</span><span class="rval"><span class="badge b-ok">&lt; 2 mL/L</span> good &nbsp;<span class="badge b-warn">2–5 mL/L</span> moderate &nbsp;<span class="badge b-bad">&gt; 5 mL/L</span> high</span></div>
+      <div class="result-row"><span class="rname">Biofilm thickness target</span><span class="rval">50 – 300 µm — thicker may cause O₂ diffusion limitation in high-COD dairy</span></div>
+      <div class="result-row"><span class="rname">Media fill</span><span class="rval">30–70% of tank volume — do not exceed 70%</span></div>
+      <div class="result-row"><span class="rname">FOG on media</span><span class="rval">Fat coating reduces biofilm activity — visible as white/yellow slick on media surface</span></div>
+    </div>
+
+    <div class="card" style="margin-bottom:12px">
+      <div class="card-title">Phosphorus — dairy</div>
+      <div class="result-row"><span class="rname">Dairy P levels</span><span class="rval">Typically 10–50 mg/L in raw dairy WW — much higher than municipal (3–8 mg/L)</span></div>
+      <div class="result-row"><span class="rname">Minimum for biofilm growth</span><span class="rval"><span class="badge b-warn">≥ 0.1 mg/L</span> — rarely limiting in dairy due to naturally high P</span></div>
+      <div class="result-row"><span class="rname">N:P ratio for healthy biomass</span><span class="rval">~100:1 BOD : 1 P — dairy usually P-sufficient</span></div>
+      <div class="result-row"><span class="rname">Discharge concern</span><span class="rval">High P in dairy effluent can cause eutrophication — check permit P limits</span></div>
+    </div>
+
+    <div class="card" style="margin-bottom:12px">
+      <div class="card-title">Volatile acids (VFA) — dairy</div>
+      <div class="result-row"><span class="rname">VFA:Alkalinity ratio</span><span class="rval"><span class="badge b-ok">&lt; 0.1</span> stable &nbsp;<span class="badge b-warn">0.1–0.3</span> monitor &nbsp;<span class="badge b-bad">&gt; 0.3</span> unstable</span></div>
+      <div class="result-row"><span class="rname">Dairy VFA source</span><span class="rval">Lactose ferments quickly to lactic and acetic acid — elevated VFA common after production surges</span></div>
+      <div class="result-row"><span class="rname">Lactic acid</span><span class="rval">Primary VFA from dairy — drops pH rapidly if alkalinity is insufficient</span></div>
+      <div class="result-row"><span class="rname">CIP acid contribution</span><span class="rval">Acid CIP steps contribute directly to VFA — coordinate CIP discharge timing with plant ops</span></div>
+    </div>
+
+    <div class="card" style="margin-bottom:12px">
+      <div class="card-title">CIP chemical inhibition — dairy specific</div>
+      <div class="result-row"><span class="rname">Free chlorine (Cl₂)</span><span class="rval"><span class="badge b-warn">0.05–0.1 mg/L</span> low risk &nbsp;<span class="badge b-bad">&gt; 0.1 mg/L</span> inhibitory to AOB</span></div>
+      <div class="result-row"><span class="rname">Peracetic acid (PAA)</span><span class="rval"><span class="badge b-warn">0.1–0.5 mg/L</span> monitor &nbsp;<span class="badge b-bad">&gt; 0.5 mg/L</span> inhibitory</span></div>
+      <div class="result-row"><span class="rname">Dairy CIP frequency</span><span class="rval">Typically 1–3× per day — each event is a potential chemical shock to MBBR</span></div>
+      <div class="result-row"><span class="rname">Caustic NaOH (CIP)</span><span class="rval">pH spike risk — dilute or equalize before entering MBBR</span></div>
+      <div class="result-row"><span class="rname">Iodophors (iodine sanitizers)</span><span class="rval">Also inhibitory to nitrifiers — treat same as chlorine</span></div>
+      <div class="result-row"><span class="rname">Quaternary ammonium (QAC)</span><span class="rval"><span class="badge b-bad">Highly toxic to biofilm</span> even at low concentrations — do not allow to enter MBBR</span></div>
+      <div class="result-row"><span class="rname">Best practice</span><span class="rval">Equalization tank before MBBR to blend and dilute CIP events — reduces shock loading significantly</span></div>
+    </div>
+
+    <div class="card" style="margin-bottom:12px">
+      <div class="card-title">Neutralizer stoichiometry</div>
+      <div class="result-row"><span class="rname">Sodium thiosulfate</span><span class="rval">2.2 mg/L per mg/L Cl₂ or PAA</span></div>
+      <div class="result-row"><span class="rname">Sodium bisulfite</span><span class="rval">1.5 mg/L per mg/L Cl₂ or PAA</span></div>
+      <div class="result-row"><span class="rname">Ascorbic acid</span><span class="rval">2.5 mg/L per mg/L Cl₂ or PAA</span></div>
+      <div class="result-row"><span class="rname">Reaction time</span><span class="rval">Thiosulfate and bisulfite react within seconds. PAA decomposition slower — allow adequate contact time before MBBR inlet.</span></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Bacterial growth phases</div>
+      <div class="result-row"><span class="rname" style="color:var(--blue)">Lag phase</span><span class="rval">Bacteria adapting — common after CIP shock, startup, or temperature change</span></div>
+      <div class="result-row"><span class="rname" style="color:var(--green2)">Exponential phase</span><span class="rval">Rapid growth, high substrate utilization — ideal operating condition</span></div>
+      <div class="result-row"><span class="rname" style="color:var(--amber)">Stationary phase</span><span class="rval">Growth equals decay — stable biofilm, substrate may be limiting</span></div>
+      <div class="result-row"><span class="rname" style="color:var(--red)">Decline phase</span><span class="rval">Net negative growth — chemical toxicity, O₂ crash, or FOG fouling of media</span></div>
+      <div class="result-row"><span class="rname">Min SRT for nitrifiers</span><span class="rval">3–10 days depending on temperature — critical in dairy where CIP events can washout nitrifier population</span></div>
+      <div class="result-row"><span class="rname">Dairy nitrifier recovery</span><span class="rval">After a toxic CIP event, nitrifier population can take 1–3 weeks to fully recover — expect elevated NH₃ during this period</span></div>
+    </div>
+
+  </div>
+
+  <!-- PANEL: LOG -->
+  <div class="panel" id="panel-log">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <span style="font-size:13px;color:var(--text3)" id="log-count-m">0 entries saved</span>
+      <div style="display:flex;gap:8px">
+        <button class="btn-secondary" onclick="exportCSV()" style="color:var(--green2);border-color:rgba(29,158,117,.4)">Export CSV</button>
+        <button class="btn-secondary" onclick="showClearConfirm()" id="clear-log-btn">Clear</button>
+      </div>
+    </div>
+
+    <div id="clear-confirm-box" style="display:none;background:rgba(226,75,74,.12);border:1px solid rgba(226,75,74,.4);border-radius:12px;padding:14px;margin-bottom:12px">
+      <p style="font-size:13px;color:var(--red);font-weight:600;margin-bottom:6px">Delete all log entries?</p>
+      <p style="font-size:12px;color:var(--text2);margin-bottom:12px;line-height:1.5">This will permanently delete all saved entries from local storage and cannot be undone. Tap <strong>Export CSV</strong> first if you want a backup.</p>
+      <div style="display:flex;gap:8px">
+        <button class="btn-secondary" onclick="confirmClearLog()" style="flex:1;color:var(--red);border-color:rgba(226,75,74,.4);font-weight:600">Yes, delete all</button>
+        <button class="btn-secondary" onclick="hideClearConfirm()" style="flex:1">Cancel</button>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:12px">
+      <div class="log-scroll"><div id="log-table-m"><p style="font-size:13px;color:var(--text3);text-align:center;padding:20px">No data yet. Enter parameters and tap + Log.</p></div></div>
+    </div>
+
+    <div class="section-label">NH₃ & NO₃ trend (lbs/day)</div>
+    <div class="card">
+      <div class="chart-wrap" style="height:220px"><canvas id="trend-chart-m"></canvas></div>
+    </div>
+    <div class="section-label">BOD to city trend (lbs/day)</div>
+    <div class="card">
+      <div class="chart-wrap" style="height:200px"><canvas id="bod-trend-chart-m"></canvas></div>
+    </div>
+    <div class="section-label">TSS removal trend (%)</div>
+    <div class="card">
+      <div class="chart-wrap" style="height:180px"><canvas id="tss-trend-chart-m"></canvas></div>
+    </div>
+  </div>
+
+</div><!-- end scroll-area -->
+
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav">
+  <button class="nav-btn active" id="nav-input" onclick="showTab('input')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+    Input
+  </button>
+  <button class="nav-btn" id="nav-results" onclick="showTab('results')" style="position:relative">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+    Results
+    <span class="nav-dot" id="permit-dot" style="display:none"></span>
+  </button>
+  <button class="nav-btn" id="nav-cod" onclick="showTab('cod')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+    COD/BOD
+  </button>
+  <button class="nav-btn" id="nav-pounds" onclick="showTab('pounds')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+    Lbs
+  </button>
+  <button class="nav-btn" id="nav-bio" onclick="showTab('bio')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 2a10 10 0 0 1 10 10c0 4-2.5 7.4-6 9"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10"/><circle cx="12" cy="12" r="3"/><path d="M12 9V5M15 12h4M12 15v4M9 12H5"/></svg>
+    Growth
+  </button>
+  <button class="nav-btn" id="nav-diag" onclick="showTab('diag')" style="position:relative">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+    Diag
+    <span class="nav-dot" id="diag-dot" style="display:none"></span>
+  </button>
+  <button class="nav-btn" id="nav-info" onclick="showTab('info')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    Ref
+  </button>
+  <button class="nav-btn" id="nav-log" onclick="showTab('log')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+    Log
+  </button>
+</nav>
+
+</div><!-- end unit-shell mbbr -->
+
+<!-- SAF UNIT -->
+<div class="unit-shell" id="unit-saf">
+
+<div class="app-header">
+  <button class="hamburger" onclick="openMenu()" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+  <div style="flex:1;margin-left:10px">
+    <div class="app-title">Daily COD Test</div>
+    <div class="app-subtitle">WW · Primary Eff. · BOD · City</div>
+  </div>
+  <div class="header-badge">COD</div>
+</div>
+
+<div class="scroll-area" id="saf-scroll-area">
+
+  <!-- DAILY COD INPUT -->
+  <div class="panel active" id="saf-panel-input">
+
+    <div class="section-label">Daily COD test — enter lab results</div>
+    <p class="note" style="padding:0 16px 12px;margin:0">Enter pH, turbidity, and COD for each sampling point. Leave blank if not tested today.</p>
+
+    <!-- BOD -->
+    <div class="card" style="margin-bottom:12px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+        <div style="width:10px;height:10px;border-radius:50%;background:var(--red);flex-shrink:0"></div>
+        <div class="card-title" style="margin:0">BOD — heavy solids</div>
+      </div>
+      <div class="field-group cols1" style="grid-template-columns:1fr 1fr">
+        <div class="field"><label>pH</label><input type="number" id="bod_ph" value="" step="0.1" min="0" max="14" placeholder="—"></div>
+        <div class="field"><label>COD (mg/L)</label><input type="number" id="bod_cod" value="" step="1" min="0" placeholder="—"></div>
+      </div>
+    </div>
+
+    <!-- WW -->
+    <div class="card" style="margin-bottom:12px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+        <div style="width:10px;height:10px;border-radius:50%;background:var(--amber);flex-shrink:0"></div>
+        <div class="card-title" style="margin:0">WW</div>
+      </div>
+      <div class="field-group cols1" style="grid-template-columns:1fr 1fr 1fr">
+        <div class="field"><label>pH</label><input type="number" id="pit_ph" value="" step="0.1" min="0" max="14" placeholder="—"></div>
+        <div class="field"><label>Turbidity (NTU)</label><input type="number" id="pit_turb" value="" step="0.1" min="0" placeholder="—"></div>
+        <div class="field"><label>COD (mg/L)</label><input type="number" id="pit_cod" value="" step="1" min="0" placeholder="—"></div>
+      </div>
+    </div>
+
+    <!-- PRIMARY EFFLUENT -->
+    <div class="card" style="margin-bottom:12px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+        <div style="width:10px;height:10px;border-radius:50%;background:var(--blue);flex-shrink:0"></div>
+        <div class="card-title" style="margin:0">Primary effluent</div>
+      </div>
+      <div class="field-group cols1" style="grid-template-columns:1fr 1fr 1fr">
+        <div class="field"><label>pH</label><input type="number" id="pe_ph" value="" step="0.1" min="0" max="14" placeholder="—"></div>
+        <div class="field"><label>Turbidity (NTU)</label><input type="number" id="pe_turb" value="" step="0.1" min="0" placeholder="—"></div>
+        <div class="field"><label>COD (mg/L)</label><input type="number" id="pe_cod" value="" step="1" min="0" placeholder="—"></div>
+      </div>
+    </div>
+
+    <!-- CITY -->
+    <div class="card" style="margin-bottom:16px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+        <div style="width:10px;height:10px;border-radius:50%;background:var(--green2);flex-shrink:0"></div>
+        <div class="card-title" style="margin:0">City</div>
+      </div>
+      <div class="field-group cols1" style="grid-template-columns:1fr 1fr 1fr">
+        <div class="field"><label>pH</label><input type="number" id="city_ph" value="" step="0.1" min="0" max="14" placeholder="—"></div>
+        <div class="field"><label>Turbidity (NTU)</label><input type="number" id="city_turb" value="" step="0.1" min="0" placeholder="—"></div>
+        <div class="field"><label>COD (mg/L)</label><input type="number" id="city_cod" value="" step="1" min="0" placeholder="—"></div>
+      </div>
+      <div class="field-group" style="margin-top:8px">
+        <div class="field"><label>Flow (GPD)</label><input type="number" id="city_flow_mgd" value="" step="1000" min="0" placeholder="0"></div>
+        <div class="field"><label>TSS (mg/L)</label><input type="number" id="city_tss" value="" step="1" min="0" placeholder="—"></div>
+        <div class="field"><label>BOD/COD ratio (%)</label><input type="number" id="city_bod_pct" value="23" step="1" min="1" max="100"></div>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-primary" onclick="safCalculate()">Calculate</button>
+      <button class="btn-secondary" onclick="safSaveLog()">+ Log</button>
+      <button class="btn-secondary" onclick="safClearInputs()">Clear</button>
+    </div>
+  </div>
+
+  <!-- DAILY COD RESULTS -->
+  <div class="panel" id="saf-panel-results">
+    <div id="saf-alerts" style="margin-bottom:4px"></div>
+
+    <div class="section-label">Permit compliance</div>
+    <div id="saf-compliance"></div>
+
+    <div class="section-label">Lab results</div>
+    <div class="card"><div id="saf-readings-table"></div></div>
+
+    <div class="section-label">Removal efficiency</div>
+    <div class="card"><div id="saf-removal-results"></div></div>
+
+    <div class="section-label">BOD to city</div>
+    <div class="card"><div id="saf-bod-city-card"></div></div>
+  </div>
+
+  <!-- SAF LOG -->
+  <div class="panel" id="saf-panel-log">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <span style="font-size:13px;color:var(--text3)" id="saf-log-count">0 entries saved</span>
+      <div style="display:flex;gap:8px">
+        <button class="btn-secondary" onclick="safExportCSV()" style="color:var(--green2);border-color:rgba(29,158,117,.4)">Export CSV</button>
+        <button class="btn-secondary" onclick="safShowClearConfirm()" id="saf-clear-btn">Clear</button>
+      </div>
+    </div>
+    <div id="saf-clear-confirm" style="display:none;background:rgba(226,75,74,.12);border:1px solid rgba(226,75,74,.4);border-radius:12px;padding:14px;margin-bottom:12px">
+      <p style="font-size:13px;color:var(--red);font-weight:600;margin-bottom:6px">Delete all SAF log entries?</p>
+      <p style="font-size:12px;color:var(--text2);margin-bottom:12px;line-height:1.5">This permanently deletes all saved SAF entries from local storage. Export CSV first if you want a backup.</p>
+      <div style="display:flex;gap:8px">
+        <button class="btn-secondary" onclick="safConfirmClear()" style="flex:1;color:var(--red);border-color:rgba(226,75,74,.4);font-weight:600">Yes, delete all</button>
+        <button class="btn-secondary" onclick="safHideClearConfirm()" style="flex:1">Cancel</button>
+      </div>
+    </div>
+    <div class="card" style="margin-bottom:12px">
+      <div class="log-scroll"><div id="saf-log-table"><p style="font-size:13px;color:var(--text3);text-align:center;padding:20px">No data yet. Enter parameters and tap + Log.</p></div></div>
+    </div>
+    <div class="section-label">COD removal efficiency (%)</div>
+    <div class="card"><div class="chart-wrap" style="height:240px"><canvas id="saf-cod-chart"></canvas></div></div>
+    <div class="section-label">Estimated BOD to city</div>
+    <div class="card"><div class="chart-wrap" style="height:220px"><canvas id="saf-turb-chart"></canvas></div></div>
+  </div>
+
+</div><!-- end saf scroll-area -->
+
+<!-- SAF BOTTOM NAV -->
+<nav class="bottom-nav">
+  <button class="nav-btn active" id="saf-nav-input" onclick="safShowTab('input')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+    Enter
+  </button>
+  <button class="nav-btn" id="saf-nav-results" onclick="safShowTab('results')" style="position:relative">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+    Results
+    <span class="nav-dot" id="saf-permit-dot" style="display:none"></span>
+  </button>
+  <button class="nav-btn" id="saf-nav-log" onclick="safShowTab('log')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+    Log
+  </button>
+</nav>
+
+</div><!-- end unit-shell saf -->
+
+<!-- IMPORT CONFIRM BOX -->
+<div id="import-confirm-box" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:600;align-items:center;justify-content:center;padding:20px">
+  <div style="background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:20px;max-width:340px;width:100%">
+    <div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:12px">Import backup?</div>
+    <div id="import-confirm-info" style="font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:16px"></div>
+    <div style="display:flex;gap:8px">
+      <button onclick="confirmImport()" style="flex:1;background:var(--green3);color:var(--green2);border:1px solid rgba(29,158,117,.4);border-radius:10px;padding:11px;font-size:14px;font-weight:600;cursor:pointer">Import & merge</button>
+      <button onclick="cancelImport()" style="flex:1;background:var(--bg3);color:var(--text2);border:1px solid var(--border);border-radius:10px;padding:11px;font-size:14px;font-weight:600;cursor:pointer">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- IMPORT SUCCESS -->
+<div id="import-success-box" style="display:none;position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--green3);color:var(--green2);border:1px solid rgba(29,158,117,.4);border-radius:10px;padding:10px 20px;font-size:13px;font-weight:600;z-index:600;white-space:nowrap">
+  ✓ Backup imported successfully
+</div>
+
+</div><!-- end app-shell -->
+
+<!-- PDF PREVIEW OVERLAY -->
+<div id="pdf-overlay" style="display:none;position:fixed;inset:0;background:#fff;z-index:500;overflow-y:auto;-webkit-overflow-scrolling:touch;">
+  <div style="position:sticky;top:0;background:#1D9E75;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;z-index:501;">
+    <div style="font-size:15px;font-weight:600;color:#fff">Report preview</div>
+    <div style="display:flex;gap:8px">
+      <button onclick="window.print()" style="background:#0F6E56;color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer">Print / Save PDF</button>
+      <button onclick="closePDF()" style="background:rgba(255,255,255,.2);color:#fff;border:none;border-radius:8px;padding:8px 14px;font-size:13px;font-weight:600;cursor:pointer">✕ Close</button>
+    </div>
+  </div>
+  <div id="pdf-content" style="padding:20px;max-width:800px;margin:0 auto;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:#111;font-size:13px;line-height:1.5"></div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+let logData=[];
+let tC=null,bC=null,tssC=null;
+const BOD_DAILY=800,BOD_WEEKLY=650,PH_LO=6.5,PH_HI=9.5;
+const LS_KEY='mbbr_log_v1';
+
+// LOCALSTORAGE
+function saveLog(){try{localStorage.setItem(LS_KEY,JSON.stringify(logData));}catch(e){}}
+function loadLog(){try{const d=localStorage.getItem(LS_KEY);if(d){logData=JSON.parse(d);renderLog();updateLogCount();}}catch(e){logData=[];}}
+function updateLogCount(){document.getElementById('log-count-m').textContent=logData.length+' entr'+(logData.length===1?'y':'ies')+' saved'+(logData.length>0?' — persisted locally':'');}
+
+// STRESS EVENTS STORAGE
+const LS_EVENTS='mbbr_events_v1';
+let stressEvents=[];
+function saveEvents(){try{localStorage.setItem(LS_EVENTS,JSON.stringify(stressEvents));}catch(e){}}
+function loadEvents(){try{const d=localStorage.getItem(LS_EVENTS);if(d){stressEvents=JSON.parse(d);renderEvents();updateEventCount();}}catch(e){stressEvents=[];}}
+function updateEventCount(){const el=document.getElementById('event-count');if(el)el.textContent=stressEvents.length+' event'+(stressEvents.length===1?'':'s')+' logged';}
+
+function calcNeutResidual(chem){
+  const pump_ml_min = parseFloat(document.getElementById(chem+'_pump_ml_min').value)||0;
+  const stock_conc  = parseFloat(document.getElementById(chem+'_stock_conc').value)||1;
+  const gpm         = parseFloat(document.getElementById(chem+'_gpm').value)||130;
+  const sanitizer_residual = parseFloat(document.getElementById(chem+'_residual').value)||0;
+  const agent       = document.getElementById(chem+'_neutralizer').value;
+  const el          = document.getElementById(chem+'-pump-result');
+
+  const neutRatios  = {sodium_thiosulfate:2.2,sodium_bisulfite:1.5,ascorbic_acid:2.5,none:0};
+  const neutNames   = {sodium_thiosulfate:'Sodium thiosulfate',sodium_bisulfite:'Sodium bisulfite',ascorbic_acid:'Ascorbic acid',none:'None'};
+  const label       = chem==='paa'?'PAA':'Cl₂';
+  const inhibThresh = chem==='paa'?0.5:0.1;
+  const safeThresh  = chem==='paa'?0.1:0.05;
+
+  if(pump_ml_min===0){
+    el.innerHTML='<div class="alert a-info" style="margin-top:0">Enter neutralizer pump output (mL/min) to calculate remaining residual after treatment.</div>';
+    return;
+  }
+  if(agent==='none'){
+    el.innerHTML='<div class="alert a-warn" style="margin-top:0">Select a neutralization agent above to calculate remaining residual.</div>';
+    return;
+  }
+
+  // How much neutralizer is being dosed into the stream (mg/L)?
+  // pump delivers: pump_ml_min × stock_conc mg/mL = mg/min of neutralizer
+  // stream flow: gpm × 3785.41 mL/min
+  // neutralizer conc in stream (mg/L) = mg/min ÷ (stream mL/min ÷ 1000)
+  const neut_mg_per_min   = pump_ml_min * stock_conc;
+  const stream_mL_per_min = gpm * 3785.41;
+  const neut_conc_in_stream_mgL = +(neut_mg_per_min / (stream_mL_per_min / 1000)).toFixed(2);
+
+  // How much sanitizer does that neutralizer consume?
+  // neutralizer ratio = mg neutralizer per mg sanitizer
+  // sanitizer consumed (mg/L) = neutralizer dosed (mg/L) / ratio
+  const ratio = neutRatios[agent]||1;
+  const sanitizer_consumed = +(neut_conc_in_stream_mgL / ratio).toFixed(2);
+
+  // Remaining residual = titrated influent − sanitizer consumed by neutralizer
+  const remaining = Math.max(0, +(sanitizer_residual - sanitizer_consumed).toFixed(2));
+  const over      = remaining > inhibThresh;
+  const safe      = remaining <= safeThresh;
+  const color     = over ? 'var(--red)' : safe ? 'var(--green2)' : 'var(--amber)';
+  const statusTxt = over ? 'Above inhibition threshold' : safe ? 'Fully neutralized' : 'Low — monitor';
+  const statusCls = over ? 'b-bad' : safe ? 'b-ok' : 'b-warn';
+  const alertCls  = over ? 'a-bad' : safe ? 'a-ok' : 'a-warn';
+  const alertTxt  = over
+    ? `Remaining ${label} residual (${remaining} mg/L) still exceeds the ${inhibThresh} mg/L inhibition threshold. Increase neutralizer pump output.`
+    : safe
+    ? `${label} fully neutralized to ${remaining} mg/L — below the ${safeThresh} mg/L safe threshold.`
+    : `${label} residual reduced to ${remaining} mg/L — below inhibition threshold (${inhibThresh} mg/L) but worth monitoring.`;
+
+  el.innerHTML=`
+    <div style="background:var(--bg);border-radius:10px;padding:12px 14px;border:1px solid ${over?'rgba(226,75,74,.4)':safe?'rgba(29,158,117,.3)':'rgba(239,159,39,.4)'}">
+      <div style="font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Estimated ${label} residual after neutralization</div>
+      <div style="font-size:32px;font-weight:800;color:${color};line-height:1;margin-bottom:4px">${remaining} <span style="font-size:14px;font-weight:500;color:var(--text3)">mg/L</span></div>
+      <div style="margin-bottom:10px">${badge(statusTxt,statusCls)}</div>
+      ${rr('Influent '+label+' titrated',sanitizer_residual,'mg/L')}
+      ${rr('Neutralizer pump output',pump_ml_min,'mL/min')}
+      ${rr('Neutralizer in stream',neut_conc_in_stream_mgL,'mg/L ('+neutNames[agent]+')')}
+      ${rr(label+' consumed by neutralizer',sanitizer_consumed,'mg/L')}
+      ${rr(label+' remaining',remaining,'mg/L')}
+      <div class="alert ${alertCls}" style="margin-top:8px">${alertTxt}</div>
+    </div>`;
+}
+
+function clearInputs(){
+  const fields=[
+    'flow_mgd','flow_gpd',
+    'eff_nh3','eff_no2','eff_no3','eff_tkn',
+    'inf_nh3','inf_no2','inf_no3','inf_tkn',
+    'inf_cod','eff_cod',
+    'eff_ph','inf_ph','eff_do','inf_do',
+    'eff_alk','inf_alk','eff_p','inf_p',
+    'vol_acids','eff_tss','inf_tss','eff_vss','inf_vss','imhoff'
+  ];
+  fields.forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+}
+
+function calcDiag(){
+  const inf_nh3=gv('inf_nh3'),eff_nh3=gv('eff_nh3');
+  const inf_cod=gv('inf_cod'),eff_cod=gv('eff_cod');
+  const inf_tss=gv('inf_tss'),eff_tss=gv('eff_tss');
+  const eff_do=gv('eff_do'),eff_ph=gv('eff_ph');
+  const flow=gv('flow_mgd'),temp=gv('temp');
+  const eff_no2=gv('eff_no2'),eff_alk=gv('eff_alk');
+  const paa_res=gv('paa_residual'),paa_gpm=gv('paa_gpm')||130;
+  const cl2_res=gv('cl2_residual'),cl2_gpm=gv('cl2_gpm')||130;
+  const paa_neutralizer=document.getElementById('paa_neutralizer').value;
+  const cl2_neutralizer=document.getElementById('cl2_neutralizer').value;
+
+  // Stoichiometric ratios: mg neutralizer needed per mg/L of sanitizer
+  // These are weight ratios — lbs neutralizer per lb sanitizer at 1 mg/L
+  const neutRatios={sodium_thiosulfate:2.2,sodium_bisulfite:1.5,ascorbic_acid:2.5,none:0};
+  const neutNames={sodium_thiosulfate:'Sodium thiosulfate',sodium_bisulfite:'Sodium bisulfite',ascorbic_acid:'Ascorbic acid',none:'None'};
+  // Stock solution concentrations (% w/v → g/100mL → mg/mL)
+  const neutStockMgPerMl={sodium_thiosulfate:125,sodium_bisulfite:380,ascorbic_acid:100,none:1};
+
+  function neutCalc(residual, gpm, agent){
+    const ratio=neutRatios[agent]||0;
+    const neut_conc_mgL=+(residual*ratio).toFixed(2);                        // mg/L neutralizer needed in stream
+    const flow_gpd=gpm*1440;                                                  // GPD
+    const flow_mgd=flow_gpd/1e6;
+    const neut_lbs_day=+(neut_conc_mgL*flow_mgd*8.34).toFixed(2);           // lbs/day
+    const neut_lbs_min=+(neut_lbs_day/1440).toFixed(4);                      // lbs/min
+    const neut_oz_min=+(neut_lbs_min*16).toFixed(2);                         // oz/min
+    // mL of stock solution per L of stream: (mg/L needed) / (mg/mL of stock)
+    const stockConc=neutStockMgPerMl[agent]||1;
+    const neut_mL_per_L=+(neut_conc_mgL/stockConc).toFixed(4);              // mL stock / L stream
+    return{ratio,neut_conc_mgL,flow_gpd,flow_mgd,neut_lbs_day,neut_lbs_min,neut_oz_min,neut_mL_per_L,stockConc};
+  }
+
+  // PAA ASSESSMENT
+  const paaSeverity=paa_res<=0.1?0:paa_res<=0.5?1:paa_res<=2?2:3;
+  const paaScore=Math.min(100,Math.round(paa_res/3*100));
+  const paaLabels=['No inhibition concern','Low — monitor','Moderate inhibition likely','Severe — biofilm at risk'];
+  const paaCls=['b-ok','b-warn','b-warn','b-bad'];
+  const pN=neutCalc(paa_res,paa_gpm,paa_neutralizer);
+  document.getElementById('paa-result').innerHTML=
+    rr('PAA residual tested',paa_res,'mg/L',badge(paaLabels[paaSeverity],paaCls[paaSeverity]))+
+    rr('Flow at dosing point',paa_gpm+' GPM','→ '+(pN.flow_gpd.toLocaleString())+' GPD')+
+    (paa_neutralizer!=='none'?
+      '<div class="divider"></div>'+
+      rr('Neutralizer required',pN.neut_conc_mgL,'mg/L in stream')+
+      rr('',pN.neut_mL_per_L,'mL/L in stream ('+pN.stockConc+' mg/mL stock)')+
+      rr('Neutralizer dose rate',pN.neut_lbs_day.toLocaleString(),'lbs/day')+
+      rr('',pN.neut_lbs_min,'lbs/min')+
+      rr('',pN.neut_oz_min,'oz/min')+
+      rr('Stoichiometric ratio','1 mg/L PAA : '+pN.ratio+' mg/L '+neutNames[paa_neutralizer],'')
+    :'<div class="alert a-warn" style="margin-top:8px">No neutralizer selected. Select an agent to calculate required dose.</div>')+
+    (paa_res>0.5?'<div class="alert a-warn" style="margin-top:8px">PAA residual above 0.5 mg/L is inhibitory to AOB nitrifiers. Dose neutralizer upstream of MBBR and verify residual drops below 0.1 mg/L before contact.</div>':'')+
+    (paa_res>0&&paa_res<=0.1?'<div class="alert a-ok" style="margin-top:8px">PAA residual below inhibitory threshold. Continue monitoring.</div>':'')+
+    (paa_res===0?'<div class="alert a-info" style="margin-top:8px">Enter your tested PAA residual to calculate neutralizer dose.</div>':'');
+
+  // CHLORINE ASSESSMENT
+  const cl2Severity=cl2_res<=0.05?0:cl2_res<=0.1?1:cl2_res<=0.5?2:3;
+  const cl2Score=Math.min(100,Math.round(cl2_res/0.6*100));
+  const cl2Labels=['No inhibition concern','Low — verify neutralization','Moderate — nitrification likely impacted','Severe — immediate action needed'];
+  const cl2Cls=['b-ok','b-warn','b-warn','b-bad'];
+  const cN=neutCalc(cl2_res,cl2_gpm,cl2_neutralizer);
+  document.getElementById('cl2-result').innerHTML=
+    rr('Cl₂ residual tested',cl2_res,'mg/L',badge(cl2Labels[cl2Severity],cl2Cls[cl2Severity]))+
+    rr('Flow at dosing point',cl2_gpm+' GPM','→ '+(cN.flow_gpd.toLocaleString())+' GPD')+
+    (cl2_neutralizer!=='none'?
+      '<div class="divider"></div>'+
+      rr('Neutralizer required',cN.neut_conc_mgL,'mg/L in stream')+
+      rr('',cN.neut_mL_per_L,'mL/L in stream ('+cN.stockConc+' mg/mL stock)')+
+      rr('Neutralizer dose rate',cN.neut_lbs_day.toLocaleString(),'lbs/day')+
+      rr('',cN.neut_lbs_min,'lbs/min')+
+      rr('',cN.neut_oz_min,'oz/min')+
+      rr('Stoichiometric ratio','1 mg/L Cl₂ : '+cN.ratio+' mg/L '+neutNames[cl2_neutralizer],'')
+    :'<div class="alert a-warn" style="margin-top:8px">No neutralizer selected. Select an agent to calculate required dose.</div>')+
+    (cl2_res>0.1?'<div class="alert a-bad" style="margin-top:8px">Free chlorine above 0.1 mg/L is inhibitory to nitrifiers. Even brief exposures above 0.5 mg/L can cause significant AOB population loss. Neutralize upstream of MBBR.</div>':'')+
+    (cl2_res>0&&cl2_res<=0.05?'<div class="alert a-ok" style="margin-top:8px">Cl₂ residual below inhibitory threshold. Continue monitoring.</div>':'')+
+    (cl2_res===0?'<div class="alert a-info" style="margin-top:8px">Enter your tested Cl₂ residual to calculate neutralizer dose.</div>':'');
+  const typicalFlow=0.180;
+  const flowRatio=typicalFlow>0?flow/typicalFlow:1;
+  const hydraulicShock=flowRatio>1.5;
+  const hydraulicSeverity=Math.min(100,Math.round((flowRatio-1)*100));
+  const codRemEff=inf_cod>0?(inf_cod-eff_cod)/inf_cod*100:0;
+  const organicShock=inf_cod>8000||(eff_cod>2000);
+  const organicScore=Math.min(100,Math.round(Math.max(0,inf_cod>0?(inf_cod-3000)/inf_cod*100:0)));
+  const nh3RemEff=inf_nh3>0?(inf_nh3-eff_nh3)/inf_nh3*100:0;
+  const eff_nh3_diag=gv('eff_nh3'),eff_no2_diag=gv('eff_no2');
+  const nitrogenShock=eff_nh3_diag>20||(eff_nh3_diag>10&&eff_no2_diag>0.5);
+  const nitrogenScore=Math.min(100,Math.round(Math.max(0,eff_nh3_diag>0?(eff_nh3_diag-10)/eff_nh3_diag*100:0)));
+  const doShock=eff_do<1.0;
+  const doScore=Math.min(100,Math.round(Math.max(0,(2.5-eff_do)/2.5*100)));
+  const phLow=eff_ph>0&&eff_ph<6.8,phHigh=eff_ph>8.5;
+  const phShock=phLow||phHigh;
+  const phScore=eff_ph>0?Math.min(100,Math.round(Math.max(0,phLow?(6.8-eff_ph)/1.5*100:(eff_ph-8.5)/1.0*100))):0;
+  const tempShock=temp<10||temp>30;
+  const tempScore=Math.min(100,Math.round(temp<10?(10-temp)/10*100:temp>30?(temp-30)/10*100:0));
+  const no2Lock=eff_no2>1.0;
+  const no2Score=Math.min(100,Math.round(Math.min(eff_no2/3*100,100)));
+
+  // Pull additional parameters needed for expanded health score
+  const inf_alk  = gv('inf_alk');
+  const va       = gv('vol_acids');
+  const imhoff   = gv('imhoff');
+  const eff_p    = gv('eff_p');
+  const eff_vss  = gv('eff_vss');
+  const inf_vss  = gv('inf_vss');
+
+  // Growth phase data — recalculate key growth metrics inline
+  const mu_max   = gv('mu_max')||0.8;
+  const ks       = gv('ks_nh3')||0.5;
+  const ko_do    = gv('ko_do')||0.5;
+  const kd       = gv('kd')||0.05;
+  const mu_s_h   = mu_max*(eff_nh3/(ks+eff_nh3));
+  const mu_do_h  = eff_do/(ko_do+eff_do);
+  const mu_gross = mu_s_h*mu_do_h*Math.pow(1.058,temp-20);
+  const mu_net_h = mu_gross - kd;
+
+  // ── SCORE EACH FACTOR (0=perfect, 100=worst) ───────────────────
+  // Only include factor if the relevant input is populated (>0 or valid)
+
+  const factors=[];
+
+  // 1. DO — always relevant, 0 is edge case not "unpopulated"
+  factors.push({name:'Dissolved oxygen',score:doScore,weight:0.14,populated:true});
+
+  // 2. pH — only if entered (>0)
+  if(eff_ph>0) factors.push({name:'pH stability',score:phScore,weight:0.10,populated:true});
+
+  // 3. Chlorine residual
+  if(cl2_res>0) factors.push({name:'Chlorine residual',score:cl2Score,weight:0.12,populated:true});
+
+  // 4. PAA residual
+  if(paa_res>0) factors.push({name:'PAA residual',score:paaScore,weight:0.10,populated:true});
+
+  // 5. Nitrite (NO2) — 0 is valid default, include always
+  factors.push({name:'Nitrite accumulation',score:no2Score,weight:0.08,populated:true});
+
+  // 6. Nitrogen loading — only if inf_nh3 entered
+  if(inf_nh3>0) factors.push({name:'Nitrogen loading',score:nitrogenScore,weight:0.08,populated:true});
+
+  // 7. Organic loading — only if COD entered
+  if(inf_cod>0) factors.push({name:'Organic (COD) loading',score:organicScore,weight:0.07,populated:true});
+
+  // 8. Alkalinity — only if effluent alk entered
+  if(eff_alk>0){
+    const alkScore=eff_alk<50?100:eff_alk<80?Math.round((80-eff_alk)/30*80):eff_alk<120?Math.round((120-eff_alk)/40*40):0;
+    factors.push({name:'Alkalinity',score:Math.min(100,alkScore),weight:0.09,populated:true});
+  }
+
+  // 9. VFA:Alkalinity ratio — only if both va and alk entered
+  if(va>0&&inf_alk>0){
+    const vaRatioH=va/inf_alk;
+    const vaScore=vaRatioH<0.1?0:vaRatioH<0.3?Math.round((vaRatioH-0.1)/0.2*60):Math.min(100,Math.round(60+(vaRatioH-0.3)/0.3*40));
+    factors.push({name:'VFA:Alkalinity stability',score:vaScore,weight:0.07,populated:true});
+  }
+
+  // 10. Temperature — always a factor
+  factors.push({name:'Temperature',score:tempScore,weight:0.06,populated:true});
+
+  // 11. Imhoff / settleable solids — only if entered
+  if(imhoff>0){
+    const imhoffScore=imhoff<2?0:imhoff<5?Math.round((imhoff-2)/3*30):imhoff<10?Math.round(30+(imhoff-5)/5*50):Math.min(100,80+Math.round((imhoff-10)/5*20));
+    factors.push({name:'Settleable solids (Imhoff)',score:imhoffScore,weight:0.04,populated:true});
+  }
+
+  // 12. TSS removal — only if both entered
+  if(inf_tss>0&&eff_tss>=0){
+    const tssRemH=inf_tss>0?(inf_tss-eff_tss)/inf_tss*100:100;
+    const tssScore=tssRemH>80?0:tssRemH>60?Math.round((80-tssRemH)/20*40):Math.min(100,40+Math.round((60-tssRemH)/60*60));
+    factors.push({name:'TSS removal efficiency',score:Math.max(0,tssScore),weight:0.04,populated:true});
+  }
+
+  // 13. VSS/TSS volatile fraction — biofilm sloughing signal
+  if(eff_vss>0&&eff_tss>0&&inf_vss>0&&inf_tss>0){
+    const vfEff=eff_vss/eff_tss,vfInf=inf_vss/inf_tss;
+    const sloughScore=vfEff>vfInf+0.1?Math.min(100,Math.round((vfEff-vfInf)*200)):0;
+    if(sloughScore>0) factors.push({name:'Biofilm sloughing signal',score:sloughScore,weight:0.04,populated:true});
+  }
+
+  // 14. Phosphorus limitation — only if effluent P entered
+  if(eff_p>0){
+    const pScore=eff_p<0.05?80:eff_p<0.1?40:0;
+    if(pScore>0) factors.push({name:'Phosphorus limitation',score:pScore,weight:0.03,populated:true});
+  }
+
+  // 15. Net growth rate — always calculable from growth inputs
+  {
+    const growthScore=mu_net_h>0.02?0:mu_net_h>0?Math.round((0.02-mu_net_h)/0.02*40):Math.min(100,40+Math.round(Math.abs(mu_net_h)/0.05*60));
+    factors.push({name:'Bacterial net growth rate',score:growthScore,weight:0.06,populated:true});
+  }
+
+  // 16. Hydraulic shock
+  if(flow>0) factors.push({name:'Hydraulic loading',score:hydraulicSeverity,weight:0.03,populated:true});
+
+  // ── DYNAMIC REWEIGHTING ─────────────────────────────────────────
+  // Normalize weights so they always sum to 1.0 regardless of which
+  // factors are included
+  const totalWeight=factors.reduce((s,f)=>s+f.weight,0);
+  const normalized=factors.map(f=>({...f,normWeight:f.weight/totalWeight}));
+  const weightedStress=normalized.reduce((s,f)=>s+f.score*f.normWeight,0);
+  const healthScore=Math.round(Math.max(0,Math.min(100,100-weightedStress)));
+
+  let healthLabel,healthColor;
+  if(healthScore>=85){healthLabel='Healthy';healthColor='var(--green2)';}
+  else if(healthScore>=70){healthLabel='Mild stress';healthColor='var(--green)';}
+  else if(healthScore>=50){healthLabel='Moderate stress';healthColor='var(--amber)';}
+  else if(healthScore>=30){healthLabel='High stress';healthColor='var(--red)';}
+  else{healthLabel='Critical';healthColor='var(--red)';}
+  document.getElementById('health-score-num').textContent=healthScore;
+  document.getElementById('health-score-num').style.color=healthColor;
+  document.getElementById('health-status-label').textContent=healthLabel;
+  document.getElementById('health-status-label').style.color=healthColor;
+
+  // Show factor count so operators know how many inputs are in the score
+  const existingSubtitle=document.getElementById('health-factor-count');
+  if(existingSubtitle) existingSubtitle.textContent=`Based on ${factors.length} of 16 possible factors`;
+  else{
+    const scoreEl=document.getElementById('health-score-num');
+    const cnt=document.createElement('div');
+    cnt.id='health-factor-count';
+    cnt.style.cssText='font-size:11px;color:var(--text3);margin-top:4px';
+    cnt.textContent=`Based on ${factors.length} of 16 possible factors`;
+    scoreEl.parentNode.insertBefore(cnt,scoreEl.nextSibling.nextSibling);
+  }
+
+  // Stress bars — sorted worst first
+  const sorted=[...normalized].sort((a,b)=>b.score-a.score);
+  let sbHTML='';
+  sorted.forEach(f=>{
+    const c=f.score<30?'var(--green)':f.score<60?'var(--amber)':'var(--red)';
+    const pct_wt=Math.round(f.normWeight*100);
+    sbHTML+=`<div class="stress-bar-row"><span class="stress-bar-name">${f.name}<span style="font-size:9px;color:var(--text3);margin-left:4px">${pct_wt}%</span></span><div class="stress-bar-track"><div class="stress-bar-fill" style="width:${f.score}%;background:${c}"></div></div><span class="stress-bar-val">${f.score}</span></div>`;
+  });
+  document.getElementById('stress-bars').innerHTML=sbHTML;
+
+  // SHOCK RESULTS
+  const shocks=[
+    {name:'Hydraulic shock',active:hydraulicShock,detail:`Flow ${flow} MGD — ${flowRatio.toFixed(2)}× baseline. Check for production surge or CIP discharge.`,sev:hydraulicSeverity},
+    {name:'Organic shock',active:organicShock,detail:`COD: inf ${inf_cod} mg/L / eff ${eff_cod} mg/L. Dairy threshold: inf > 8,000 mg/L or eff > 2,000 mg/L may indicate CIP or whey event.`,sev:organicScore},
+    {name:'Nitrogen shock',active:nitrogenShock,detail:`NH₃ in MBBR: ${eff_nh3_diag} mg/L. High NH₃ from protein breakdown — check if production increased.`,sev:nitrogenScore},
+    {name:'DO crash',active:doShock,detail:`DO: ${eff_do} mg/L (threshold: 1.0 mg/L). High dairy COD increases O₂ demand — check aeration.`,sev:doScore},
+    {name:'pH excursion',active:phShock,detail:`pH: ${eff_ph}. Dairy risk: acid CIP below 6.5 stops nitrification, caustic CIP above 9.5 causes free ammonia toxicity.`,sev:phScore},
+    {name:'Temperature stress',active:tempShock,detail:`Temp: ${temp}°C (optimal: 20–28°C). Check if hot CIP or pasteurizer water is entering the MBBR.`,sev:tempScore},
+    {name:'Nitrite lock',active:no2Lock,detail:`NO₂: ${eff_no2} mg/L (threshold: 1.0 mg/L). Common after CIP chemical shock to NOB population.`,sev:no2Score},
+  ];
+  let shockHTML='';
+  const activeShocks=shocks.filter(s=>s.active);
+  if(!activeShocks.length){shockHTML='<div class="alert a-ok">No shock load conditions detected.</div>';}
+  else{activeShocks.forEach(s=>{
+    const cls=s.sev<40?'b-warn':'b-bad';
+    shockHTML+=`<div class="chem-card"><div class="chem-header"><span class="chem-name">${s.name}</span>${badge(s.sev<40?'Mild':'Severe',cls)}</div><div style="font-size:12px;color:var(--text2);line-height:1.5">${s.detail}</div><div class="stress-bar-track" style="margin-top:8px"><div class="stress-bar-fill" style="width:${s.sev}%;background:${s.sev<40?'var(--amber)':'var(--red)'}"></div></div></div>`;
+  });}
+  shocks.filter(s=>!s.active).forEach(s=>{
+    shockHTML+=`<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);font-size:13px"><span style="color:var(--text2)">${s.name}</span>${badge('Normal','b-ok')}</div>`;
+  });
+  document.getElementById('shock-results').innerHTML=shockHTML;
+
+  // TOXICITY SUMMARY
+  let toxHTML='';
+  const toxIssues=[];
+  if(cl2_res>0.1)toxIssues.push({name:'Free chlorine',val:cl2_res+' mg/L',threshold:'0.1 mg/L',action:'Likely from CIP sanitizing step. Verify sodium thiosulfate or bisulfite neutralization upstream of MBBR. Test residual at the MBBR inlet — not just at the dosing point. Coordinate CIP discharge timing with operations.'});
+  if(paa_res>0.5)toxIssues.push({name:'Peracetic acid',val:paa_res+' mg/L',threshold:'0.5 mg/L',action:'Likely from CIP PAA sanitizing step. PAA half-life is pH and temperature dependent — lower pH and lower temp slow breakdown. Allow additional contact time or increase neutralizer dose before MBBR inlet.'});
+  if(eff_no2>1.0)toxIssues.push({name:'Nitrite / free nitrous acid',val:eff_no2+' mg/L',threshold:'1.0 mg/L',action:'Elevated NO₂ often follows a CIP chemical shock that selectively damaged the NOB (Nitrobacter) population. AOB recovers faster than NOB. Maintain stable conditions — nitrifier balance typically restores in 1–3 weeks.'});
+  if(eff_ph>0&&(eff_ph<6.5||eff_ph>9.5))toxIssues.push({name:'pH out of permit range',val:eff_ph.toFixed(2),threshold:'6.5–9.5',action:'In dairy, sudden pH drops often trace to acid CIP (nitric/phosphoric acid) or lactic acid from lactose fermentation. Sudden pH spikes trace to caustic CIP (NaOH). Identify and equalize or neutralize the source before MBBR.'});
+  if(temp>35)toxIssues.push({name:'High temperature stress',val:temp+'°C',threshold:'≤35°C',action:'Hot CIP water, pasteurizer discharge, or warm dairy process water may be entering the MBBR. Temperatures above 35°C reduce nitrifier activity. Investigate source and add cooling or equalization if needed.'});
+  if(temp<8)toxIssues.push({name:'Cold temperature inhibition',val:temp+'°C',threshold:'≥8°C',action:'Cold weather or cold dairy process water is slowing nitrification. Expect elevated NH₃ and reduced nitrifier activity. Monitor closely and reduce loading if effluent NH₃ climbs.'});
+  if(!toxIssues.length){toxHTML='<div class="alert a-ok">No active chemical inhibition or toxicity conditions detected.</div>';}
+  else{toxIssues.forEach(t=>{toxHTML+=`<div class="rec-card bad" style="margin-bottom:8px"><div class="rec-title">${t.name} — ${t.val} (threshold: ${t.threshold})</div><div class="rec-body">${t.action}</div></div>`;});}
+  document.getElementById('toxicity-results').innerHTML=toxHTML;
+
+  // Nav dot
+  const diagAlert=activeShocks.length>0||cl2_res>0.1||paa_res>0.5||healthScore<40;
+  document.getElementById('diag-dot').style.display=diagAlert?'block':'none';
+}
+
+function logStressEvent(){
+  const type=document.getElementById('event-type').value;
+  const notes=document.getElementById('event-notes').value.trim();
+  const typeLabels={hydraulic_shock:'Hydraulic shock',organic_shock:'Organic shock',nitrogen_shock:'Nitrogen shock',paa_exposure:'PAA exposure',chlorine_exposure:'Chlorine exposure',low_do:'Low DO event',ph_excursion:'pH excursion',temp_shock:'Temperature shock',other:'Other'};
+  const typeCls={hydraulic_shock:'b-warn',organic_shock:'b-warn',nitrogen_shock:'b-warn',paa_exposure:'b-bad',chlorine_exposure:'b-bad',low_do:'b-bad',ph_excursion:'b-warn',temp_shock:'b-warn',other:'b-info'};
+  stressEvents.unshift({date:new Date().toLocaleString(),type,label:typeLabels[type],cls:typeCls[type],notes:notes||'No additional notes.',flow:gv('flow_mgd'),eff_nh3:gv('eff_nh3'),eff_do:gv('eff_do'),paa:gv('paa_residual'),cl2:gv('cl2_residual'),ph:gv('eff_ph')});
+  document.getElementById('event-notes').value='';
+  saveEvents();renderEvents();updateEventCount();
+}
+
+function renderEvents(){
+  if(!stressEvents.length){document.getElementById('event-history').innerHTML='<p style="font-size:13px;color:var(--text3);text-align:center;padding:16px">No events logged yet.</p>';return;}
+  let h='';
+  stressEvents.forEach((e,i)=>{
+    h+=`<div class="event-row"><div class="event-left"><div class="event-date">${e.date}</div><div class="event-desc">${badge(e.label,e.cls)} ${e.notes}</div><div style="font-size:11px;color:var(--text3);margin-top:4px">Flow: ${e.flow} MGD &nbsp;·&nbsp; NH₃: ${e.eff_nh3} mg/L &nbsp;·&nbsp; DO: ${e.eff_do} mg/L &nbsp;·&nbsp; pH: ${e.ph} &nbsp;·&nbsp; PAA: ${e.paa} &nbsp;·&nbsp; Cl₂: ${e.cl2}</div></div><div class="event-right"><button class="del-btn" onclick="delEvent(${i})">×</button></div></div>`;
+  });
+  document.getElementById('event-history').innerHTML=h;
+}
+
+function delEvent(i){stressEvents.splice(i,1);saveEvents();renderEvents();updateEventCount();}
+function clearEvents(){stressEvents=[];saveEvents();renderEvents();updateEventCount();}
+
+function gv(id){return parseFloat(document.getElementById(id).value)||0}
+function sv(id,v){document.getElementById(id).value=v}
+function lbs(c,f){return +(c*f*8.34).toFixed(2)}
+function pct(a,b){return a>0?+((a-b)/a*100).toFixed(2):0}
+function rr(n,v,u,b){return`<div class="result-row"><span class="rname">${n}</span><span class="rval">${v}${u?`<span class="runit">${u}</span>`:''}${b?b:''}</span></div>`}
+function badge(t,cls){return`<span class="badge ${cls}">${t}</span>`}
+
+// FLOW SYNC
+document.getElementById('flow_mgd').addEventListener('input',function(){sv('flow_gpd',+(gv('flow_mgd')*1e6).toFixed(0))});
+document.getElementById('flow_gpd').addEventListener('input',function(){sv('flow_mgd',+(gv('flow_gpd')/1e6).toFixed(6))});
+
+// CUSTOM CALC
+document.getElementById('custom_conc').addEventListener('input',calcCustom);
+document.getElementById('custom_flow').addEventListener('input',calcCustom);
+function calcCustom(){document.getElementById('custom_result').textContent=lbs(gv('custom_conc'),gv('custom_flow')).toLocaleString()}
+
+// RATIO SLIDER
+document.getElementById('ratio-slider-m').addEventListener('input',function(){
+  document.getElementById('ratio-slider-val-m').textContent=this.value+'%';
+  sv('bod_cod_pct',this.value);updateSlider();
+});
+document.getElementById('bod_cod_pct').addEventListener('input',function(){
+  document.getElementById('ratio-slider-m').value=this.value;
+  document.getElementById('ratio-slider-val-m').textContent=this.value+'%';updateSlider();
+});
+function updateSlider(){
+  const r=gv('bod_cod_pct')/100,f=gv('flow_mgd');
+  const ei=+(gv('inf_cod')*r).toFixed(2),ee=+(gv('eff_cod')*r).toFixed(2);
+  document.getElementById('ratio-slider-results-m').innerHTML=
+    rr('Est. influent BOD',ei,'mg/L')+rr('Est. effluent BOD (city)',ee,'mg/L')+rr('BOD to city',lbs(ee,f).toLocaleString(),'lbs/day',badge('Discharge est.','b-info'));
+}
+
+function showTab(name){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('panel-'+name).classList.add('active');
+  document.getElementById('nav-'+name).classList.add('active');
+  document.getElementById('scroll-area').scrollTop=0;
+  if(name==='log')renderTrendCharts();
+}
+
+function getBOD(cod,isInf){
+  const d=isInf?gv('inf_bod'):gv('eff_bod');
+  if(d>0)return{val:d,src:'direct'};
+  const r=gv('bod_cod_pct')/100;
+  return{val:+(cod*r).toFixed(2),src:'est. '+gv('bod_cod_pct')+'% of COD'};
+}
+function bioLabel(r){
+  if(r>=0.35)return{t:'Good biodegradability for dairy',c:'b-ok'};
+  if(r>=0.20)return{t:'Typical dairy range',c:'b-warn'};
+  return{t:'Low — high refractory COD',c:'b-bad'};
+}
+
+function buildWeeklyMobile(){
+  const days=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  let lh='',ih='';
+  days.forEach((d,i)=>{
+    lh+=`<div class="week-day">${d}</div>`;
+    ih+=`<div><input type="number" id="mwb_${i}" value="0" step="1" min="0" oninput="updateWeeklyMobile()"></div>`;
+  });
+  document.getElementById('weekly-day-labels').innerHTML=lh;
+  document.getElementById('weekly-inputs-mobile').innerHTML=ih;
+}
+
+function updateWeeklyMobile(){
+  const vals=[];for(let i=0;i<7;i++)vals.push(parseFloat(document.getElementById('mwb_'+i).value)||0);
+  const filled=vals.filter(v=>v>0);
+  const sum=vals.reduce((a,b)=>a+b,0);
+  const avg=filled.length>0?+(sum/filled.length).toFixed(2):0;
+  const mx=Math.max(...vals,0);
+  const wFail=avg>BOD_WEEKLY&&filled.length>0;
+  const dFail=vals.some(v=>v>BOD_DAILY&&v>0);
+  const pw=Math.min(100,+(avg/BOD_WEEKLY*100).toFixed(2));
+  const pd=Math.min(100,+(mx/BOD_DAILY*100).toFixed(2));
+  const cw=wFail?'var(--red)':avg>BOD_WEEKLY*.85?'var(--amber)':'var(--green)';
+  const cd=dFail?'var(--red)':mx>BOD_DAILY*.85?'var(--amber)':'var(--green)';
+  document.getElementById('weekly-results-mobile').innerHTML=`
+    <div class="tracker-grid">
+      <div class="tracker-stat">
+        <div class="t-label">7-day average</div>
+        <div><span class="t-val">${avg}</span><span class="t-unit">lbs/day</span></div>
+        <div class="bar-bg"><div class="bar-fill" style="width:${pw}%;background:${cw}"></div></div>
+        <div style="font-size:10px;color:var(--text3)">${pw}% of 650 limit</div>
+        <div style="margin-top:6px">${badge(wFail?'Weekly FAIL':'Weekly OK',wFail?'b-bad':'b-ok')}</div>
+      </div>
+      <div class="tracker-stat">
+        <div class="t-label">Peak day</div>
+        <div><span class="t-val">${mx}</span><span class="t-unit">lbs/day</span></div>
+        <div class="bar-bg"><div class="bar-fill" style="width:${pd}%;background:${cd}"></div></div>
+        <div style="font-size:10px;color:var(--text3)">${pd}% of 800 limit</div>
+        <div style="margin-top:6px">${badge(dFail?'Daily FAIL':'Daily OK',dFail?'b-bad':'b-ok')}</div>
+      </div>
+    </div>
+    <div class="tracker-note">${filled.length}/7 days entered &nbsp;·&nbsp; Week total: ${sum.toLocaleString()} lbs &nbsp;·&nbsp; Headroom daily: ${Math.max(0,BOD_DAILY-mx).toLocaleString()} lbs/day &nbsp;·&nbsp; Headroom weekly avg: ${Math.max(0,BOD_WEEKLY-avg).toFixed(2)} lbs/day</div>`;
+}
+
+function calculate(){
+  const flow=gv('flow_mgd');
+  const inf={nh3:gv('inf_nh3'),no2:gv('inf_no2'),no3:gv('inf_no3'),tkn:gv('inf_tkn'),alk:gv('inf_alk'),p:gv('inf_p'),tss:gv('inf_tss'),vss:gv('inf_vss'),do_:gv('inf_do'),cod:gv('inf_cod'),ph:gv('inf_ph')};
+  const eff={nh3:gv('eff_nh3'),no2:gv('eff_no2'),no3:gv('eff_no3'),tkn:gv('eff_tkn'),alk:gv('eff_alk'),p:gv('eff_p'),tss:gv('eff_tss'),vss:gv('eff_vss'),do_:gv('eff_do'),cod:gv('eff_cod'),ph:gv('eff_ph')};
+  const va=gv('vol_acids'),imhoff=gv('imhoff'),temp=gv('temp'),vgal=gv('mbbr_vol'),fill=gv('media_fill'),ssa=gv('media_ssa');
+  const ratio=gv('bod_cod_pct')/100;
+  const bl=bioLabel(ratio);
+  document.getElementById('biodegrad_label').innerHTML=`<span class="badge ${bl.c}">${bl.t}</span>`;
+
+  const infBOD=getBOD(inf.cod,true),effBOD=getBOD(eff.cod,false);
+  const effBodLbs=lbs(effBOD.val,flow);
+  const codRem=pct(inf.cod,eff.cod),bodRem=infBOD.val>0?pct(infBOD.val,effBOD.val):0;
+  const tssPct=pct(inf.tss,eff.tss);
+  const hrt=vgal>0&&flow>0?+((vgal/(flow*1e6))*24).toFixed(2):0;
+  const dnh3=inf.nh3-eff.nh3,nitriEff=pct(inf.nh3,eff.nh3);
+  const o2req=+(4.57*dnh3).toFixed(2),alkCons=+(7.14*dnh3).toFixed(2);
+  const k20=0.5,kT=+(k20*Math.pow(1.058,temp-20)).toFixed(2);
+  const vm3=vgal*0.003785,mvm3=vm3*(fill/100),ma=mvm3*ssa,fm3d=flow*3785.41;
+  const salr=ma>0?+((dnh3*fm3d/1000)/ma*1000).toFixed(2):0;
+  const dailyPass=effBodLbs<=BOD_DAILY;
+  const phPass=eff.ph>=PH_LO&&eff.ph<=PH_HI&&eff.ph>0;
+  const vaRatio=inf.alk>0?+(va/inf.alk).toFixed(2):0;
+  const alkDrop=inf.alk-eff.alk,alkPred=+(7.14*dnh3).toFixed(2);
+  const vfEff=eff.tss>0?+((eff.vss/eff.tss)*100).toFixed(2):0;
+  const vfInf=inf.tss>0?+((inf.vss/inf.tss)*100).toFixed(2):0;
+
+  // PERMIT dot indicator
+  const anyFail=!dailyPass||!phPass||(effBodLbs>BOD_WEEKLY);
+  document.getElementById('permit-dot').style.display=anyFail?'block':'none';
+
+  // SUMMARY ALERTS
+  let sa='';
+  if(!dailyPass)sa+=`<div class="alert a-bad">BOD (${effBodLbs} lbs/day) exceeds 800 lbs/day daily limit.</div>`;
+  if(effBodLbs>BOD_WEEKLY&&dailyPass)sa+=`<div class="alert a-warn">BOD above 650 lbs/day — weekly average at risk.</div>`;
+  if(!phPass&&eff.ph>0)sa+=`<div class="alert a-bad">pH ${eff.ph} is outside 6.5–9.5 permit range.</div>`;
+  if(!sa)sa='<div class="alert a-ok">BOD and pH are within permit limits.</div>';
+  document.getElementById('summary-alerts-mobile').innerHTML=sa;
+
+  // COMPLIANCE
+  let comp='';
+  comp+=`<div class="permit-card ${dailyPass?'permit-pass':'permit-fail'}">
+    <div class="permit-name">BOD — daily maximum</div>
+    <div class="permit-detail">Permit limit: 800 lbs/day</div>
+    <div class="permit-bottom">
+      <div><div class="permit-value">${effBodLbs.toLocaleString()} lbs/day</div><div class="permit-limit">Max: 800 lbs/day</div></div>
+      ${badge(dailyPass?'Pass':'FAIL',dailyPass?'b-ok':'b-bad')}${effBodLbs>BOD_WEEKLY&&dailyPass?badge('Above weekly avg','b-warn'):''}
+    </div>
+  </div>`;
+  comp+=`<div class="permit-card ${effBodLbs<=BOD_WEEKLY?'permit-pass':'permit-fail'}">
+    <div class="permit-name">BOD — weekly average</div>
+    <div class="permit-detail">Permit limit: 650 lbs/day avg</div>
+    <div class="permit-bottom">
+      <div><div class="permit-value">${effBodLbs.toLocaleString()} lbs/day</div><div class="permit-limit">Avg: 650 lbs/day</div></div>
+      ${badge(effBodLbs<=BOD_WEEKLY?'Pass':'FAIL',effBodLbs<=BOD_WEEKLY?'b-ok':'b-bad')}
+    </div>
+  </div>`;
+  comp+=`<div class="permit-card ${eff.ph===0?'permit-fail':phPass?'permit-pass':'permit-fail'}">
+    <div class="permit-name">pH</div>
+    <div class="permit-detail">Permit range: 6.5 – 9.5</div>
+    <div class="permit-bottom">
+      <div><div class="permit-value">${eff.ph>0?eff.ph.toFixed(2):'Not entered'}</div><div class="permit-limit">Range: 6.5–9.5</div></div>
+      ${badge(eff.ph===0?'FAIL':phPass?'Pass':'FAIL',eff.ph===0||!phPass?'b-bad':'b-ok')}
+    </div>
+  </div>`;
+  document.getElementById('compliance-mobile').innerHTML=comp;
+
+  // SUMMARY METRICS
+  document.getElementById('summary-metrics-mobile').innerHTML=`
+    <div class="metric-card"><div class="metric-label">NH₃ removal</div><div class="metric-value">${pct(inf.nh3,eff.nh3)}%</div></div>
+    <div class="metric-card"><div class="metric-label">COD removal</div><div class="metric-value">${codRem}%</div></div>
+    <div class="metric-card"><div class="metric-label">VSS/TSS ratio</div><div class="metric-value">${eff.tss>0?+((eff.vss/eff.tss)*100).toFixed(2):0}%</div><div class="metric-unit">volatile fraction</div></div>
+    <div class="metric-card"><div class="metric-label">HRT</div><div class="metric-value">${hrt}</div><div class="metric-unit">hours</div></div>`;
+
+  // BOD HIGHLIGHTS
+  document.getElementById('bod-highlights').innerHTML=`
+    <div class="cod-hl"><div class="chl-label">Eff. BOD</div><div class="chl-val">${effBOD.val}<span class="chl-unit">mg/L</span></div><div class="chl-note">${effBOD.src}</div></div>
+    <div class="cod-hl"><div class="chl-label">To city</div><div class="chl-val">${effBodLbs.toLocaleString()}<span class="chl-unit">lbs/d</span></div><div class="chl-note">${badge(dailyPass?'Under limit':'Over limit',dailyPass?'b-ok':'b-bad')}</div></div>
+    <div class="cod-hl"><div class="chl-label">Removed</div><div class="chl-val">${(lbs(infBOD.val,flow)-effBodLbs).toLocaleString()}<span class="chl-unit">lbs/d</span></div><div class="chl-note">${bodRem}% removal</div></div>`;
+  document.getElementById('bod-alerts-mobile').innerHTML=
+    (!dailyPass?`<div class="alert a-bad">BOD exceeds 800 lbs/day by ${(effBodLbs-BOD_DAILY).toFixed(2)} lbs/day.</div>`:'')+
+    (effBodLbs>BOD_WEEKLY&&dailyPass?`<div class="alert a-warn">Above 650 lbs/day weekly avg limit.</div>`:'')+
+    (effBodLbs<=BOD_WEEKLY?'<div class="alert a-ok">Within both BOD permit limits.</div>':'');
+
+  // NITRIFICATION
+  let na='';
+  if(eff.nh3>3)na+=`<div class="alert a-warn">NH₃ at ${eff.nh3} mg/L — may indicate nitrification stress or incomplete nitrification.</div>`;
+  if(eff.no2>0.5)na+=`<div class="alert a-warn">Nitrite ${eff.no2} mg/L — possible nitrite lock.</div>`;
+  if(eff.nh3<1&&eff.no2<0.3)na+=`<div class="alert a-ok">NH₃ and NO₂ both low — nitrification performing well.</div>`;
+  if(eff.do_<2)na+=`<div class="alert a-bad">DO ${eff.do_} mg/L — low for MBBR biofilm, may limit nitrification.</div>`;
+  document.getElementById('nitri-alerts-mobile').innerHTML=na;
+  document.getElementById('nitri-metrics-mobile').innerHTML=
+    rr('NH₃-N in MBBR',eff.nh3,'mg/L')+
+    rr('NO₂-N in MBBR',eff.no2,'mg/L',eff.no2>0.5?badge('Elevated','b-warn'):badge('Normal','b-ok'))+
+    rr('NO₃-N in MBBR',eff.no3,'mg/L')+
+    rr('k_T at '+temp+'°C',kT,'hr⁻¹')+
+    rr('O₂ required for nitrification',o2req,'mg/L')+
+    rr('Alk. consumed by nitrification',alkCons,'mg/L CaCO₃')+
+    rr('Media surface area',ma.toFixed(2),'m²')+
+    rr('NH₃ SALR',salr,'g/m²·day',salr>3?badge('High','b-warn'):badge('OK','b-ok'));
+
+  // SOLIDS
+  const iCls=imhoff<5?'b-ok':imhoff<10?'b-warn':'b-bad';
+  const iTxt=imhoff<5?'Low':imhoff<10?'Moderate':'High';
+  document.getElementById('solids-metrics-mobile').innerHTML=`
+    <div class="metric-card"><div class="metric-label">TSS</div><div class="metric-value">${eff.tss}</div><div class="metric-unit">mg/L</div></div>
+    <div class="metric-card"><div class="metric-label">VSS</div><div class="metric-value">${eff.vss}</div><div class="metric-unit">mg/L</div></div>
+    <div class="metric-card"><div class="metric-label">VSS/TSS</div><div class="metric-value">${eff.tss>0?+((eff.vss/eff.tss)*100).toFixed(2):0}%</div><div class="metric-unit">volatile fraction</div></div>
+    <div class="metric-card"><div class="metric-label">Imhoff 60min</div><div class="metric-value">${imhoff}</div><div class="metric-unit">mL/L ${badge(iTxt,iCls)}</div></div>`;
+  const tIn=lbs(eff.tss,flow);
+  document.getElementById('tss-results-mobile').innerHTML=
+    rr('TSS in tank',eff.tss,'mg/L')+
+    rr('VSS in tank',eff.vss,'mg/L')+
+    rr('TSS loading (lbs/day)',tIn.toLocaleString(),'lbs/day')+
+    rr('VSS loading (lbs/day)',lbs(eff.vss,flow).toLocaleString(),'lbs/day')+
+    rr('VSS/TSS volatile fraction',eff.tss>0?+((eff.vss/eff.tss)*100).toFixed(2)+'%':'—','')+
+    rr('Imhoff settleable solids',imhoff,'mL/L');
+
+  // ALKALINITY
+  let aa='';
+  if(eff.alk<80)aa=`<div class="alert a-bad">Alkalinity ${eff.alk} mg/L — critically low. Risk of pH crash and nitrification failure.</div>`;
+  else if(eff.alk<120)aa=`<div class="alert a-warn">Alkalinity ${eff.alk} mg/L — below 120 mg/L. Monitor pH closely.</div>`;
+  else aa=`<div class="alert a-ok">Alkalinity adequate at ${eff.alk} mg/L.</div>`;
+  if(vaRatio>0.3)aa+=`<div class="alert a-bad">VFA:Alk ratio ${vaRatio} — anaerobic activity suspected.</div>`;
+  document.getElementById('alk-alerts-mobile').innerHTML=aa;
+  document.getElementById('alk-results-mobile').innerHTML=
+    rr('Alkalinity in tank',eff.alk,'mg/L CaCO₃')+
+    rr('Alk. consumed by nitrification (predicted)',alkPred,'mg/L')+
+    rr('VFA:Alk ratio',vaRatio,'',badge(vaRatio<0.1?'Stable':vaRatio<0.3?'Monitor':'Unstable',vaRatio<0.1?'b-ok':vaRatio<0.3?'b-warn':'b-bad'))+
+    rr('Volatile acids',gv('vol_acids'),'mg/L');
+
+  // PHOSPHORUS
+  document.getElementById('phos-results-mobile').innerHTML=
+    rr('Phosphorus in tank',eff.p,'mg/L')+
+    rr('P loading',lbs(eff.p,flow).toLocaleString(),'lbs/day')+
+    (eff.p<0.1?'<div class="alert a-warn" style="margin-top:8px">P below 0.1 mg/L — possible nutrient limitation for biofilm growth.</div>':'');
+
+  // NUTRIENT RATIO — BOD:N:P (100:5:1)
+  const bod_tank = +(gv('bod_cod_pct')/100 * eff.cod).toFixed(2);  // BOD estimated from effluent COD
+  const n_tank   = eff.nh3 + eff.no2 + eff.no3;                    // total inorganic N as proxy
+  const p_tank   = eff.p;
+  // Normalize everything to P=1 basis
+  const bod_per_p = p_tank>0 ? +(bod_tank/p_tank).toFixed(2) : null;
+  const n_per_p   = p_tank>0 ? +(n_tank/p_tank).toFixed(2)   : null;
+  // Required ratios: BOD:N:P = 100:5:1
+  // N needed for current BOD: BOD/20  (i.e. 100:5 → N = BOD×5/100)
+  // P needed for current BOD: BOD/100
+  const n_required  = +(bod_tank * 5 / 100).toFixed(2);
+  const p_required  = +(bod_tank / 100).toFixed(2);
+  const n_status    = n_tank >= n_required ? 'sufficient' : 'deficient';
+  const p_status    = p_tank >= p_required ? 'sufficient' : 'deficient';
+  const n_surplus   = +(n_tank - n_required).toFixed(2);
+  const p_surplus   = +(p_tank - p_required).toFixed(2);
+  const n_cls       = n_status==='sufficient' ? 'b-ok' : 'b-bad';
+  const p_cls       = p_status==='sufficient' ? 'b-ok' : 'b-bad';
+  // Actual ratio string normalized to P
+  const actualRatioStr = p_tank>0 ? `${bod_per_p} : ${n_per_p} : 1` : '— (P not entered)';
+
+  let nrHTML = '';
+  nrHTML += `<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px">
+    <div class="metric-card"><div class="metric-label">BOD (est.)</div><div class="metric-value" style="font-size:18px">${bod_tank}</div><div class="metric-unit">mg/L</div></div>
+    <div class="metric-card"><div class="metric-label">Total N</div><div class="metric-value" style="font-size:18px">${n_tank.toFixed(2)}</div><div class="metric-unit">mg/L</div></div>
+    <div class="metric-card"><div class="metric-label">Phosphorus</div><div class="metric-value" style="font-size:18px">${p_tank}</div><div class="metric-unit">mg/L</div></div>
+  </div>`;
+  nrHTML += rr('Target ratio','100 : 5 : 1','BOD : N : P');
+  nrHTML += rr('Your actual ratio',actualRatioStr,'BOD : N : P');
+  nrHTML += '<div class="divider"></div>';
+  nrHTML += rr('N required for BOD load',n_required,'mg/L',badge('Need '+n_required+' mg/L','b-info'));
+  nrHTML += rr('N available',n_tank.toFixed(2),'mg/L',badge(n_status,n_cls));
+  nrHTML += rr('N surplus / deficit',(n_surplus>=0?'+':'')+n_surplus,'mg/L');
+  nrHTML += rr('P required for BOD load',p_required,'mg/L',badge('Need '+p_required+' mg/L','b-info'));
+  nrHTML += rr('P available',p_tank,'mg/L',badge(p_status,p_cls));
+  nrHTML += rr('P surplus / deficit',(p_surplus>=0?'+':'')+p_surplus,'mg/L');
+  nrHTML += '<div class="divider"></div>';
+  if(n_status==='deficient')
+    nrHTML += `<div class="alert a-bad">Nitrogen is deficient by ${Math.abs(n_surplus).toFixed(2)} mg/L relative to your BOD load. Biofilm growth will be nitrogen-limited. In dairy this can occur during heavy dilution or low-protein production runs.</div>`;
+  else if(p_status==='deficient')
+    nrHTML += `<div class="alert a-warn">Phosphorus is deficient by ${Math.abs(p_surplus).toFixed(2)} mg/L relative to your BOD load. Unusual for dairy — check if P is being chemically precipitated upstream.</div>`;
+  else
+    nrHTML += `<div class="alert a-ok">Nutrients are sufficient for your organic load. Both N and P exceed the 100:5:1 minimum — typical for dairy wastewater.</div>`;
+  nrHTML += `<p class="note" style="margin-top:8px">Total N calculated as NH₃-N + NO₂-N + NO₃-N. BOD estimated from effluent COD × BOD/COD ratio. Dairy wastewater is rarely nutrient-limited due to naturally high protein and phosphorus content.</p>`;
+  document.getElementById('nutrient-ratio-results').innerHTML=nrHTML;
+
+  // CARBON — TOC ESTIMATE & C:N RATIO
+  // TOC ≈ COD ÷ 2.67 (theoretical conversion for typical organic matter)
+  const toc_inf  = +(inf.cod / 2.67).toFixed(2);
+  const toc_eff  = +(eff.cod / 2.67).toFixed(2);
+  const toc_removed = +(toc_inf - toc_eff).toFixed(2);
+  const toc_removal_pct = inf.cod>0 ? pct(toc_inf, toc_eff) : 0;
+
+  // Carbon in biomass from VSS (bacterial cells ~50% C by dry weight)
+  const c_in_biomass = +(eff.vss * 0.50).toFixed(2);
+
+  // C:N ratio — TOC vs TKN (most meaningful for biological treatment)
+  const cn_ratio = eff.tkn>0 ? +(toc_eff / eff.tkn).toFixed(2) : null;
+  const cn_inf   = inf.tkn>0  ? +(toc_inf  / inf.tkn).toFixed(2)  : null;
+
+  // C:N interpretation for MBBR biofilm
+  // Optimal heterotrophic growth: C:N ~20:1 to 30:1
+  // Nitrification favored when C:N drops below 5:1 (less competition from heterotrophs)
+  // Denitrification needs C:N > 4:1 as carbon source
+  let cn_status, cn_cls, cn_note;
+  if(cn_ratio===null){
+    cn_status='—'; cn_cls='b-info'; cn_note='Enter TKN to calculate C:N ratio.';
+  } else if(cn_ratio>30){
+    cn_status='High — heterotrophic dominance'; cn_cls='b-warn';
+    cn_note='High C:N favors heterotrophs over nitrifiers. In dairy this is common during high-fat/lactose events. Ensure DO is elevated to maintain nitrification despite competition.';
+  } else if(cn_ratio>=20){
+    cn_status='Balanced — good for BOD removal'; cn_cls='b-ok';
+    cn_note='C:N in the optimal range for heterotrophic BOD removal. Nitrifiers can coexist but may need elevated DO to compete.';
+  } else if(cn_ratio>=5){
+    cn_status='Moderate — nitrification favorable'; cn_cls='b-ok';
+    cn_note='C:N ratio supports both BOD removal and nitrification. Good balance for a combined MBBR system.';
+  } else if(cn_ratio>=3){
+    cn_status='Low — nitrification dominant'; cn_cls='b-warn';
+    cn_note='Low C:N means limited organic carbon relative to nitrogen. Nitrifiers will thrive but heterotrophic BOD removal may slow. Common in dairy when protein load is high relative to lactose/fat.';
+  } else {
+    cn_status='Very low — carbon limiting'; cn_cls='b-bad';
+    cn_note='Very low C:N — organic carbon is insufficient relative to nitrogen load. Biofilm growth may be carbon-limited. Check COD loading and consider whether upstream pre-treatment is removing too much carbon.';
+  }
+
+  // Carbon loading lbs/day
+  const toc_inf_lbs = lbs(toc_inf, flow);
+  const toc_eff_lbs = lbs(toc_eff, flow);
+
+  let cHTML = '';
+  cHTML += `<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
+    <div class="metric-card"><div class="metric-label">Est. TOC influent</div><div class="metric-value" style="font-size:18px">${toc_inf}</div><div class="metric-unit">mg/L</div></div>
+    <div class="metric-card"><div class="metric-label">Est. TOC effluent</div><div class="metric-value" style="font-size:18px">${toc_eff}</div><div class="metric-unit">mg/L</div></div>
+    <div class="metric-card"><div class="metric-label">TOC removed</div><div class="metric-value" style="font-size:18px">${toc_removal_pct}%</div><div class="metric-unit">${toc_removed} mg/L</div></div>
+    <div class="metric-card"><div class="metric-label">C in biomass (VSS)</div><div class="metric-value" style="font-size:18px">${c_in_biomass}</div><div class="metric-unit">mg C/L (~50% of VSS)</div></div>
+  </div>`;
+  cHTML += `<div class="formula-box" style="margin-bottom:10px">TOC (mg/L) ≈ COD (mg/L) ÷ 2.67</div>`;
+  cHTML += rr('TOC influent (est.)', toc_inf, 'mg/L');
+  cHTML += rr('TOC effluent (est.)', toc_eff, 'mg/L');
+  cHTML += rr('TOC loading in', toc_inf_lbs.toLocaleString(), 'lbs/day');
+  cHTML += rr('TOC loading out', toc_eff_lbs.toLocaleString(), 'lbs/day');
+  cHTML += rr('TOC removed', (toc_inf_lbs - toc_eff_lbs).toLocaleString(), 'lbs/day');
+  cHTML += '<div class="divider"></div>';
+  cHTML += rr('C:N ratio (influent)', cn_inf !== null ? cn_inf+' : 1' : '—', '');
+  cHTML += rr('C:N ratio (tank)', cn_ratio !== null ? cn_ratio+' : 1' : '—', '', badge(cn_status, cn_cls));
+  cHTML += rr('Optimal for BOD removal', '20–30 : 1', '');
+  cHTML += rr('Optimal for nitrification', '5–10 : 1', '');
+  cHTML += rr('Min for denitrification', '> 4 : 1', '');
+  cHTML += `<div class="alert ${cn_ratio===null?'a-info':cn_cls==='b-ok'?'a-ok':cn_cls==='b-warn'?'a-warn':'a-bad'}" style="margin-top:10px">${cn_note}</div>`;
+  cHTML += `<p class="note" style="margin-top:8px">TOC is estimated using the theoretical conversion COD ÷ 2.67. This assumes organic matter similar to glucose (C₆H₁₂O₆). Dairy fats have a higher COD:TOC ratio (~2.9) and proteins slightly lower (~2.5) — actual TOC may vary ±15%. For precise TOC, a dedicated TOC analyzer is required.</p>`;
+  document.getElementById('carbon-results').innerHTML=cHTML;
+
+  // O2
+  document.getElementById('o2-results-mobile').innerHTML=
+    rr('DO in tank',eff.do_,'mg/L')+
+    rr('O₂ required for nitrification',o2req,'mg/L → '+lbs(o2req,flow)+' lbs/day')+
+    (eff.do_<2?'<div class="alert a-bad" style="margin-top:8px">DO &lt; 2 mg/L — check aeration.</div>':'<div class="alert a-ok" style="margin-top:8px">DO adequate for biofilm nitrification.</div>');
+
+  // COD PANEL
+  document.getElementById('cod-conc-m').innerHTML=
+    rr('Inf. COD',inf.cod,'mg/L')+rr('Eff. COD',eff.cod,'mg/L')+rr('COD removal',codRem+'%','')+
+    '<div class="divider"></div>'+
+    rr('Inf. BOD ('+infBOD.src+')',infBOD.val,'mg/L')+
+    rr('Eff. BOD ('+effBOD.src+')',effBOD.val,'mg/L')+
+    rr('BOD/COD ratio',(ratio*100).toFixed(2)+'%','',badge(bl.t,bl.c));
+  document.getElementById('cod-inf-m').innerHTML=rr('COD in',lbs(inf.cod,flow).toLocaleString(),'lbs/day')+rr('BOD in',lbs(infBOD.val,flow).toLocaleString(),'lbs/day');
+  document.getElementById('cod-eff-m').innerHTML=rr('COD out',lbs(eff.cod,flow).toLocaleString(),'lbs/day')+rr('BOD out',effBodLbs.toLocaleString(),'lbs/day',badge('Sent to city','b-info'));
+  document.getElementById('cod-ratio-m').innerHTML=
+    rr('Your ratio',(ratio*100).toFixed(2)+'%','')+
+    rr('Dairy wastewater (typical)','20–35%','')+
+    rr('Dairy after pre-treatment','15–25%','')+
+    rr('Municipal for comparison','50–65%','');
+  document.getElementById('ratio-slider-m').value=gv('bod_cod_pct');
+  document.getElementById('ratio-slider-val-m').textContent=gv('bod_cod_pct')+'%';
+  updateSlider();
+
+  // POUNDS
+  const params=[
+    {n:'NH₃-N (MBBR)',i:inf.nh3,e:eff.nh3},{n:'NO₂-N (MBBR)',i:inf.no2,e:eff.no2},
+    {n:'NO₃-N (MBBR)',i:inf.no3,e:eff.no3},{n:'TKN (MBBR)',i:inf.tkn,e:eff.tkn},
+    {n:'COD influent',i:inf.cod,e:0},{n:'COD effluent',i:0,e:eff.cod},
+    {n:'BOD (est. effluent)',i:0,e:effBOD.val},
+    {n:'Alkalinity',i:inf.alk,e:0},{n:'Phosphorus',i:inf.p,e:0},
+    {n:'TSS',i:inf.tss,e:0},{n:'VSS',i:inf.vss,e:0},
+  ];
+  let ih='',eh='',rh='';
+  params.forEach(p=>{
+    const il=lbs(p.i,flow),el=lbs(p.e,flow),rem=+(il-el).toFixed(2),rp=p.i>0?pct(p.i,p.e):0;
+    ih+=rr(p.n,il.toLocaleString(),'lbs/day');
+    eh+=rr(p.n,el.toLocaleString(),'lbs/day');
+    rh+=rr(p.n,rem.toLocaleString()+' ('+rp+'%)','' ,badge(rem>=0?'Removed':'Increase',rem>=0?'b-ok':'b-bad'));
+  });
+  document.getElementById('inf-pounds-m').innerHTML=ih;
+  document.getElementById('eff-pounds-m').innerHTML=eh;
+  document.getElementById('removal-pounds-m').innerHTML=rh;
+
+  calcCustom();
+  updateWeeklyMobile();
+  calcGrowth();
+  calcDiag();
+}
+
+function saveToLog(){
+  const flow=gv('flow_mgd');
+  const effBOD=getBOD(gv('eff_cod'),false);
+  const infBOD=getBOD(gv('inf_cod'),true);
+  const ebl=lbs(effBOD.val,flow),ph=gv('eff_ph');
+  logData.push({
+    date:new Date().toLocaleString(),flow,
+    eff_nh3:gv('eff_nh3'),eff_no3:gv('eff_no3'),
+    inf_cod:gv('inf_cod'),eff_cod:gv('eff_cod'),eff_bod:effBOD.val,eff_ph:ph,
+    inf_tss:gv('inf_tss'),eff_tss:gv('eff_tss'),alk:gv('eff_alk'),imhoff:gv('imhoff'),
+    nh3_lbs:lbs(gv('inf_nh3'),flow),no3_lbs:lbs(gv('eff_no3'),flow),
+    bod_lbs:ebl,tss_rem:pct(gv('inf_tss'),gv('eff_tss')),
+    bod_pass:ebl<=BOD_DAILY,ph_pass:ph>=PH_LO&&ph<=PH_HI&&ph>0
+  });
+  saveLog();renderLog();renderTrendCharts();updateLogCount();
+}
+
+// GROWTH PHASE CALCULATION
+function calcGrowth(){
+  const eff_nh3=gv('eff_nh3'),eff_do=gv('eff_do'),temp=gv('temp');
+  const inf_nh3=gv('inf_nh3'),inf_vss=gv('inf_vss'),eff_vss=gv('eff_vss');
+  const inf_tss=gv('inf_tss'),eff_tss=gv('eff_tss');
+  const eff_no2=gv('eff_no2'),eff_alk=gv('eff_alk'),eff_p=gv('eff_p');
+  const mu_max=gv('mu_max')||0.8;
+  const ks=gv('ks_nh3')||0.5;
+  const ko=gv('ko_do')||0.5;
+  const kd=gv('kd')||0.05;
+  const Y=gv('yield_coeff')||0.45;
+  const fill=gv('media_fill'),ssa=gv('media_ssa'),vgal=gv('mbbr_vol');
+  const flow=gv('flow_mgd');
+
+  // Auto-calculate SRT: in a MBBR with no dedicated WAS, only solids leaving
+  // are in the effluent, so SRT = Volume (gal) ÷ Effluent Flow (gal/day)
+  const flow_gpd=flow*1e6;
+  const srt_calc=flow_gpd>0?+(vgal/flow_gpd).toFixed(2):15;
+  sv('srt', srt_calc);
+  const srt=srt_calc;
+
+  // Monod specific growth rate — dual substrate (NH3 and DO)
+  const mu_s=mu_max*(eff_nh3/(ks+eff_nh3));
+  const mu_do=eff_do/(ko+eff_do);
+  const mu=+(mu_s*mu_do).toFixed(4);
+  const mu_net=+(mu-kd).toFixed(4);
+
+  // Temperature correction for nitrifier (Arrhenius θ=1.058)
+  const mu_T=+(mu_max*Math.pow(1.058,temp-20)).toFixed(4);
+  const mu_actual_T=+(mu_T*(eff_nh3/(ks+eff_nh3))*(eff_do/(ko+eff_do))-kd).toFixed(4);
+
+  // Doubling time
+  const td=mu>0?+(Math.LN2/mu*60).toFixed(2):Infinity;
+
+  // SRT check for nitrifier washout (minimum SRT = 1/(μ_net))
+  const srt_min_days=mu_net>0?+(1/(mu_net*24)).toFixed(2):999;
+  const washout_risk=srt<srt_min_days*1.5;
+
+  // Biofilm surface area
+  const vm3=vgal*0.003785,mvm3=vm3*(fill/100),ma=mvm3*ssa;
+  // Estimated biofilm thickness from VSS and media area (rough empirical)
+  const vss_removed=Math.max(0,inf_vss-eff_vss);
+  const biofilm_density=10000; // mg VSS/m² typical for MBBR nitrification biofilm
+  const est_thickness_um=ma>0?+(vss_removed*gv('flow_mgd')*3785410/(ma*biofilm_density)*1000).toFixed(2):0;
+
+  // Net biomass production (heterotrophs)
+  const cod_removed=Math.max(0,gv('inf_cod')-gv('eff_cod'));
+  const obs_yield=Y/(1+kd*24*srt); // observed yield
+  const net_vss_prod=+(cod_removed*obs_yield).toFixed(2); // mg VSS/L
+
+  // Growth phase classification
+  let phase,phaseClass,phaseSub;
+  const dnh3_pct=inf_nh3>0?(inf_nh3-eff_nh3)/inf_nh3*100:0;
+  if(mu_net<=0||eff_nh3<0.3){
+    phase='Decline / Starvation';phaseClass='phase-dec';
+    phaseSub='Net negative growth — substrate limiting or decay dominating';
+  } else if(eff_nh3>inf_nh3*0.6||dnh3_pct<30){
+    phase='Lag Phase';phaseClass='phase-lag';
+    phaseSub='Low substrate utilization — biofilm may be establishing or stressed';
+  } else if(dnh3_pct>=30&&dnh3_pct<75&&mu_net>0&&mu_net<mu_max*0.5){
+    phase='Late Exponential';phaseClass='phase-exp';
+    phaseSub='Active growth with moderate substrate utilization';
+  } else if(dnh3_pct>=75&&mu_net>0){
+    if(eff_nh3<1&&eff_no2<0.3){
+      phase='Stationary Phase';phaseClass='phase-stat';
+      phaseSub='Substrate nearly depleted — biofilm in maintenance mode';
+    } else {
+      phase='Exponential Phase';phaseClass='phase-exp';
+      phaseSub='Rapid growth — high substrate utilization and active nitrification';
+    }
+  } else {
+    phase='Stationary Phase';phaseClass='phase-stat';
+    phaseSub='Growth balanced by decay — stable biofilm community';
+  }
+
+  // Nutrient limitation checks
+  const p_limiting=eff_p<0.1;
+  const alk_limiting=eff_alk<80;
+  const do_limiting=eff_do<1.5;
+  const nh3_limiting=eff_nh3<0.5;
+
+  // Monod bar visualization (show μ vs substrate)
+  const s_range=[0.1,0.5,1,2,5,10,eff_nh3];
+  const bars=s_range.map(s=>{
+    const mu_s2=mu_max*(s/(ks+s))*(eff_do/(ko+eff_do));
+    const h=Math.max(4,Math.round(mu_s2/mu_max*100));
+    const isActive=Math.abs(s-eff_nh3)<0.01;
+    return`<div style="flex:1;display:flex;flex-direction:column;align-items:center">
+      <div class="monod-bar" style="height:${h}%;background:${isActive?'var(--green2)':'var(--green3)'};width:100%"></div>
+      <div class="monod-label">${s===eff_nh3?'now':s}</div>
+    </div>`;
+  });
+  document.getElementById('monod-bars').innerHTML=`
+    <div style="font-size:11px;color:var(--text3);margin-bottom:4px">μ vs NH₃ substrate (mg/L) at current DO=${eff_do} mg/L</div>
+    <div class="monod-visual">${bars.join('')}</div>`;
+
+  document.getElementById('monod-results').innerHTML=
+    rr('μ_max (20°C)',mu_max,'hr⁻¹')+
+    rr('μ_max (temp-corrected '+temp+'°C)',mu_T,'hr⁻¹')+
+    rr('Substrate factor (NH₃)',+(eff_nh3/(ks+eff_nh3)).toFixed(2),'')+
+    rr('DO limitation factor',+(eff_do/(ko+eff_do)).toFixed(2),'')+
+    rr('Actual μ (net of decay)',mu_actual_T,'hr⁻¹',badge(mu_actual_T>0?'Growing':'Declining',mu_actual_T>0?'b-ok':'b-bad'))+
+    rr('Doubling time',td===Infinity?'N/A':td+'','min')+
+    rr('Observed yield Y_obs',obs_yield.toFixed(2),'g VSS/g COD');
+
+  // Phase banner
+  document.getElementById('growth-phase-banner').innerHTML=`
+    <div class="phase-banner ${phaseClass}">
+      <div class="phase-name">${phase}</div>
+      <div class="phase-sub">${phaseSub}</div>
+    </div>`;
+
+  // Growth metrics
+  document.getElementById('growth-metrics').innerHTML=`
+    <div class="growth-stat"><div class="gs-label">Net growth rate</div><div class="gs-val">${mu_actual_T}</div><div class="gs-unit">hr⁻¹ at ${temp}°C</div></div>
+    <div class="growth-stat"><div class="gs-label">Min SRT for nitrifiers</div><div class="gs-val">${srt_min_days===999?'>60':srt_min_days}</div><div class="gs-unit">days ${badge(washout_risk?'Washout risk':'Safe',washout_risk?'b-bad':'b-ok')}</div></div>
+    <div class="growth-stat"><div class="gs-label">Net VSS production</div><div class="gs-val">${net_vss_prod}</div><div class="gs-unit">mg VSS/L</div></div>
+    <div class="growth-stat"><div class="gs-label">Est. biofilm loading</div><div class="gs-val">${est_thickness_um}</div><div class="gs-unit">mg VSS/m² removed</div></div>`;
+
+  // Nitrifier status
+  const nitrifier_mu_min=0.02; // hr⁻¹ min for stable AOB population
+  document.getElementById('nitrifier-status').innerHTML=
+    rr('AOB growth rate (actual)',mu_actual_T,'hr⁻¹',badge(mu_actual_T>=nitrifier_mu_min?'Active':'At risk',mu_actual_T>=nitrifier_mu_min?'b-ok':'b-bad'))+
+    rr('Current SRT',srt,'days',badge(srt>=srt_min_days?'Adequate':'Too short',srt>=srt_min_days?'b-ok':'b-bad'))+
+    rr('Min SRT to prevent washout',srt_min_days===999?'>60':srt_min_days,'days')+
+    rr('NH₃ substrate limitation',nh3_limiting?'YES — <0.5 mg/L':'No','',nh3_limiting?badge('Limiting','b-warn'):badge('OK','b-ok'))+
+    rr('DO limitation',do_limiting?'YES — <1.5 mg/L':'No','',do_limiting?badge('Limiting','b-bad'):badge('OK','b-ok'))+
+    rr('Alkalinity limitation',alk_limiting?'YES — <80 mg/L':'No','',alk_limiting?badge('Limiting','b-bad'):badge('OK','b-ok'))+
+    rr('Phosphorus limitation',p_limiting?'YES — <0.1 mg/L':'No','',p_limiting?badge('Limiting','b-warn'):badge('OK','b-ok'));
+
+  // Biomass balance
+  const net_pct=Math.min(100,Math.max(0,+(mu_net/(mu_max)*100).toFixed(2)));
+  const col=mu_net>0?'var(--green)':mu_net>-0.01?'var(--amber)':'var(--red)';
+  document.getElementById('biomass-balance').innerHTML=`
+    <div class="biomass-gauge"><div class="biomass-fill" style="width:${net_pct}%;background:${col}"></div></div>
+    <div style="font-size:10px;color:var(--text3);margin-bottom:10px">${net_pct}% of maximum growth capacity utilized</div>`+
+    rr('Gross growth rate μ',mu.toFixed(4),'hr⁻¹')+
+    rr('Decay rate kd',kd,'hr⁻¹')+
+    rr('Net growth μ_net',mu_net,'hr⁻¹',badge(mu_net>0?'Net positive':'Net negative',mu_net>0?'b-ok':'b-bad'))+
+    rr('COD removed',cod_removed,'mg/L')+
+    rr('Net biomass produced',net_vss_prod,'mg VSS/L produced');
+
+  // Recommendations
+  let recs='';
+  if(do_limiting)recs+=`<div class="rec-card bad"><div class="rec-title">Increase aeration</div><div class="rec-body">DO at ${eff_do} mg/L is limiting nitrifier growth. Target ≥2.0 mg/L in MBBR zone. At current DO, growth rate is reduced by ${+(1-(eff_do/(ko+eff_do))).toFixed(2)*100}% from maximum.</div></div>`;
+  if(nh3_limiting&&phase!=='Stationary Phase')recs+=`<div class="rec-card warn"><div class="rec-title">Substrate approaching depletion</div><div class="rec-body">NH₃ at ${eff_nh3} mg/L is near the Ks value (${ks} mg/L). Nitrifiers are operating at half-saturation or below. Verify this is intended — if not, check for short-circuiting or flow distribution issues.</div></div>`;
+  if(washout_risk)recs+=`<div class="rec-card bad"><div class="rec-title">Nitrifier washout risk</div><div class="rec-body">Current SRT (${srt} days) is below the 1.5× safety factor over minimum SRT (${srt_min_days} days). Increase SRT or reduce wasting to protect the nitrifier population.</div></div>`;
+  if(alk_limiting)recs+=`<div class="rec-card bad"><div class="rec-title">Supplement alkalinity</div><div class="rec-body">Effluent alkalinity at ${eff_alk} mg/L. Below 80 mg/L risks pH drop that will inhibit nitrifiers (optimum pH 7.5–8.0). Add sodium bicarbonate or lime.</div></div>`;
+  if(eff_no2>0.5)recs+=`<div class="rec-card warn"><div class="rec-title">Nitrite accumulation — nitrite lock</div><div class="rec-body">NO₂ at ${eff_no2} mg/L indicates NOB (Nitrobacter) activity is lagging behind AOB. Common causes: low DO, temperature shock, or free ammonia inhibition. Monitor closely.</div></div>`;
+  if(p_limiting)recs+=`<div class="rec-card warn"><div class="rec-title">Phosphorus may be limiting</div><div class="rec-body">Effluent P at ${eff_p} mg/L is very low. Biological systems require ~0.1–0.2 mg/L P minimum for growth. If P removal is not the goal, check influent P and biofilm nutrient balance.</div></div>`;
+  if(phaseClass==='phase-lag')recs+=`<div class="rec-card warn"><div class="rec-title">Lag phase — check biofilm establishment</div><div class="rec-body">Low utilization efficiency suggests the biofilm may be newly seeded, stressed, or recovering from a disturbance. Maintain stable loading and avoid hydraulic shock. Seed with return activated sludge if available.</div></div>`;
+  if(phaseClass==='phase-dec')recs+=`<div class="rec-card bad"><div class="rec-title">Decline phase — immediate attention needed</div><div class="rec-body">Net negative growth indicates the biofilm is losing mass faster than it grows. Check for toxic inhibition, extreme pH, DO crash, or substrate starvation. Review recent operational changes.</div></div>`;
+  if(!recs)recs=`<div class="rec-card"><div class="rec-title">System operating well</div><div class="rec-body">No critical growth limitations detected. Continue monitoring substrate, DO, alkalinity, and SRT at current intervals.</div></div>`;
+  document.getElementById('growth-recs').innerHTML=recs;
+}
+
+function renderLog(){
+  if(!logData.length){document.getElementById('log-table-m').innerHTML='<p style="font-size:13px;color:var(--text3);text-align:center;padding:20px">No data yet.</p>';return}
+  let h=`<table class="log-table"><thead><tr><th>Date</th><th>NH₃</th><th>COD</th><th>BOD</th><th>BOD lbs</th><th>BOD</th><th>pH</th><th>pH</th><th>TSS</th><th>Alk</th><th></th></tr></thead><tbody>`;
+  logData.forEach((e,i)=>{
+    h+=`<tr><td>${e.date}</td><td>${e.eff_nh3}</td><td>${e.eff_cod}</td><td>${e.eff_bod}</td><td>${e.bod_lbs}</td>
+    <td><span class="badge ${e.bod_pass?'b-ok':'b-bad'}">${e.bod_pass?'Pass':'FAIL'}</span></td>
+    <td>${e.eff_ph}</td>
+    <td><span class="badge ${e.ph_pass?'b-ok':'b-bad'}">${e.ph_pass?'OK':'!'}</span></td>
+    <td>${e.eff_tss}</td><td>${e.alk}</td>
+    <td><button class="del-btn" onclick="delLog(${i})">×</button></td></tr>`;
+  });
+  h+='</tbody></table>';
+  document.getElementById('log-table-m').innerHTML=h;
+}
+function delLog(i){logData.splice(i,1);saveLog();renderLog();renderTrendCharts();updateLogCount();}
+function showClearConfirm(){
+  if(!logData.length)return;
+  document.getElementById('clear-confirm-box').style.display='block';
+  document.getElementById('clear-log-btn').style.display='none';
+}
+function hideClearConfirm(){
+  document.getElementById('clear-confirm-box').style.display='none';
+  document.getElementById('clear-log-btn').style.display='';
+}
+function confirmClearLog(){
+  logData=[];saveLog();renderLog();renderTrendCharts();updateLogCount();
+  hideClearConfirm();
+}
+function clearLog(){confirmClearLog();}
+
+function exportCSV(){
+  if(!logData.length){
+    alert('No data to export yet. Log at least one entry first.');
+    return;
+  }
+  const headers=[
+    'Date/Time','Flow (MGD)',
+    'NH3-N (mg/L)','NO2-N (mg/L)','NO3-N (mg/L)',
+    'COD Inf (mg/L)','COD Eff (mg/L)',
+    'BOD Eff est (mg/L)','BOD Discharged (lbs/day)','BOD Permit',
+    'pH','pH Permit',
+    'TSS (mg/L)','Eff Alkalinity (mg/L)','Imhoff (mL/L)',
+    'NH3 Loading (lbs/day)','NO3 Loading (lbs/day)',
+    'TSS Removal (%)'
+  ];
+  const rows=logData.map(e=>[
+    `"${e.date}"`,
+    e.flow,
+    e.eff_nh3,e.eff_no2||'',e.eff_no3||'',
+    e.inf_cod,e.eff_cod,
+    e.eff_bod,e.bod_lbs,e.bod_pass?'Pass':'FAIL',
+    e.eff_ph,e.ph_pass?'Pass':'FAIL',
+    e.eff_tss,e.alk,e.imhoff,
+    e.nh3_lbs,e.no3_lbs,
+    e.tss_rem
+  ].join(','));
+  const csv=[headers.join(','),...rows].join('\n');
+  const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;
+  a.download='mbbr_dairy_log_'+new Date().toISOString().slice(0,10)+'.csv';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function renderTrendCharts(){
+  const labels=logData.map((_,i)=>'#'+(i+1));
+  if(tC)tC.destroy();if(bC)bC.destroy();if(tssC)tssC.destroy();
+  tC=new Chart(document.getElementById('trend-chart-m').getContext('2d'),{type:'line',data:{labels,datasets:[
+    {label:'NH₃-N lbs/day',data:logData.map(e=>e.nh3_lbs),borderColor:'#1D9E75',backgroundColor:'rgba(29,158,117,.15)',tension:.3,fill:true},
+    {label:'NO₃-N lbs/day',data:logData.map(e=>e.no3_lbs),borderColor:'#EF9F27',backgroundColor:'rgba(239,159,39,.1)',tension:.3,fill:true}
+  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#9fc5b5',font:{size:11}}}},scales:{x:{ticks:{color:'#5d8a78'}},y:{beginAtZero:true,ticks:{color:'#5d8a78'},grid:{color:'rgba(29,158,117,.1)'}}}}});
+  bC=new Chart(document.getElementById('bod-trend-chart-m').getContext('2d'),{type:'line',data:{labels,datasets:[
+    {label:'BOD to city',data:logData.map(e=>e.bod_lbs),borderColor:'#378ADD',backgroundColor:'rgba(55,138,221,.12)',tension:.3,fill:true},
+    {label:'Daily limit (800)',data:logData.map(()=>800),borderColor:'#E24B4A',borderDash:[4,4],pointRadius:0,fill:false},
+    {label:'Weekly avg (650)',data:logData.map(()=>650),borderColor:'#EF9F27',borderDash:[4,4],pointRadius:0,fill:false}
+  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#9fc5b5',font:{size:11}}}},scales:{x:{ticks:{color:'#5d8a78'}},y:{beginAtZero:true,ticks:{color:'#5d8a78'},grid:{color:'rgba(29,158,117,.1)'}}}}});
+  tssC=new Chart(document.getElementById('tss-trend-chart-m').getContext('2d'),{type:'bar',data:{labels,datasets:[
+    {label:'TSS removal %',data:logData.map(e=>e.tss_rem),backgroundColor:'#5DCAA5'}
+  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#5d8a78'}},y:{min:0,max:100,ticks:{color:'#5d8a78'},grid:{color:'rgba(29,158,117,.1)'}}}}});
+}
+
+buildWeeklyMobile();
+loadLog();
+loadEvents();
+calculate();
+calcGrowth();
+calcNeutResidual('paa');
+calcNeutResidual('cl2');
+
+// ── MENU & UNIT SWITCHING ─────────────────────────────────────
+function exportPDF(){
+  const mbbr=document.getElementById('unit-mbbr').classList.contains('active');
+  const now=new Date().toLocaleString();
+
+  // Helper to safely get element innerHTML or blank
+  function html(id){const el=document.getElementById(id);return el?el.innerHTML:'';}
+  function val(id){const el=document.getElementById(id);return el?(el.value||'—'):'—';}
+
+  let content='';
+
+  // ── HEADER ──────────────────────────────────────────────────
+  const title=mbbr?'MBBR Process Monitor':'Daily COD Test';
+  const subtitle=mbbr?'Dairy wastewater — moving bed biofilm reactor':'WW · Primary Eff. · BOD · City';
+  content+=`
+    <div style="border-bottom:3px solid #1D9E75;padding-bottom:12px;margin-bottom:20px">
+      <div style="font-size:22px;font-weight:700;color:#0F6E56">${title}</div>
+      <div style="font-size:13px;color:#5d8a78;margin-top:2px">${subtitle}</div>
+      <div style="font-size:11px;color:#888;margin-top:6px">Generated: ${now}</div>
+    </div>`;
+
+  if(mbbr){
+    // ── PERMIT COMPLIANCE ──
+    content+=section('Permit compliance',html('compliance-mobile'));
+
+    // ── PERFORMANCE METRICS ──
+    content+=section('Performance overview',html('summary-metrics-mobile'));
+
+    // ── SYSTEM ALERTS ──
+    const alerts=html('summary-alerts-mobile');
+    if(alerts) content+=section('System alerts',alerts);
+
+    // ── INPUTS SUMMARY ──
+    content+=`<div style="background:#f5faf8;border:1px solid #c8e6d8;border-radius:8px;padding:14px;margin-bottom:16px">
+      <div style="font-size:11px;font-weight:700;color:#0F6E56;text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">Inputs recorded</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:12px">
+        ${inputRow('Flow (MGD)',val('flow_mgd'))}
+        ${inputRow('Flow (GPD)',val('flow_gpd'))}
+        ${inputRow('MBBR volume (gal)',val('mbbr_vol'))}
+        ${inputRow('Temp (°C)',val('temp'))}
+        ${inputRow('NH₃-N (mg/L)',val('eff_nh3'))}
+        ${inputRow('NO₂-N (mg/L)',val('eff_no2'))}
+        ${inputRow('NO₃-N (mg/L)',val('eff_no3'))}
+        ${inputRow('TKN (mg/L)',val('eff_tkn'))}
+        ${inputRow('COD influent (mg/L)',val('inf_cod'))}
+        ${inputRow('COD effluent (mg/L)',val('eff_cod'))}
+        ${inputRow('BOD/COD ratio (%)',val('bod_cod_pct'))}
+        ${inputRow('pH',val('eff_ph'))}
+        ${inputRow('DO (mg/L)',val('eff_do'))}
+        ${inputRow('Alkalinity (mg/L)',val('eff_alk'))}
+        ${inputRow('Phosphorus (mg/L)',val('eff_p'))}
+        ${inputRow('Volatile acids (mg/L)',val('vol_acids'))}
+        ${inputRow('TSS (mg/L)',val('eff_tss'))}
+        ${inputRow('VSS (mg/L)',val('eff_vss'))}
+        ${inputRow('Imhoff cone (mL/L)',val('imhoff'))}
+      </div>
+    </div>`;
+
+    // ── RESULTS SECTIONS ──
+    content+=section('BOD discharge to city',html('bod-highlights')+html('bod-alerts-mobile'));
+    content+=section('Nitrification',html('nitri-alerts-mobile')+html('nitri-metrics-mobile'));
+    content+=section('Alkalinity & volatile acids',html('alk-alerts-mobile')+html('alk-results-mobile'));
+    content+=section('Solids & TSS',html('tss-results-mobile'));
+    content+=section('Phosphorus',html('phos-results-mobile'));
+    content+=section('Nutrient ratio — BOD:N:P',html('nutrient-ratio-results'));
+    content+=section('Carbon — TOC estimate & C:N',html('carbon-results'));
+    content+=section('O₂ demand',html('o2-results-mobile'));
+    content+=section('System health index',
+      `<div style="font-size:32px;font-weight:800;color:#0F6E56;margin-bottom:4px">${html('health-score-num')}</div>`+
+      `<div style="font-size:14px;margin-bottom:10px">${html('health-status-label')}</div>`+
+      html('stress-bars'));
+
+  } else {
+    // ── DAILY COD TEST — MANAGEMENT REPORT ──────────────────
+
+    // Pull raw values
+    const bod_ph=val('bod_ph'), bod_cod=val('bod_cod');
+    const pit_ph=val('pit_ph'),   pit_turb=val('pit_turb'),   pit_cod=val('pit_cod');
+    const pe_ph=val('pe_ph'),     pe_turb=val('pe_turb'),     pe_cod=val('pe_cod');
+    const cy_ph=val('city_ph'),   cy_turb=val('city_turb'),   cy_cod=val('city_cod');
+    const cy_flow=val('city_flow_mgd'), bod_pct=val('city_bod_pct'), cy_tss=val('city_tss');
+
+    // Permit status
+    const cy_ph_num=parseFloat(cy_ph)||0;
+    const cy_cod_num=parseFloat(cy_cod)||0;
+    const cy_flow_num=parseFloat(cy_flow)||0;
+    const cy_flow_mgd=cy_flow_num/1e6;
+    const ratio=parseFloat(bod_pct)/100||0.23;
+    const bod_lbs=cy_cod_num&&cy_flow_mgd ? +(cy_cod_num*ratio*cy_flow_mgd*8.34).toFixed(2) : 0;
+    const ph_pass=cy_ph_num>=6.5&&cy_ph_num<=9.5&&cy_ph_num>0;
+    const bod_daily_pass=bod_lbs>0?bod_lbs<=800:true;
+    const bod_weekly_pass=bod_lbs>0?bod_lbs<=650:true;
+    const all_pass=ph_pass&&bod_daily_pass&&bod_weekly_pass;
+
+    // COD reduction
+    const pit_cod_num=parseFloat(pit_cod)||0;
+    const cy_cod_pct=pit_cod_num&&cy_cod_num ? ((pit_cod_num-cy_cod_num)/pit_cod_num*100).toFixed(1) : null;
+
+    function statusBadge(pass,passLabel,failLabel){
+      return pass
+        ? `<span style="background:#e1f5ee;color:#0F6E56;font-weight:700;padding:3px 10px;border-radius:20px;font-size:12px">${passLabel}</span>`
+        : `<span style="background:#fcebeb;color:#A32D2D;font-weight:700;padding:3px 10px;border-radius:20px;font-size:12px">${failLabel}</span>`;
+    }
+
+    function phStatus(ph){
+      const n=parseFloat(ph);
+      if(!n) return '<span style="color:#aaa">—</span>';
+      return `<span style="font-weight:500">${ph}</span>`;
+    }
+    function phStatusCity(ph){
+      const n=parseFloat(ph);
+      if(!n) return '<span style="color:#aaa">—</span>';
+      const ok=n>=6.5&&n<=9.5;
+      return ok
+        ? `<span style="color:#0F6E56;font-weight:600">${ph} ✓</span>`
+        : `<span style="color:#A32D2D;font-weight:700">${ph} !</span>`;
+    }
+
+    function turbStatus(t){
+      const n=parseFloat(t);
+      if(!n) return '<span style="color:#aaa">—</span>';
+      return `<span>${t}</span>`;
+    }
+
+    function codVal(c){
+      return parseFloat(c) ? c : '<span style="color:#aaa">—</span>';
+    }
+
+    // Override header for management report
+    content='';
+    content+=`
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;border-bottom:3px solid #1D9E75;padding-bottom:14px;margin-bottom:20px">
+        <div>
+          <div style="font-size:24px;font-weight:800;color:#0F6E56;letter-spacing:-.5px">Daily COD Test Report</div>
+          <div style="font-size:13px;color:#555;margin-top:4px">Dairy Wastewater Treatment System</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:13px;font-weight:600;color:#111">${new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'})}</div>
+          <div style="font-size:11px;color:#888;margin-top:2px">${new Date().toLocaleTimeString()}</div>
+        </div>
+      </div>`;
+
+    // ── PERMIT STATUS BANNER ──
+    content+=`
+      <div style="background:${all_pass?'#e1f5ee':'#fcebeb'};border:2px solid ${all_pass?'#1D9E75':'#E24B4A'};border-radius:10px;padding:16px;margin-bottom:20px;display:flex;align-items:center;gap:16px">
+        <div style="font-size:40px;line-height:1">${all_pass?'✓':'!'}</div>
+        <div>
+          <div style="font-size:16px;font-weight:800;color:${all_pass?'#0F6E56':'#A32D2D'}">${all_pass?'All permit limits met':'Permit limit exceeded'}</div>
+          <div style="font-size:12px;color:${all_pass?'#2D7A5A':'#7A1F1F'};margin-top:4px">
+            BOD daily: ${statusBadge(bod_daily_pass,'Pass','FAIL')} &nbsp;
+            BOD weekly avg: ${statusBadge(bod_weekly_pass,'Pass','FAIL')} &nbsp;
+            pH: ${statusBadge(ph_pass,'Pass','FAIL')}
+          </div>
+        </div>
+      </div>`;
+
+    // ── SAMPLING POINT TABLE ──
+    content+=`
+      <div style="margin-bottom:20px">
+        <div style="font-size:11px;font-weight:700;color:#0F6E56;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Sampling results</div>
+        <table style="width:100%;border-collapse:collapse;font-size:13px">
+          <thead>
+            <tr style="background:#f0f9f5">
+              <th style="text-align:left;padding:10px 12px;border:1px solid #c8e6d8;color:#0F6E56;font-size:11px;text-transform:uppercase;letter-spacing:.06em">Sampling point</th>
+              <th style="text-align:center;padding:10px 12px;border:1px solid #c8e6d8;color:#0F6E56;font-size:11px;text-transform:uppercase;letter-spacing:.06em">pH<br><span style="font-weight:400;color:#888">(6.5–9.5)</span></th>
+              <th style="text-align:center;padding:10px 12px;border:1px solid #c8e6d8;color:#0F6E56;font-size:11px;text-transform:uppercase;letter-spacing:.06em">Turbidity<br><span style="font-weight:400;color:#888">(NTU)</span></th>
+              <th style="text-align:center;padding:10px 12px;border:1px solid #c8e6d8;color:#0F6E56;font-size:11px;text-transform:uppercase;letter-spacing:.06em">COD<br><span style="font-weight:400;color:#888">(mg/L)</span></th>
+              <th style="text-align:center;padding:10px 12px;border:1px solid #c8e6d8;color:#0F6E56;font-size:11px;text-transform:uppercase;letter-spacing:.06em">Est. BOD<br><span style="font-weight:400;color:#888">(mg/L)</span></th>
+              <th style="text-align:center;padding:10px 12px;border:1px solid #c8e6d8;color:#0F6E56;font-size:11px;text-transform:uppercase;letter-spacing:.06em">TSS<br><span style="font-weight:400;color:#888">(mg/L)</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="background:#fff8f0">
+              <td style="padding:10px 12px;border:1px solid #e8ddd0;font-weight:600"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#E24B4A;margin-right:8px"></span>BOD — heavy solids</td>
+              <td style="text-align:center;padding:10px 12px;border:1px solid #e8ddd0">${phStatus(bod_ph)}</td>
+              <td style="text-align:center;padding:10px 12px;border:1px solid #e8ddd0;color:#888">—</td>
+              <td style="text-align:center;padding:10px 12px;border:1px solid #e8ddd0">${codVal(bod_cod)}</td>
+              <td style="text-align:center;padding:10px 12px;border:1px solid #e8ddd0">${parseFloat(bod_cod)?+(parseFloat(bod_cod)*ratio).toFixed(2):'—'}</td>
+              <td style="text-align:center;padding:10px 12px;border:1px solid #e8ddd0;color:#aaa">—</td>
+            </tr>
+            <tr style="background:#fffdf0">
+              <td style="padding:10px 12px;border:1px solid #e8e0c8;font-weight:600"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#EF9F27;margin-right:8px"></spanWW</td>
+              <td style="text-align:center;padding:10px 12px;border:1px solid #e8e0c8">${phStatus(pit_ph)}</td>
+              <td style="text-align:center;padding:10px 12px;border:1px solid #e8e0c8">${turbStatus(pit_turb)}</td>
+              <td style="text-align:center;padding:10px 12px;border:1px solid #e8e0c8">${codVal(pit_cod)}</td>
+              <td style="text-align:center;padding:10px 12px;border:1px solid #e8e0c8">${parseFloat(pit_cod)?+(parseFloat(pit_cod)*ratio).toFixed(2):'—'}</td>
+              <td style="text-align:center;padding:10px 12px;border:1px solid #e8e0c8;color:#aaa">—</td>
+            </tr>
+            <tr style="background:#f0f6ff">
+              <td style="padding:10px 12px;border:1px solid #c8d8e6;font-weight:600"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#378ADD;margin-right:8px"></span>Primary effluent</td>
+              <td style="text-align:center;padding:10px 12px;border:1px solid #c8d8e6">${phStatus(pe_ph)}</td>
+              <td style="text-align:center;padding:10px 12px;border:1px solid #c8d8e6">${turbStatus(pe_turb)}</td>
+              <td style="text-align:center;padding:10px 12px;border:1px solid #c8d8e6">${codVal(pe_cod)}</td>
+              <td style="text-align:center;padding:10px 12px;border:1px solid #c8d8e6">${parseFloat(pe_cod)?+(parseFloat(pe_cod)*ratio).toFixed(2):'—'}</td>
+              <td style="text-align:center;padding:10px 12px;border:1px solid #c8d8e6;color:#aaa">—</td>
+            </tr>
+            <tr style="background:#f0f9f5;font-weight:700">
+              <td style="padding:10px 12px;border:2px solid #1D9E75;color:#0F6E56"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#1D9E75;margin-right:8px"></span>City — final discharge</td>
+              <td style="text-align:center;padding:10px 12px;border:2px solid #1D9E75">${phStatusCity(cy_ph)}</td>
+              <td style="text-align:center;padding:10px 12px;border:2px solid #1D9E75">${turbStatus(cy_turb)}</td>
+              <td style="text-align:center;padding:10px 12px;border:2px solid #1D9E75">${codVal(cy_cod)}</td>
+              <td style="text-align:center;padding:10px 12px;border:2px solid #1D9E75">${parseFloat(cy_cod)?+(parseFloat(cy_cod)*ratio).toFixed(2):'—'}</td>
+              <td style="text-align:center;padding:10px 12px;border:2px solid #1D9E75">${parseFloat(cy_tss)?cy_tss:'—'}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>`;
+
+    // ── CITY DISCHARGE SUMMARY ──
+    const cy_tss_num=parseFloat(cy_tss)||0;
+    content+=`
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;margin-bottom:20px">
+        <div style="background:#f5faf8;border:1px solid #c8e6d8;border-radius:8px;padding:12px;text-align:center">
+          <div style="font-size:10px;color:#5d8a78;font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">Flow</div>
+          <div style="font-size:20px;font-weight:800;color:#111">${cy_flow_num||'—'}</div>
+          <div style="font-size:11px;color:#888">GPD</div>
+        </div>
+        <div style="background:${bod_daily_pass?'#f5faf8':'#fcebeb'};border:1px solid ${bod_daily_pass?'#c8e6d8':'#f5b8b8'};border-radius:8px;padding:12px;text-align:center">
+          <div style="font-size:10px;color:#5d8a78;font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">BOD to city</div>
+          <div style="font-size:20px;font-weight:800;color:${bod_daily_pass?'#111':'#A32D2D'}">${bod_lbs||'—'}</div>
+          <div style="font-size:11px;color:#888">lbs/day · limit 800</div>
+        </div>
+        <div style="background:${ph_pass?'#f5faf8':'#fcebeb'};border:1px solid ${ph_pass?'#c8e6d8':'#f5b8b8'};border-radius:8px;padding:12px;text-align:center">
+          <div style="font-size:10px;color:#5d8a78;font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">City pH</div>
+          <div style="font-size:20px;font-weight:800;color:${ph_pass?'#111':'#A32D2D'}">${cy_ph_num||'—'}</div>
+          <div style="font-size:11px;color:#888">range 6.5 – 9.5</div>
+        </div>
+        <div style="background:#f5faf8;border:1px solid #c8e6d8;border-radius:8px;padding:12px;text-align:center">
+          <div style="font-size:10px;color:#5d8a78;font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">City TSS</div>
+          <div style="font-size:20px;font-weight:800;color:#111">${cy_tss_num||'—'}</div>
+          <div style="font-size:11px;color:#888">mg/L</div>
+        </div>
+      </div>`;
+
+    // ── COD REDUCTION ──
+    if(cy_cod_pct!==null){
+      content+=`
+        <div style="background:#f5faf8;border:1px solid #c8e6d8;border-radius:8px;padding:14px;margin-bottom:20px">
+          <div style="font-size:11px;font-weight:700;color:#0F6E56;text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">System COD reduction</div>
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+            ${pit_cod_num?`<div style="text-align:center"><div style="font-size:11px;color:#888"WW</div><div style="font-size:16px;font-weight:700">${pit_cod} mg/L</div></div><div style="color:#aaa;font-size:18px">→</div>`:''}
+            ${parseFloat(pe_cod)?`<div style="text-align:center"><div style="font-size:11px;color:#888">Primary eff.</div><div style="font-size:16px;font-weight:700">${pe_cod} mg/L</div></div><div style="color:#aaa;font-size:18px">→</div>`:''}
+            ${cy_cod_num?`<div style="text-align:center"><div style="font-size:11px;color:#888">City</div><div style="font-size:16px;font-weight:700">${cy_cod} mg/L</div></div>`:''}
+            ${cy_cod_pct!==null?`<div style="margin-left:auto;text-align:center;background:${parseFloat(cy_cod_pct)>=70?'#e1f5ee':parseFloat(cy_cod_pct)>=40?'#faeeda':'#fcebeb'};border-radius:8px;padding:10px 16px"><div style="font-size:11px;color:#888">Overall removal</div><div style="font-size:24px;font-weight:800;color:${parseFloat(cy_cod_pct)>=70?'#0F6E56':parseFloat(cy_cod_pct)>=40?'#854F0B':'#A32D2D'}">${cy_cod_pct}%</div></div>`:''}
+          </div>
+        </div>`;
+    }
+
+    // ── ESTIMATED BOD TO CITY ──
+    const city_bod_mgL_pdf = +(cy_cod_num * ratio).toFixed(2);
+    const city_bod_lbs_pdf = cy_flow_mgd>0 && cy_cod_num>0 ? +(city_bod_mgL_pdf * cy_flow_mgd * 8.34).toFixed(2) : null;
+    const bod_daily_ok = city_bod_lbs_pdf!==null ? city_bod_lbs_pdf<=800 : true;
+    const bod_weekly_ok = city_bod_lbs_pdf!==null ? city_bod_lbs_pdf<=650 : true;
+    content+=`
+      <div style="background:#f5faf8;border:1px solid #c8e6d8;border-radius:8px;padding:14px;margin-bottom:20px">
+        <div style="font-size:11px;font-weight:700;color:#0F6E56;text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px">Estimated BOD sent to city</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;text-align:center">
+          <div>
+            <div style="font-size:11px;color:#888;margin-bottom:4px">Concentration</div>
+            <div style="font-size:28px;font-weight:800;color:#111">${cy_cod_num?city_bod_mgL_pdf:'—'}</div>
+            <div style="font-size:12px;color:#888">mg/L</div>
+          </div>
+          <div>
+            <div style="font-size:11px;color:#888;margin-bottom:4px">Mass loading</div>
+            <div style="font-size:28px;font-weight:800;color:${city_bod_lbs_pdf!==null?(bod_daily_ok?'#0F6E56':'#A32D2D'):'#111'}">${city_bod_lbs_pdf!==null?city_bod_lbs_pdf:'—'}</div>
+            <div style="font-size:12px;color:#888">lbs/day</div>
+          </div>
+        </div>
+        ${city_bod_lbs_pdf!==null?`<div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+          <span style="background:${bod_daily_ok?'#e1f5ee':'#fcebeb'};color:${bod_daily_ok?'#0F6E56':'#A32D2D'};padding:3px 10px;border-radius:20px;font-size:12px;font-weight:600">${bod_daily_ok?'Under 800 lbs/day':'Over 800 lbs/day'}</span>
+          <span style="background:${bod_weekly_ok?'#e1f5ee':'#faeeda'};color:${bod_weekly_ok?'#0F6E56':'#854F0B'};padding:3px 10px;border-radius:20px;font-size:12px;font-weight:600">${bod_weekly_ok?'Under 650 lbs/day avg':'Over 650 lbs/day avg'}</span>
+        </div>`:''}
+      </div>`;
+    content+=`
+      <div style="background:#f9f9f9;border:1px solid #ddd;border-radius:8px;padding:12px;margin-bottom:20px">
+        <div style="font-size:11px;font-weight:700;color:#555;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Permit limits — reference</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;font-size:12px">
+          <div><span style="color:#888">BOD daily max:</span> <strong>800 lbs/day</strong></div>
+          <div><span style="color:#888">BOD weekly avg:</span> <strong>650 lbs/day</strong></div>
+          <div><span style="color:#888">pH range:</span> <strong>6.5 – 9.5</strong></div>
+        </div>
+      </div>`;
+
+    // ── SIGNATURE LINE ──
+    content+=`
+      <div style="margin-top:30px;display:grid;grid-template-columns:1fr 1fr;gap:40px">
+        <div>
+          <div style="border-top:1px solid #555;padding-top:6px;font-size:11px;color:#555">Operator signature</div>
+        </div>
+        <div>
+          <div style="border-top:1px solid #555;padding-top:6px;font-size:11px;color:#555">Date verified</div>
+        </div>
+      </div>`;
+  }
+
+  // ── FOOTER ──
+  content+=`<div style="border-top:1px solid #ddd;padding-top:10px;margin-top:20px;font-size:10px;color:#aaa;text-align:center">
+    Dairy Wastewater Calculator · Both units share permit limits: BOD max 800 lbs/day · avg 650 lbs/day · pH 6.5–9.5
+  </div>`;
+
+  document.getElementById('pdf-content').innerHTML=content;
+  document.getElementById('pdf-overlay').style.display='block';
+  document.getElementById('pdf-overlay').scrollTop=0;
+}
+
+function closePDF(){
+  document.getElementById('pdf-overlay').style.display='none';
+}
+
+function section(title,body){
+  if(!body||body.trim()==='')return'';
+  return`<div style="margin-bottom:16px;page-break-inside:avoid">
+    <div style="font-size:11px;font-weight:700;color:#0F6E56;text-transform:uppercase;letter-spacing:.08em;border-bottom:1px solid #c8e6d8;padding-bottom:4px;margin-bottom:8px">${title}</div>
+    <div>${body}</div>
+  </div>`;
+}
+
+function inputRow(label,val){
+  return`<div style="display:contents">
+    <div style="color:#5d8a78">${label}</div>
+    <div style="font-weight:600;color:#111">${val}</div>
+  </div>`;
+}
+
+// ── DATA BACKUP & RESTORE ─────────────────────────────────────
+function updateStorageInfo(){
+  const mbbrCount=logData.length;
+  const codCount=safLog.length;
+  const eventsCount=stressEvents?stressEvents.length:0;
+  // Estimate localStorage usage
+  let bytes=0;
+  try{[LS_KEY,SAF_LS,LS_EVENTS].forEach(k=>{const v=localStorage.getItem(k);if(v)bytes+=v.length*2;});}catch(e){}
+  const kb=(bytes/1024).toFixed(1);
+  const el=document.getElementById('backup-storage-info');
+  if(el) el.innerHTML=
+    `MBBR log: ${mbbrCount} entr${mbbrCount===1?'y':'ies'}<br>`+
+    `Daily COD log: ${codCount} entr${codCount===1?'y':'ies'}<br>`+
+    `Stress events: ${eventsCount}<br>`+
+    `Storage used: ~${kb} KB`;
+}
+
+function exportBackup(){
+  const backup={
+    version:1,
+    exported:new Date().toISOString(),
+    mbbr_log:logData,
+    daily_cod_log:safLog,
+    stress_events:stressEvents||[]
+  };
+  const json=JSON.stringify(backup,null,2);
+  const blob=new Blob([json],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;
+  a.download='dairy_calc_backup_'+new Date().toISOString().slice(0,10)+'.json';
+  document.body.appendChild(a);a.click();document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function importBackup(event){
+  const file=event.target.files[0];
+  if(!file) return;
+  const reader=new FileReader();
+  reader.onload=function(e){
+    try{
+      const backup=JSON.parse(e.target.result);
+      if(!backup.version){throw new Error('Invalid backup file');}
+
+      // Show confirmation box
+      const mbbrNew=(backup.mbbr_log||[]).length;
+      const codNew=(backup.daily_cod_log||[]).length;
+      const evNew=(backup.stress_events||[]).length;
+      const exported=backup.exported?new Date(backup.exported).toLocaleString():'unknown date';
+
+      document.getElementById('import-confirm-info').innerHTML=
+        `Backup from: <strong>${exported}</strong><br>`+
+        `MBBR log: <strong>${mbbrNew} entr${mbbrNew===1?'y':'ies'}</strong><br>`+
+        `Daily COD log: <strong>${codNew} entr${codNew===1?'y':'ies'}</strong><br>`+
+        `Stress events: <strong>${evNew}</strong><br><br>`+
+        `<span style="color:var(--amber)">This will merge with your current data. Existing entries are kept.</span>`;
+
+      // Store parsed data temporarily
+      window._pendingBackup=backup;
+      document.getElementById('import-confirm-box').style.display='flex';
+    }catch(err){
+      alert('Could not read backup file. Make sure it is a valid dairy calculator .json backup.');
+    }
+    // Reset file input so same file can be re-imported if needed
+    event.target.value='';
+  };
+  reader.readAsText(file);
+}
+
+function confirmImport(){
+  const backup=window._pendingBackup;
+  if(!backup) return;
+  // Merge — add new entries that don't already exist (match by date)
+  const existingMbbrDates=new Set(logData.map(e=>e.date));
+  (backup.mbbr_log||[]).forEach(e=>{if(!existingMbbrDates.has(e.date))logData.push(e);});
+  const existingCodDates=new Set(safLog.map(e=>e.date));
+  (backup.daily_cod_log||[]).forEach(e=>{if(!existingCodDates.has(e.date))safLog.push(e);});
+  const existingEventDates=new Set((stressEvents||[]).map(e=>e.date));
+  (backup.stress_events||[]).forEach(e=>{if(!existingEventDates.has(e.date))stressEvents.push(e);});
+  // Save everything
+  saveLog();safSaveStorage();
+  try{localStorage.setItem(LS_EVENTS,JSON.stringify(stressEvents));}catch(err){}
+  // Re-render
+  renderLog();safRenderLog();renderTrendCharts();safRenderCharts();updateLogCount();safUpdateCount();updateStorageInfo();
+  window._pendingBackup=null;
+  document.getElementById('import-confirm-box').style.display='none';
+  // Show success
+  document.getElementById('import-success-box').style.display='block';
+  setTimeout(()=>{document.getElementById('import-success-box').style.display='none';},3000);
+}
+
+function cancelImport(){
+  window._pendingBackup=null;
+  document.getElementById('import-confirm-box').style.display='none';
+}
+
+function openMenu(){
+  updateStorageInfo();
+  document.getElementById('side-menu').classList.add('open');
+  document.getElementById('side-overlay').classList.add('open');
+}
+function closeMenu(){
+  document.getElementById('side-menu').classList.remove('open');
+  document.getElementById('side-overlay').classList.remove('open');
+}
+function switchUnit(unit){
+  document.querySelectorAll('.unit-shell').forEach(u=>u.classList.remove('active'));
+  document.getElementById('unit-'+unit).classList.add('active');
+  document.querySelectorAll('.menu-item').forEach(m=>m.classList.remove('active-unit'));
+  document.getElementById('menu-'+unit).classList.add('active-unit');
+  closeMenu();
+  if(unit==='saf') safShowTab('input');
+  if(unit==='mbbr') showTab('input');
+}
+
+// ── DAILY COD TEST CALCULATOR ─────────────────────────────────
+const SAF_LS='daily_cod_log_v1';
+let safLog=[];
+let safCodChart=null,safTurbChart=null;
+
+function safGv(id){return parseFloat(document.getElementById(id).value)||0;}
+function safLoadLog(){try{const d=localStorage.getItem(SAF_LS);if(d){safLog=JSON.parse(d);safRenderLog();safUpdateCount();}}catch(e){safLog=[];}}
+function safSaveStorage(){try{localStorage.setItem(SAF_LS,JSON.stringify(safLog));}catch(e){}}
+function safUpdateCount(){document.getElementById('saf-log-count').textContent=safLog.length+' entr'+(safLog.length===1?'y':'ies')+' saved'+(safLog.length>0?' — persisted locally':'');}
+
+function safShowTab(name){
+  document.querySelectorAll('#unit-saf .panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('#unit-saf .nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('saf-panel-'+name).classList.add('active');
+  document.getElementById('saf-nav-'+name).classList.add('active');
+  document.getElementById('saf-scroll-area').scrollTop=0;
+  if(name==='log')safRenderCharts();
+}
+
+function safClearInputs(){
+  ['pit_ph','pit_turb','pit_cod',
+   'pe_ph','pe_turb','pe_cod',
+   'bod_ph','bod_cod',
+   'city_ph','city_turb','city_cod','city_tss','city_flow_mgd'
+  ].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+}
+
+function pointRow(label,ph,turb,cod,ratio){
+  const bod=+(cod*ratio).toFixed(2);
+  const ph_ok=ph>=PH_LO&&ph<=PH_HI&&ph>0;
+  let h='';
+  if(ph>0) h+=rr('pH',ph.toFixed(2),'',badge(ph_ok?'In range':'Out of range',ph_ok?'b-ok':'b-bad'));
+  if(turb>0) h+=rr('Turbidity',turb.toFixed(2),'NTU',badge(turb<10?'Low':turb<50?'Moderate':'High',turb<10?'b-ok':turb<50?'b-warn':'b-bad'));
+  if(cod>0){
+    h+=rr('COD',cod.toFixed(2),'mg/L');
+    h+=rr('Est. BOD ('+((ratio)*100).toFixed(0)+'% of COD)',bod,'mg/L');
+  }
+  if(!ph&&!turb&&!cod) h='<div class="result-row"><span class="rname" style="color:var(--text3)">No data entered for this point</span></div>';
+  return h;
+}
+
+function safCalculate(){
+  const pit  ={ph:safGv('pit_ph'), turb:safGv('pit_turb'), cod:safGv('pit_cod')};
+  const pe   ={ph:safGv('pe_ph'),  turb:safGv('pe_turb'),  cod:safGv('pe_cod')};
+  const bod  ={ph:safGv('bod_ph'), turb:0, cod:safGv('bod_cod')};
+  const city ={ph:safGv('city_ph'),turb:safGv('city_turb'),cod:safGv('city_cod')};
+  const flow =safGv('city_flow_mgd')/1e6;
+  const ratio=safGv('city_bod_pct')/100;
+
+  const city_bod_lbs = flow>0 && city.cod>0 ? lbs(city.cod*ratio, flow) : 0;
+  const daily_pass   = city_bod_lbs>0 ? city_bod_lbs<=BOD_DAILY : true;
+  const weekly_pass  = city_bod_lbs>0 ? city_bod_lbs<=BOD_WEEKLY : true;
+  const city_ph_pass = city.ph>=PH_LO&&city.ph<=PH_HI&&city.ph>0;
+
+  // Overall COD reduction pit → city
+  const overall_cod_rem = pit.cod>0&&city.cod>0 ? pct(pit.cod,city.cod) : null;
+  const pe_cod_rem      = pit.cod>0&&pe.cod>0   ? pct(pit.cod,pe.cod)   : null;
+
+  // Alerts
+  let alerts='';
+  if(city.ph>0&&!city_ph_pass) alerts+=`<div class="alert a-bad">City pH (${city.ph.toFixed(2)}) is outside permit range 6.5–9.5.</div>`;
+  if(city_bod_lbs>BOD_DAILY)   alerts+=`<div class="alert a-bad">City BOD (${city_bod_lbs.toFixed(2)} lbs/day) exceeds 800 lbs/day daily limit.</div>`;
+  if(city_bod_lbs>BOD_WEEKLY&&city_bod_lbs<=BOD_DAILY) alerts+=`<div class="alert a-warn">City BOD above 650 lbs/day — weekly average at risk.</div>`;
+  if(!alerts)                alerts='<div class="alert a-ok">All entered values within acceptable range.</div>';
+  document.getElementById('saf-alerts').innerHTML=alerts;
+
+  // Compliance
+  let comp='';
+  if(city_bod_lbs>0){
+    comp+=`<div class="permit-card ${daily_pass?'permit-pass':'permit-fail'}">
+      <div class="permit-name">BOD — daily maximum</div><div class="permit-detail">City discharge · Permit: 800 lbs/day</div>
+      <div class="permit-bottom"><div><div class="permit-value">${city_bod_lbs.toFixed(2)} lbs/day</div><div class="permit-limit">Max: 800 lbs/day</div></div>
+      ${badge(daily_pass?'Pass':'FAIL',daily_pass?'b-ok':'b-bad')}</div></div>`;
+    comp+=`<div class="permit-card ${weekly_pass?'permit-pass':'permit-fail'}">
+      <div class="permit-name">BOD — weekly average</div><div class="permit-detail">City discharge · Permit: 650 lbs/day avg</div>
+      <div class="permit-bottom"><div><div class="permit-value">${city_bod_lbs.toFixed(2)} lbs/day</div><div class="permit-limit">Avg: 650 lbs/day</div></div>
+      ${badge(weekly_pass?'Pass':'FAIL',weekly_pass?'b-ok':'b-bad')}</div></div>`;
+  } else {
+    comp+='<div class="alert a-info">Enter city COD and flow to calculate BOD permit compliance.</div>';
+  }
+  comp+=`<div class="permit-card ${city.ph===0?'permit-fail':city_ph_pass?'permit-pass':'permit-fail'}">
+    <div class="permit-name">pH — city discharge</div><div class="permit-detail">Permit range: 6.5 – 9.5</div>
+    <div class="permit-bottom"><div><div class="permit-value">${city.ph>0?city.ph.toFixed(2):'Not entered'}</div><div class="permit-limit">Range: 6.5–9.5</div></div>
+    ${badge(city.ph===0?'FAIL':city_ph_pass?'Pass':'FAIL',city.ph===0||!city_ph_pass?'b-bad':'b-ok')}</div></div>`;
+  document.getElementById('saf-compliance').innerHTML=comp;
+
+  // ── LAB RESULTS TABLE ──
+  const city_tss=safGv('city_tss');
+  function tdVal(v){ return v>0?v:'—'; }
+  function tdPh(v){
+    if(!v) return '<td style="text-align:center;color:var(--text3)">—</td>';
+    return `<td style="text-align:center;padding:10px 6px">${v.toFixed(2)}</td>`;
+  }
+  function tdPhCity(v){
+    if(!v) return '<td style="text-align:center;color:var(--text3)">—</td>';
+    const ok=v>=6.5&&v<=9.5;
+    return `<td style="text-align:center;font-weight:600;color:${ok?'var(--green2)':'var(--red)'}">${v.toFixed(2)}</td>`;
+  }
+  document.getElementById('saf-readings-table').innerHTML=`
+    <table style="width:100%;border-collapse:collapse;font-size:13px">
+      <thead>
+        <tr>
+          <th style="text-align:left;padding:8px 6px;border-bottom:1px solid var(--border);color:var(--text3);font-size:11px;font-weight:600;text-transform:uppercase">Point</th>
+          <th style="text-align:center;padding:8px 6px;border-bottom:1px solid var(--border);color:var(--text3);font-size:11px;font-weight:600;text-transform:uppercase">pH</th>
+          <th style="text-align:center;padding:8px 6px;border-bottom:1px solid var(--border);color:var(--text3);font-size:11px;font-weight:600;text-transform:uppercase">Turbidity<br>NTU</th>
+          <th style="text-align:center;padding:8px 6px;border-bottom:1px solid var(--border);color:var(--text3);font-size:11px;font-weight:600;text-transform:uppercase">COD<br>mg/L</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style="border-bottom:1px solid var(--border)">
+          <td style="padding:10px 6px;font-weight:600;color:var(--red)">BOD</td>
+          ${tdPh(bod.ph)}<td style="text-align:center;padding:10px 6px;color:var(--text3)">—</td><td style="text-align:center;padding:10px 6px">${tdVal(bod.cod)}</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border)">
+          <td style="padding:10px 6px;font-weight:600;color:var(--amber)">WW</td>
+          ${tdPh(pit.ph)}<td style="text-align:center;padding:10px 6px">${tdVal(pit.turb)}</td><td style="text-align:center;padding:10px 6px">${tdVal(pit.cod)}</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border)">
+          <td style="padding:10px 6px;font-weight:600;color:var(--blue)">Primary eff.</td>
+          ${tdPh(pe.ph)}<td style="text-align:center;padding:10px 6px">${tdVal(pe.turb)}</td><td style="text-align:center;padding:10px 6px">${tdVal(pe.cod)}</td>
+        </tr>
+        <tr>
+          <td style="padding:10px 6px;font-weight:700;color:var(--green2)">City</td>
+          ${tdPhCity(city.ph)}<td style="text-align:center;padding:10px 6px;font-weight:600">${tdVal(city.turb)}</td><td style="text-align:center;padding:10px 6px;font-weight:600">${tdVal(city.cod)}</td>
+        </tr>
+        ${city_tss>0?`<tr style="border-top:1px solid var(--border)"><td style="padding:6px 6px;font-size:11px;color:var(--text3)" colspan="3">City TSS</td><td style="text-align:center;padding:6px 6px;font-size:13px;font-weight:600">${city_tss.toFixed(2)} mg/L</td></tr>`:''}
+      </tbody>
+    </table>`;
+
+  // ── REMOVAL EFFICIENCY ──
+  function effRow(label, from, to){
+    if(!from||!to) return rr(label,'—','%');
+    const p=pct(from,to);
+    return rr(label, p.toFixed(2), '%', badge(p>=70?'Good':p>=40?'Moderate':'Low', p>=70?'b-ok':p>=40?'b-warn':'b-bad'));
+  }
+  let remHTML='';
+  remHTML+=effRow('WW → Primary effluent (COD)', pit.cod, pe.cod);
+  remHTML+=effRow('Primary effluent → City (COD)', pe.cod, city.cod);
+  remHTML+='<div class="divider"></div>';
+  remHTML+=effRow('Overall — WW → City (COD)', pit.cod, city.cod);
+  document.getElementById('saf-removal-results').innerHTML=remHTML;
+
+  // ── BOD TO CITY ──
+  const city_bod_mgL = +(city.cod * ratio).toFixed(2);
+  const city_bod_lbsR = flow>0 ? lbs(city_bod_mgL, flow) : null;
+  document.getElementById('saf-bod-city-card').innerHTML=`
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:${city_bod_lbsR!==null?'12px':'0'}">
+      <div style="text-align:center">
+        <div style="font-size:11px;color:var(--text3);margin-bottom:4px">Concentration</div>
+        <div style="font-size:32px;font-weight:800;color:var(--text)">${city.cod?city_bod_mgL:'—'}</div>
+        <div style="font-size:12px;color:var(--text3)">mg/L</div>
+      </div>
+      <div style="text-align:center">
+        <div style="font-size:11px;color:var(--text3);margin-bottom:4px">lbs/day</div>
+        <div style="font-size:32px;font-weight:800;color:${city_bod_lbsR!==null?(daily_pass?'var(--green2)':'var(--red)'):'var(--text)'}">${city_bod_lbsR!==null?city_bod_lbsR.toFixed(2):'—'}</div>
+        <div style="font-size:12px;color:var(--text3)">lbs/day</div>
+      </div>
+    </div>
+    ${city_bod_lbsR!==null?`${badge(daily_pass?'Under 800 lbs/day':'Over 800 lbs/day',daily_pass?'b-ok':'b-bad')} ${badge(weekly_pass?'Under 650 lbs/day avg':'Over 650 avg',weekly_pass?'b-ok':'b-warn')}`:''}
+    ${!city.cod?'<div style="font-size:12px;color:var(--text3);margin-top:4px">Enter City COD to calculate.</div>':''}
+    ${city.cod&&!flow?'<div style="font-size:12px;color:var(--text3);margin-top:4px">Enter City flow (GPD) to calculate lbs/day.</div>':''}`;
+
+  // Nav dot
+  document.getElementById('saf-permit-dot').style.display=(!daily_pass||!city_ph_pass||!weekly_pass)?'block':'none';
+}
+
+function safSaveLog(){
+  const flow=safGv('city_flow_mgd')/1e6;
+  const ratio=safGv('city_bod_pct')/100;
+  const pit_cod=safGv('pit_cod'), pe_cod=safGv('pe_cod'), city_cod=safGv('city_cod');
+  const city_bod_mgL=+(city_cod*ratio).toFixed(2);
+  const city_bod_lbs=flow>0?lbs(city_bod_mgL,flow):0;
+  // Efficiencies
+  function eff(from,to){return from&&to?+pct(from,to).toFixed(2):null;}
+  safLog.push({
+    date:new Date().toLocaleString(),
+    pit_ph:safGv('pit_ph'),pit_turb:safGv('pit_turb'),pit_cod,
+    pe_ph:safGv('pe_ph'),  pe_turb:safGv('pe_turb'),  pe_cod,
+    bod_ph:safGv('bod_ph'),bod_turb:0, bod_cod:safGv('bod_cod'),
+    city_ph:safGv('city_ph'),city_turb:safGv('city_turb'),city_cod,city_tss:safGv('city_tss'),
+    flow,ratio:safGv('city_bod_pct'),
+    city_ph_pass:safGv('city_ph')>=PH_LO&&safGv('city_ph')<=PH_HI&&safGv('city_ph')>0,
+    city_bod_lbs,city_bod_mgL,
+    eff_ww_to_pe:eff(pit_cod,pe_cod),
+    eff_pe_to_city:eff(pe_cod,city_cod),
+    eff_overall:eff(pit_cod,city_cod)
+  });
+  safSaveStorage();safRenderLog();safRenderCharts();safUpdateCount();
+}
+
+function safRenderLog(){
+  if(!safLog.length){document.getElementById('saf-log-table').innerHTML='<p style="font-size:13px;color:var(--text3);text-align:center;padding:20px">No data yet.</p>';return;}
+  let h=`<p style="font-size:11px;color:var(--text3);margin-bottom:8px;text-align:center">Double-tap any row to load into Enter tab</p>`;
+  h+=`<table class="log-table"><thead><tr>
+    <th>Date</th>
+    <th>WW pH</th><th>WW NTU</th><th>WW COD</th>
+    <th>PE pH</th><th>PE NTU</th><th>PE COD</th>
+    <th>BOD pH</th><th>BOD COD</th>
+    <th>City pH</th><th>City NTU</th><th>City COD</th><th>City TSS</th>
+    <th>BOD lbs</th><th>Permit</th><th></th>
+  </tr></thead><tbody>`;
+  safLog.forEach((e,i)=>{
+    h+=`<tr ondblclick="safLoadEntry(${i})" style="cursor:pointer" title="Double-click to load into Enter tab">
+      <td>${e.date}</td>
+      <td>${e.pit_ph||'—'}</td><td>${e.pit_turb||'—'}</td><td>${e.pit_cod||'—'}</td>
+      <td>${e.pe_ph||'—'}</td><td>${e.pe_turb||'—'}</td><td>${e.pe_cod||'—'}</td>
+      <td>${e.bod_ph||'—'}</td><td>${e.bod_cod||'—'}</td>
+      <td>${e.city_ph||'—'}</td><td>${e.city_turb||'—'}</td><td>${e.city_cod||'—'}</td><td>${e.city_tss||'—'}</td>
+      <td>${e.city_bod_lbs>0?e.city_bod_lbs.toFixed(2):'—'}</td>
+      <td>${e.city_bod_lbs>0?`<span class="badge ${e.city_bod_lbs<=BOD_DAILY?'b-ok':'b-bad'}">${e.city_bod_lbs<=BOD_DAILY?'Pass':'FAIL'}</span>`:'—'}</td>
+      <td><button class="del-btn" onclick="event.stopPropagation();safDelLog(${i})">×</button></td>
+    </tr>`;
+  });
+  h+='</tbody></table>';
+  document.getElementById('saf-log-table').innerHTML=h;
+}
+
+function safLoadEntry(i){
+  const e=safLog[i];
+  if(!e) return;
+  // Populate all fields
+  const set=(id,v)=>{const el=document.getElementById(id);if(el)el.value=v||'';};
+  set('pit_ph',   e.pit_ph);   set('pit_turb',  e.pit_turb);  set('pit_cod',  e.pit_cod);
+  set('pe_ph',    e.pe_ph);    set('pe_turb',   e.pe_turb);   set('pe_cod',   e.pe_cod);
+  set('bod_ph',   e.bod_ph);                                   set('bod_cod',  e.bod_cod);
+  set('city_ph',  e.city_ph);  set('city_turb', e.city_turb); set('city_cod', e.city_cod);
+  set('city_tss', e.city_tss); set('city_flow_mgd', e.flow);  set('city_bod_pct', e.ratio);
+  // Switch to enter tab and calculate
+  safShowTab('input');
+  safCalculate();
+}
+
+function safDelLog(i){safLog.splice(i,1);safSaveStorage();safRenderLog();safRenderCharts();safUpdateCount();}
+function safShowClearConfirm(){if(!safLog.length)return;document.getElementById('saf-clear-confirm').style.display='block';document.getElementById('saf-clear-btn').style.display='none';}
+function safHideClearConfirm(){document.getElementById('saf-clear-confirm').style.display='none';document.getElementById('saf-clear-btn').style.display='';}
+function safConfirmClear(){safLog=[];safSaveStorage();safRenderLog();safRenderCharts();safUpdateCount();safHideClearConfirm();}
+
+function safExportCSV(){
+  if(!safLog.length){alert('No daily COD data to export yet.');return;}
+  const headers=['Date/Time','WW pH','WW Turbidity','WW COD','PE pH','PE Turbidity','PE COD','BOD pH','BOD Turbidity','BOD COD','City pH','City Turbidity','City COD','City TSS (mg/L)','City Flow (GPD)','BOD/COD Ratio (%)','Est. BOD to City (lbs/day)','Permit'];
+  const rows=safLog.map(e=>[`"${e.date}"`,e.pit_ph,e.pit_turb,e.pit_cod,e.pe_ph,e.pe_turb,e.pe_cod,e.bod_ph,"—",e.bod_cod,e.city_ph,e.city_turb,e.city_cod,e.city_tss||'',e.flow,e.ratio,e.city_bod_lbs>0?e.city_bod_lbs.toFixed(2):'',e.city_bod_lbs>0?(e.city_bod_lbs<=BOD_DAILY?'Pass':'FAIL'):''].join(','));
+  const csv=[headers.join(','),...rows].join('\n');
+  const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;a.download='daily_cod_log_'+new Date().toISOString().slice(0,10)+'.csv';
+  document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);
+}
+
+function safRenderCharts(){
+  const labels=safLog.map((_,i)=>'#'+(i+1));
+  if(safCodChart)safCodChart.destroy();
+  if(safTurbChart)safTurbChart.destroy();
+
+  // Chart 1 — COD removal efficiency %
+  safCodChart=new Chart(document.getElementById('saf-cod-chart').getContext('2d'),{
+    type:'line',
+    data:{labels,datasets:[
+      {label:'WW → Primary eff.',data:safLog.map(e=>e.eff_ww_to_pe??null),borderColor:'#EF9F27',backgroundColor:'transparent',tension:.3,pointRadius:4,spanGaps:false},
+      {label:'Primary eff. → City',data:safLog.map(e=>e.eff_pe_to_city??null),borderColor:'#378ADD',backgroundColor:'transparent',tension:.3,pointRadius:4,spanGaps:false},
+      {label:'Overall WW → City',data:safLog.map(e=>e.eff_overall??null),borderColor:'#1D9E75',backgroundColor:'rgba(29,158,117,.08)',tension:.3,pointRadius:4,fill:true,spanGaps:false},
+    ]},
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{labels:{color:'#9fc5b5',font:{size:11}}}},
+      scales:{
+        x:{ticks:{color:'#5d8a78'}},
+        y:{min:0,max:100,ticks:{color:'#5d8a78',callback:v=>v+'%'},grid:{color:'rgba(29,158,117,.1)'}}
+      }
+    }
+  });
+
+  // Chart 2 — BOD to city (mg/L left axis, lbs/day right axis)
+  const hasMgL=safLog.some(e=>e.city_bod_mgL>0);
+  const hasLbs=safLog.some(e=>e.city_bod_lbs>0);
+  const ds2=[];
+  if(hasMgL) ds2.push({label:'BOD (mg/L)',data:safLog.map(e=>e.city_bod_mgL||null),borderColor:'#5DCAA5',backgroundColor:'rgba(93,202,165,.1)',tension:.3,pointRadius:4,fill:true,yAxisID:'y',spanGaps:false});
+  if(hasLbs){
+    ds2.push({label:'BOD (lbs/day)',data:safLog.map(e=>e.city_bod_lbs>0?e.city_bod_lbs:null),borderColor:'#378ADD',backgroundColor:'transparent',tension:.3,pointRadius:4,yAxisID:'y2',spanGaps:false});
+    ds2.push({label:'800 lbs/day limit',data:safLog.map(()=>800),borderColor:'rgba(226,75,74,.5)',borderDash:[6,4],pointRadius:0,yAxisID:'y2'});
+    ds2.push({label:'650 lbs/day avg',data:safLog.map(()=>650),borderColor:'rgba(239,159,39,.5)',borderDash:[4,4],pointRadius:0,yAxisID:'y2'});
+  }
+  safTurbChart=new Chart(document.getElementById('saf-turb-chart').getContext('2d'),{
+    type:'line',
+    data:{labels,datasets:ds2},
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{labels:{color:'#9fc5b5',font:{size:11}}}},
+      scales:{
+        x:{ticks:{color:'#5d8a78'}},
+        y:{position:'left',beginAtZero:true,ticks:{color:'#5DCAA5'},grid:{color:'rgba(29,158,117,.1)'},title:{display:true,text:'mg/L',color:'#5d8a78',font:{size:10}}},
+        y2:{position:'right',beginAtZero:true,ticks:{color:'#378ADD'},grid:{drawOnChartArea:false},title:{display:true,text:'lbs/day',color:'#5d8a78',font:{size:10}}}
+      }
+    }
+  });
+}
+
+safLoadLog();
+
+// ── ARROW KEY NAVIGATION ──────────────────────────────────────
+document.addEventListener('keydown', function(e){
+  if(e.key!=='ArrowDown'&&e.key!=='ArrowUp'&&e.key!=='ArrowLeft'&&e.key!=='ArrowRight'&&e.key!=='Enter') return;
+  const active=document.activeElement;
+  if(!active||!['INPUT','SELECT'].includes(active.tagName)) return;
+  // Only navigate on arrow keys if input is not being edited with left/right
+  // Left/Right arrows only navigate when the input type is number (no text cursor movement needed)
+  if((e.key==='ArrowLeft'||e.key==='ArrowRight')&&active.type!=='number') return;
+
+  // Get all visible, enabled inputs and selects in the current active panel
+  const panel=active.closest('.panel')||active.closest('.scroll-area')||document;
+  const all=Array.from(panel.querySelectorAll('input:not([type=hidden]):not([disabled]),select:not([disabled])'))
+    .filter(el=>{
+      const r=el.getBoundingClientRect();
+      return r.width>0&&r.height>0&&!el.closest('[style*="display:none"]');
+    });
+  const idx=all.indexOf(active);
+  if(idx===-1) return;
+
+  let next=-1;
+  if(e.key==='ArrowDown'||e.key==='ArrowRight'||e.key==='Enter') next=idx+1;
+  if(e.key==='ArrowUp'||e.key==='ArrowLeft') next=idx-1;
+
+  if(next>=0&&next<all.length){
+    e.preventDefault();
+    all[next].focus();
+    if(all[next].select) all[next].select();
+  }
+});
+
+
+</script>
+
+<!-- PWA SERVICE WORKER -->
+<script>
+if('serviceWorker' in navigator){
+  const sw=`
+    const CACHE='mbbr-v1';
+    const FILES=['/'];
+    self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(FILES))));
+    self.addEventListener('fetch',e=>e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request))));
+  `;
+  const blob=new Blob([sw],{type:'application/javascript'});
+  const url=URL.createObjectURL(blob);
+  navigator.serviceWorker.register(url).catch(()=>{});
+}
+</script>
+</body>
+</html>
