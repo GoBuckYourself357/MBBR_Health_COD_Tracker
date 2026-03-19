@@ -1150,7 +1150,8 @@ input[type=range]{width:100%;accent-color:var(--green);height:4px;margin:8px 0}
         <div class="field"><label>Influent pH</label><input type="number" id="sys_mbbr_inf_ph" value="" step="0.1" min="0" max="14" placeholder="—"></div>
         <div class="field"><label>Effluent pH</label><input type="number" id="sys_mbbr_eff_ph" value="" step="0.1" min="0" max="14" placeholder="—"></div>
         <div class="field"><label>DO (mg/L)</label><input type="number" id="sys_mbbr_do" value="" step="0.1" min="0" placeholder="—"></div>
-        <div class="field"><label>Tank depth (ft)</label><input type="number" id="sys_mbbr_depth" value="" step="0.1" min="0" placeholder="—"></div>
+        <div class="field"><label>Tank depth (ft)</label><input type="number" id="sys_mbbr_depth" value="" step="0.1" min="0" placeholder="—" oninput="sysCalcMbbrVol()"></div>
+        <div class="field"><label>Tank volume (gal)</label><div class="biodegrad-display" id="sys_mbbr_vol_display">—</div></div>
         <div class="field"><label>Sludge tank depth (ft)</label><input type="number" id="sys_sludge_depth" value="" step="0.1" min="0" placeholder="—"></div>
       </div>
     </div>
@@ -1296,6 +1297,23 @@ input[type=range]{width:100%;accent-color:var(--green);height:4px;margin:8px 0}
 <!-- IMPORT SUCCESS -->
 <div id="import-success-box" style="display:none;position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--green3);color:var(--green2);border:1px solid rgba(29,158,117,.4);border-radius:10px;padding:10px 20px;font-size:13px;font-weight:600;z-index:600;white-space:nowrap">
   ✓ Backup imported successfully
+</div>
+
+<!-- SYSTEM MONITOR DATE PICKER OVERLAY -->
+<div id="sys-date-picker" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:600;align-items:center;justify-content:center;padding:20px">
+  <div style="background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:20px;max-width:340px;width:100%">
+    <div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:6px">System Monitor Report</div>
+    <div style="font-size:12px;color:var(--text3);margin-bottom:16px">Select a date to print all entries logged that day</div>
+    <div style="margin-bottom:16px">
+      <label style="font-size:12px;color:var(--text3);display:block;margin-bottom:6px">Report date</label>
+      <input type="date" id="sys-report-date" style="width:100%;padding:11px 12px;border:1px solid var(--border);border-radius:10px;background:var(--bg3);color:var(--text);font-size:15px">
+    </div>
+    <div id="sys-date-entry-count" style="font-size:12px;color:var(--text3);margin-bottom:16px;text-align:center"></div>
+    <div style="display:flex;gap:8px">
+      <button onclick="sysGenerateReport()" style="flex:1;background:var(--green3);color:var(--green2);border:1px solid rgba(29,158,117,.4);border-radius:10px;padding:11px;font-size:14px;font-weight:600;cursor:pointer">Generate Report</button>
+      <button onclick="document.getElementById('sys-date-picker').style.display='none'" style="flex:1;background:var(--bg3);color:var(--text2);border:1px solid var(--border);border-radius:10px;padding:11px;font-size:14px;font-weight:600;cursor:pointer">Cancel</button>
+    </div>
+  </div>
 </div>
 
 </div><!-- end app-shell -->
@@ -2435,6 +2453,10 @@ calcNeutResidual('cl2');
 // ── MENU & UNIT SWITCHING ─────────────────────────────────────
 function exportPDF(){
   const mbbr=document.getElementById('unit-mbbr').classList.contains('active');
+  const sys=document.getElementById('unit-sys').classList.contains('active');
+
+  // System monitor — show date picker first
+  if(sys){ sysShowDatePicker(); return; }
 
   // Force full recalculation so all result elements are populated regardless of which tab is visible
   if(mbbr){ calculate(); calcGrowth(); calcDiag(); }
@@ -2947,6 +2969,223 @@ function cancelImport(){
   document.getElementById('import-confirm-box').style.display='none';
 }
 
+function sysShowDatePicker(){
+  // Default to today
+  const today=new Date().toISOString().slice(0,10);
+  document.getElementById('sys-report-date').value=today;
+  sysUpdateDateCount();
+  document.getElementById('sys-date-picker').style.display='flex';
+}
+
+function sysUpdateDateCount(){
+  const date=document.getElementById('sys-report-date').value;
+  if(!date) return;
+  const entries=sysLog.filter(e=>e.ts&&e.ts.slice(0,10)===date);
+  document.getElementById('sys-date-entry-count').textContent=
+    entries.length>0?`${entries.length} entr${entries.length===1?'y':'ies'} found for ${new Date(date+'T12:00:00').toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'})}`:'No entries found for this date.';
+}
+document.getElementById('sys-report-date')?.addEventListener('change',sysUpdateDateCount);
+
+function sysGenerateReport(){
+  const date=document.getElementById('sys-report-date').value;
+  if(!date){alert('Please select a date.');return;}
+  const entries=sysLog.filter(e=>e.ts&&e.ts.slice(0,10)===date);
+  if(!entries.length){alert('No entries found for this date. Try a different date.');return;}
+  document.getElementById('sys-date-picker').style.display='none';
+
+  const dateLabel=new Date(date+'T12:00:00').toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+
+  // ── HELPER FUNCTIONS ──
+  function avg(arr){const v=arr.filter(x=>x>0);return v.length?+(v.reduce((a,b)=>a+b,0)/v.length).toFixed(2):null;}
+  function mn(arr){const v=arr.filter(x=>x>0);return v.length?Math.min(...v):null;}
+  function mx(arr){const v=arr.filter(x=>x>0);return v.length?Math.max(...v):null;}
+  function fmt(v){return v!==null?v:'—';}
+  function totalChem(arr){return arr.filter(x=>x>0).length?+(arr.filter(x=>x>0).reduce((a,b)=>a+b,0)*2).toFixed(4):null;} // gal/hr × 2hrs
+  function pRow(label,val,unit){return`<tr><td style="padding:5px 8px;color:#222;border-bottom:1px solid #eee">${label}</td><td style="padding:5px 8px;font-weight:600;color:#111;text-align:right;border-bottom:1px solid #eee">${val!==null&&val!==undefined?val:'—'}${unit?' <span style="font-size:10px;color:#444">'+unit+'</span>':''}</td></tr>`;}
+
+  // ── BUILD LOG TABLE ──
+  let logRows='';
+  entries.forEach((e,i)=>{
+    const t=new Date(e.ts).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+    logRows+=`<tr style="background:${i%2===0?'#fff':'#f9fdfb'}">
+      <td style="padding:5px 6px;white-space:nowrap;font-weight:600;color:#1D5E3A">${t}</td>
+      <td style="padding:5px 6px">${e.pit_vol||'—'}</td>
+      <td style="padding:5px 6px">${e.tank1_vol||'—'}</td>
+      <td style="padding:5px 6px">${e.tank2_vol||'—'}</td>
+      <td style="padding:5px 6px">${e.storage_ph||'—'}</td>
+      <td style="padding:5px 6px">${e.neut_ph||'—'}</td>
+      <td style="padding:5px 6px">${e.coag_dose?e.coag_dose.toFixed(6):'—'}</td>
+      <td style="padding:5px 6px">${e.coag_gpd||'—'}</td>
+      <td style="padding:5px 6px">${e.floc1_dose?e.floc1_dose.toFixed(6):'—'}</td>
+      <td style="padding:5px 6px">${e.floc1_gpd||'—'}</td>
+      <td style="padding:5px 6px">${e.saf1_flow||'—'}</td>
+      <td style="padding:5px 6px">${e.saf1_eff_ph||'—'}</td>
+      <td style="padding:5px 6px">${e.saf1_froth||'—'}</td>
+      <td style="padding:5px 6px">${e.saf1_froth_gph||'—'}</td>
+      <td style="padding:5px 6px">${e.mbbr_inf_ph||'—'}</td>
+      <td style="padding:5px 6px">${e.mbbr_eff_ph||'—'}</td>
+      <td style="padding:5px 6px">${e.mbbr_do||'—'}</td>
+      <td style="padding:5px 6px">${e.mbbr_depth||'—'}</td>
+      <td style="padding:5px 6px">${e.sludge_depth||'—'}</td>
+      <td style="padding:5px 6px">${e.coag2_pct||'—'}</td>
+      <td style="padding:5px 6px">${e.coag2_gph||'—'}</td>
+      <td style="padding:5px 6px">${e.floc2_pct||'—'}</td>
+      <td style="padding:5px 6px">${e.floc2_gpd||'—'}</td>
+      <td style="padding:5px 6px">${e.saf2_froth||'—'}</td>
+      <td style="padding:5px 6px">${e.saf2_froth_gph||'—'}</td>
+      <td style="padding:5px 6px">${e.saf2_eff_ph||'—'}</td>
+      <td style="padding:5px 6px">${e.saf2_turb||'—'}</td>
+      <td style="padding:5px 6px">${e.city_ph||'—'}</td>
+      <td style="padding:5px 6px">${e.out_flow||'—'}</td>
+      <td style="padding:5px 6px">${e.flume||'—'}</td>
+    </tr>`;
+  });
+
+  // ── CALCULATE DAILY TOTALS ──
+  const totalCoag=totalChem(entries.map(e=>e.coag_gpd||0));
+  const totalFloc1=totalChem(entries.map(e=>e.floc1_gpd||0));
+  const totalCoag2=totalChem(entries.map(e=>e.coag2_gph||0));
+  const totalFloc2=totalChem(entries.map(e=>e.floc2_gpd||0));
+  const totalFroth1=totalChem(entries.map(e=>e.saf1_froth_gph||0));
+  const totalFroth2=totalChem(entries.map(e=>e.saf2_froth_gph||0));
+
+  const avgStoragePh=avg(entries.map(e=>e.storage_ph||0));
+  const avgNeutPh=avg(entries.map(e=>e.neut_ph||0));
+  const avgSaf1Flow=avg(entries.map(e=>e.saf1_flow||0));
+  const avgSaf1EffPh=avg(entries.map(e=>e.saf1_eff_ph||0));
+  const avgMbbrInfPh=avg(entries.map(e=>e.mbbr_inf_ph||0));
+  const avgMbbrEffPh=avg(entries.map(e=>e.mbbr_eff_ph||0));
+  const avgDo=avg(entries.map(e=>e.mbbr_do||0));
+  const avgMbbrDepth=avg(entries.map(e=>e.mbbr_depth||0));
+  const avgMbbrVol=avgMbbrDepth!==null?+(avgMbbrDepth*2756).toFixed(0):null;
+  const avgSludgeDepth=avg(entries.map(e=>e.sludge_depth||0));
+  const avgSaf2EffPh=avg(entries.map(e=>e.saf2_eff_ph||0));
+  const avgTurb=avg(entries.map(e=>e.saf2_turb||0));
+  const avgCityPh=avg(entries.map(e=>e.city_ph||0));
+  const avgOutFlow=avg(entries.map(e=>e.out_flow||0));
+  const avgFlume=avg(entries.map(e=>e.flume||0));
+  const avgPitVol=avg(entries.map(e=>e.pit_vol||0));
+  const avgTank1=avg(entries.map(e=>e.tank1_vol||0));
+  const avgTank2=avg(entries.map(e=>e.tank2_vol||0));
+
+  const city_ph_ok=avgCityPh!==null&&avgCityPh>=6.5&&avgCityPh<=9.5;
+
+  // ── BUILD CONTENT ──
+  // Build report into internal overlay instead of new window
+  const overlayContent=`
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;border-bottom:3px solid #1D9E75;padding-bottom:14px;margin-bottom:20px">
+    <div>
+      <div style="font-size:22px;font-weight:800;color:#0F6E56">System Monitor — Daily Report</div>
+      <div style="font-size:13px;color:#555;margin-top:4px">Dairy Wastewater Treatment System</div>
+    </div>
+    <div style="text-align:right">
+      <div style="font-size:13px;font-weight:600;color:#111">${dateLabel}</div>
+      <div style="font-size:11px;color:#888;margin-top:2px">${entries.length} entries · Generated ${new Date().toLocaleString()}</div>
+    </div>
+  </div>
+
+  <div style="margin-bottom:24px">
+    <div style="font-size:11px;font-weight:700;color:#1D5E3A;text-transform:uppercase;letter-spacing:.08em;border-bottom:1px solid #b0d8c0;padding-bottom:4px;margin-bottom:10px">All entries for ${dateLabel}</div>
+    <div style="overflow-x:auto;-webkit-overflow-scrolling:touch">
+    <table style="width:100%;border-collapse:collapse;font-size:10px;min-width:1100px">
+      <thead>
+        <tr style="background:#e8f5ee">
+          <th style="padding:5px 6px;text-align:left;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">Time</th>
+          <th style="padding:5px 6px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">Pit gal</th>
+          <th style="padding:5px 6px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">T1 gal</th>
+          <th style="padding:5px 6px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">T2 gal</th>
+          <th style="padding:5px 6px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">St pH</th>
+          <th style="padding:5px 6px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">Neut pH</th>
+          <th style="padding:5px 6px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">Coag g/g</th>
+          <th style="padding:5px 6px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">Coag g/hr</th>
+          <th style="padding:5px 6px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">Floc g/g</th>
+          <th style="padding:5px 6px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">Floc g/hr</th>
+          <th style="padding:5px 6px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">Flow GPM</th>
+          <th style="padding:5px 6px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">SAF1 pH</th>
+          <th style="padding:5px 6px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">Froth mV</th>
+          <th style="padding:5px 6px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">Froth g/hr</th>
+          <th style="padding:5px 6px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">MBBR in</th>
+          <th style="padding:5px 6px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">MBBR out</th>
+          <th style="padding:5px 6px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">DO</th>
+          <th style="padding:5px 6px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">Depth ft</th>
+          <th style="padding:5px 6px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">Sludge ft</th>
+          <th style="padding:5px 6px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">Coag2%</th>
+          <th style="padding:5px 6px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">Coag2 GPH</th>
+          <th style="padding:5px 6px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">Floc2%</th>
+          <th style="padding:5px 6px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">Floc2 g/hr</th>
+          <th style="padding:5px 6px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">Froth2 mV</th>
+          <th style="padding:5px 6px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">Froth2 g/hr</th>
+          <th style="padding:5px 6px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">SAF2 pH</th>
+          <th style="padding:5px 6px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">Turb NTU</th>
+          <th style="padding:5px 6px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">City pH</th>
+          <th style="padding:5px 6px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">Out GPM</th>
+          <th style="padding:5px 6px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">Flume GPM</th>
+        </tr>
+      </thead>
+      <tbody>${logRows}</tbody>
+    </table>
+    </div>
+  </div>
+
+  <div style="page-break-inside:avoid">
+    <div style="font-size:11px;font-weight:700;color:#1D5E3A;text-transform:uppercase;letter-spacing:.08em;border-bottom:1px solid #b0d8c0;padding-bottom:4px;margin-bottom:12px">Daily totals & averages — ${entries.length} entries × 2 hours</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:16px">
+      <div>
+        <div style="font-size:10px;font-weight:700;color:#1D5E3A;margin-bottom:8px;text-transform:uppercase">Chemical usage totals</div>
+        <table style="width:100%;border-collapse:collapse;font-size:12px">
+          ${pRow('Primary SAF coag',fmt(totalCoag),'gal total')}
+          ${pRow('Primary SAF flocculant',fmt(totalFloc1),'gal total')}
+          ${pRow('Primary SAF froth',fmt(totalFroth1),'gal total')}
+          ${pRow('Secondary SAF coag',fmt(totalCoag2),'gal total')}
+          ${pRow('Secondary SAF flocculant',fmt(totalFloc2),'gal total')}
+          ${pRow('Secondary SAF froth',fmt(totalFroth2),'gal total')}
+        </table>
+      </div>
+      <div>
+        <div style="font-size:10px;font-weight:700;color:#1D5E3A;margin-bottom:8px;text-transform:uppercase">pH averages</div>
+        <table style="width:100%;border-collapse:collapse;font-size:12px">
+          ${pRow('Storage',fmt(avgStoragePh),'')}
+          ${pRow('Neutralization tank',fmt(avgNeutPh),'')}
+          ${pRow('SAF1 effluent',fmt(avgSaf1EffPh),'')}
+          ${pRow('MBBR influent',fmt(avgMbbrInfPh),'')}
+          ${pRow('MBBR effluent',fmt(avgMbbrEffPh),'')}
+          ${pRow('SAF2 effluent',fmt(avgSaf2EffPh),'')}
+          ${pRow('City',fmt(avgCityPh),'')}
+        </table>
+      </div>
+      <div>
+        <div style="font-size:10px;font-weight:700;color:#1D5E3A;margin-bottom:8px;text-transform:uppercase">Process averages</div>
+        <table style="width:100%;border-collapse:collapse;font-size:12px">
+          ${pRow('SAF1 flow',fmt(avgSaf1Flow),'GPM avg')}
+          ${pRow('Outlet flow',fmt(avgOutFlow),'GPM avg')}
+          ${pRow('Parshall flume',fmt(avgFlume),'GPM avg')}
+          ${pRow('MBBR DO',fmt(avgDo),'mg/L avg')}
+          ${pRow('MBBR tank depth',fmt(avgMbbrDepth),'ft avg')}
+          ${pRow('MBBR tank volume',avgMbbrVol!==null?parseInt(avgMbbrVol).toLocaleString():'—','gal avg (2,756 gal/ft)')}
+          ${pRow('Sludge depth',fmt(avgSludgeDepth),'ft avg')}
+          ${pRow('Turbidity',fmt(avgTurb),'NTU avg')}
+        </table>
+      </div>
+    </div>
+    <div style="background:${city_ph_ok?'#c8edd8':'#f5c8c8'};border:2px solid ${city_ph_ok?'#1D9E75':'#A32D2D'};border-radius:8px;padding:12px;display:flex;align-items:center;gap:12px;margin-bottom:20px">
+      <div style="font-size:28px">${city_ph_ok?'✓':'!'}</div>
+      <div>
+        <div style="font-size:13px;font-weight:700;color:${city_ph_ok?'#0A4D2E':'#5A0000'}">City pH — ${city_ph_ok?'Within permit range':'Outside permit range'}</div>
+        <div style="font-size:11px;color:${city_ph_ok?'#1D5E3A':'#7A1F1F'};margin-top:2px">Average city pH: ${fmt(avgCityPh)} · Permit range: 6.5–9.5</div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:30px;margin-top:24px">
+      <div><div style="border-top:1px solid #555;padding-top:6px;font-size:11px;color:#555">Operator signature</div></div>
+      <div><div style="border-top:1px solid #555;padding-top:6px;font-size:11px;color:#555">Supervisor review</div></div>
+      <div><div style="border-top:1px solid #555;padding-top:6px;font-size:11px;color:#555">Date verified</div></div>
+    </div>
+  </div>`;
+
+  document.getElementById('pdf-content').innerHTML=overlayContent;
+  document.getElementById('pdf-overlay').style.display='block';
+  document.getElementById('pdf-overlay').scrollTop=0;
+}
+
 function openMenu(){
   updateStorageInfo();
   document.getElementById('side-menu').classList.add('open');
@@ -3299,6 +3538,13 @@ function sysCalcFloc2(){
   if(el) el.textContent=f2pct>0?f2gph+' gal/hr':'—';
 }
 
+function sysCalcMbbrVol(){
+  const depth=sysGv('sys_mbbr_depth');
+  const vol=depth>0?+(depth*2756).toFixed(0):null;
+  const el=document.getElementById('sys_mbbr_vol_display');
+  if(el) el.textContent=vol!==null?vol.toLocaleString()+' gal':'—';
+}
+
 function sysCalcFroth1(){
   const mv=sysGv('sys_saf1_froth');
   const gpd=mv>=4?+((mv-4)*1.0625).toFixed(4):0;
@@ -3346,6 +3592,7 @@ function sysClearInputs(){
   document.getElementById('sys_coag_gpd').textContent='—';
   document.getElementById('sys_saf1_froth_gpd').textContent='—';
   document.getElementById('sys_saf2_froth_gpd').textContent='—';
+  document.getElementById('sys_mbbr_vol_display').textContent='—';
   document.getElementById('sys_floc1_gpd').textContent='—';
   // Set timestamp to now
   const now=new Date();
@@ -3428,6 +3675,7 @@ function sysCalculate(){
     rr('Effluent pH',mbbr_eff_ph||'—','')+
     rr('DO',mbbr_do||'—','mg/L',mbbr_do>0?badge(mbbr_do>=3?'Good':mbbr_do>=2?'Low':'Critical',mbbr_do>=3?'b-ok':mbbr_do>=2?'b-warn':'b-bad'):'')+
     rr('Tank depth',mbbr_depth||'—','ft')+
+    rr('Tank volume',mbbr_depth>0?(mbbr_depth*2756).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g,','):'—','gal (2,756 gal/ft)')+
     rr('Sludge tank depth',sludge_depth||'—','ft');
 
   // Secondary SAF results
@@ -3464,6 +3712,7 @@ function sysSaveLog(){
     saf1_froth:sysGv('sys_saf1_froth'), saf1_froth_mv:sysGv('sys_saf1_froth'), saf1_froth_gpd:sysGv('sys_saf1_froth')>=4?+((sysGv('sys_saf1_froth')-4)*1.0625).toFixed(4):0, saf1_froth_gph:sysGv('sys_saf1_froth')>=4?+((sysGv('sys_saf1_froth')-4)*1.0625/24).toFixed(4):0,
     mbbr_inf_ph:sysGv('sys_mbbr_inf_ph'), mbbr_eff_ph:sysGv('sys_mbbr_eff_ph'),
     mbbr_do:sysGv('sys_mbbr_do'), mbbr_depth:sysGv('sys_mbbr_depth'),
+    mbbr_vol_gal:sysGv('sys_mbbr_depth')>0?+(sysGv('sys_mbbr_depth')*2756).toFixed(0):0,
     sludge_depth:sysGv('sys_sludge_depth'),
     floc2_pct, floc2_gpd:+(17*floc2_pct/100).toFixed(4), coag2_pct:sysGv('sys_coag2_pct'), coag2_gph:+(26.7*sysGv('sys_coag2_pct')/100).toFixed(4),
     saf2_froth:sysGv('sys_saf2_froth'), saf2_froth_mv:sysGv('sys_saf2_froth'), saf2_froth_gpd:sysGv('sys_saf2_froth')>=4?+((sysGv('sys_saf2_froth')-4)*1.0625).toFixed(4):0, saf2_froth_gph:sysGv('sys_saf2_froth')>=4?+((sysGv('sys_saf2_froth')-4)*1.0625/24).toFixed(4):0, saf2_eff_ph:sysGv('sys_saf2_eff_ph'),
@@ -3519,7 +3768,7 @@ function sysLoadEntry(i){
   set('sys_floc1_dose',e.floc1_dose?e.floc1_dose.toFixed(6):'');
   set('sys_saf1_flow',e.saf1_flow); set('sys_saf1_eff_ph',e.saf1_eff_ph); set('sys_saf1_froth',e.saf1_froth); sysCalcFroth1();
   set('sys_mbbr_inf_ph',e.mbbr_inf_ph); set('sys_mbbr_eff_ph',e.mbbr_eff_ph);
-  set('sys_mbbr_do',e.mbbr_do); set('sys_mbbr_depth',e.mbbr_depth); set('sys_sludge_depth',e.sludge_depth);
+  set('sys_mbbr_do',e.mbbr_do); set('sys_mbbr_depth',e.mbbr_depth); sysCalcMbbrVol(); set('sys_sludge_depth',e.sludge_depth);
   set('sys_floc2_pct',e.floc2_pct); set('sys_coag2_pct',e.coag2_pct); sysCalcFloc2(); sysCalcCoag2(); sysCalcPrimarySAF();
   set('sys_saf2_froth',e.saf2_froth); sysCalcFroth2(); set('sys_saf2_eff_ph',e.saf2_eff_ph); set('sys_saf2_turb',e.saf2_turb);
   set('sys_out_flow',e.out_flow); set('sys_city_ph',e.city_ph); set('sys_flume_gpm',e.flume);
