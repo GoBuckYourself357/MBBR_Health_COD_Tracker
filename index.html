@@ -994,6 +994,7 @@ input[type=range]{width:100%;accent-color:var(--green);height:4px;margin:8px 0}
         <div class="field"><label>Flow (GPD)</label><input type="number" id="city_flow_mgd" value="" step="1000" min="0" placeholder="0"></div>
         <div class="field"><label>TSS (mg/L)</label><input type="number" id="city_tss" value="" step="1" min="0" placeholder="—"></div>
         <div class="field"><label>BOD/COD ratio (%)</label><input type="number" id="city_bod_pct" value="23" step="1" min="1" max="100"></div>
+        <div class="field"><label>Sample size (L)</label><input type="number" id="city_sample_L" value="" step="0.1" min="0" placeholder="—"></div>
       </div>
     </div>
 
@@ -1128,12 +1129,14 @@ input[type=range]{width:100%;accent-color:var(--green);height:4px;margin:8px 0}
       </div>
       <div class="field-group">
         <div class="field"><label>Neutralization tank pH</label><input type="number" id="sys_neut_ph" value="" step="0.1" min="0" max="14" placeholder="—"></div>
+        <div class="field"><label>Effluent pH → MBBR</label><input type="number" id="sys_saf1_eff_ph" value="" step="0.1" min="0" max="14" placeholder="—"></div>
         <div class="field"><label>Coag dose (gal/gal)</label><input type="number" id="sys_coag_dose" value="" step="0.000001" min="0" placeholder="0.000000" oninput="sysCalcPrimarySAF()"></div>
         <div class="field"><label>Coag usage (gal/hr)</label><div class="biodegrad-display" id="sys_coag_gpd">—</div></div>
         <div class="field"><label>Flocculant dose (gal/gal)</label><input type="number" id="sys_floc1_dose" value="" step="0.000001" min="0" placeholder="0.000000" oninput="sysCalcPrimarySAF()"></div>
         <div class="field"><label>Flocculant usage (gal/hr)</label><div class="biodegrad-display" id="sys_floc1_gpd">—</div></div>
         <div class="field"><label>Flow meter (GPM)</label><input type="number" id="sys_saf1_flow" value="" step="0.1" min="0" placeholder="0.00" oninput="sysCalcPrimarySAF()"></div>
-        <div class="field"><label>Effluent pH → MBBR</label><input type="number" id="sys_saf1_eff_ph" value="" step="0.1" min="0" max="14" placeholder="—"></div>
+        <div class="field"><label>Sludge tank (%)</label><input type="number" id="sys_saf1_sludge_pct" value="" step="0.1" min="0" max="100" placeholder="0.0" oninput="sysCalcSaf1Sludge()"></div>
+        <div class="field"><label>Sludge volume (gal)</label><div class="biodegrad-display" id="sys_saf1_sludge_gal">—</div></div>
         <div class="field"><label>Froth generator (mV)</label><input type="number" id="sys_saf1_froth" value="" step="0.1" min="4" placeholder="4.0" oninput="sysCalcFroth1()"></div>
         <div class="field"><label>Froth usage (gal/hr)</label><div class="biodegrad-display" id="sys_saf1_froth_gpd">—</div></div>
       </div>
@@ -1312,6 +1315,19 @@ input[type=range]{width:100%;accent-color:var(--green);height:4px;margin:8px 0}
     <div style="display:flex;gap:8px">
       <button onclick="sysGenerateReport()" style="flex:1;background:var(--green3);color:var(--green2);border:1px solid rgba(29,158,117,.4);border-radius:10px;padding:11px;font-size:14px;font-weight:600;cursor:pointer">Generate Report</button>
       <button onclick="document.getElementById('sys-date-picker').style.display='none'" style="flex:1;background:var(--bg3);color:var(--text2);border:1px solid var(--border);border-radius:10px;padding:11px;font-size:14px;font-weight:600;cursor:pointer">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- BACKUP COPY OVERLAY -->
+<div id="backup-copy-box" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:700;align-items:center;justify-content:center;padding:16px">
+  <div style="background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:16px;width:100%;max-width:420px;max-height:80vh;display:flex;flex-direction:column;gap:10px">
+    <div style="font-size:14px;font-weight:700;color:var(--text)">Copy backup data</div>
+    <div style="font-size:12px;color:var(--text3)">Copy all the text below and paste it into Notes, email, or any app to save your backup.</div>
+    <textarea id="backup-copy-content" readonly style="flex:1;min-height:200px;background:var(--bg3);color:var(--text2);border:1px solid var(--border);border-radius:8px;padding:10px;font-size:11px;font-family:monospace;resize:none;-webkit-user-select:all;user-select:all"></textarea>
+    <div style="display:flex;gap:8px">
+      <button id="backup-copy-btn" onclick="copyBackupText()" style="flex:1;background:var(--green3);color:var(--green2);border:1px solid rgba(29,158,117,.4);border-radius:10px;padding:11px;font-size:14px;font-weight:600;cursor:pointer">Copy all</button>
+      <button onclick="document.getElementById('backup-copy-box').style.display='none'" style="flex:1;background:var(--bg3);color:var(--text2);border:1px solid var(--border);border-radius:10px;padding:11px;font-size:14px;font-weight:600;cursor:pointer">Close</button>
     </div>
   </div>
 </div>
@@ -2414,15 +2430,7 @@ function exportCSV(){
     e.tss_rem
   ].join(','));
   const csv=[headers.join(','),...rows].join('\n');
-  const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
-  const url=URL.createObjectURL(blob);
-  const a=document.createElement('a');
-  a.href=url;
-  a.download='mbbr_dairy_log_'+new Date().toISOString().slice(0,10)+'.csv';
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
+  downloadFile(csv,'mbbr_dairy_log_'+new Date().toISOString().slice(0,10)+'.csv','text/csv;charset=utf-8;');
 }
 
 function renderTrendCharts(){
@@ -2691,6 +2699,11 @@ function exportPDF(){
           <div style="font-size:20px;font-weight:800;color:#111">${cy_tss_num||'—'}</div>
           <div style="font-size:11px;color:#888">mg/L</div>
         </div>
+        <div style="background:#f5faf8;border:1px solid #c8e6d8;border-radius:8px;padding:12px;text-align:center">
+          <div style="font-size:10px;color:#5d8a78;font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">Sample size</div>
+          <div style="font-size:20px;font-weight:800;color:#111">${val('city_sample_L')||'—'}</div>
+          <div style="font-size:11px;color:#888">liters</div>
+        </div>
       </div>`;
 
     // ── COD REDUCTION ──
@@ -2887,6 +2900,38 @@ function updateStorageInfo(){
     `Storage used: ~${kb} KB`;
 }
 
+function downloadFile(content, filename, type){
+  // Try Web Share API (Android WebView)
+  if(navigator.share){
+    const file=new File([content],filename,{type});
+    if(navigator.canShare&&navigator.canShare({files:[file]})){
+      navigator.share({files:[file],title:filename}).catch(e=>{
+        if(e.name!=='AbortError') downloadFileFallback(content,filename,type);
+      });
+      return;
+    }
+  }
+  downloadFileFallback(content,filename,type);
+}
+
+function downloadFileFallback(content,filename,type){
+  try{
+    const blob=new Blob([content],{type});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    a.href=url; a.download=filename;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  } catch(e){
+    // Last resort — show copy box for JSON, alert for CSV
+    if(type==='application/json'){
+      showBackupCopyBox(content);
+    } else {
+      alert('Download not supported on this device. Please use Export CSV on a desktop browser.');
+    }
+  }
+}
+
 function exportBackup(){
   const backup={
     version:1,
@@ -2897,13 +2942,55 @@ function exportBackup(){
     sys_monitor_log:sysLog
   };
   const json=JSON.stringify(backup,null,2);
-  const blob=new Blob([json],{type:'application/json'});
-  const url=URL.createObjectURL(blob);
-  const a=document.createElement('a');
-  a.href=url;
-  a.download='dairy_calc_backup_'+new Date().toISOString().slice(0,10)+'.json';
-  document.body.appendChild(a);a.click();document.body.removeChild(a);
-  URL.revokeObjectURL(url);
+  const filename='dairy_calc_backup_'+new Date().toISOString().slice(0,10)+'.json';
+
+  // Try Web Share API first (works in Android WebView / PWA)
+  if(navigator.share){
+    const file=new File([json],filename,{type:'application/json'});
+    if(navigator.canShare&&navigator.canShare({files:[file]})){
+      navigator.share({files:[file],title:'Dairy Calculator Backup',text:'Data backup — '+filename})
+        .catch(e=>{ if(e.name!=='AbortError') showBackupCopyBox(json); });
+      return;
+    }
+    // Share without file — share as text
+    navigator.share({title:'Dairy Calculator Backup',text:json})
+      .catch(e=>{ if(e.name!=='AbortError') showBackupCopyBox(json); });
+    return;
+  }
+
+  // Try standard download
+  try{
+    const blob=new Blob([json],{type:'application/json'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    a.href=url; a.download=filename;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  } catch(e){
+    // Fallback — show copyable text box
+    showBackupCopyBox(json);
+  }
+}
+
+function showBackupCopyBox(json){
+  document.getElementById('backup-copy-content').value=json;
+  document.getElementById('backup-copy-box').style.display='flex';
+}
+
+function copyBackupText(){
+  const ta=document.getElementById('backup-copy-content');
+  ta.select();
+  ta.setSelectionRange(0,99999);
+  try{
+    document.execCommand('copy');
+    document.getElementById('backup-copy-btn').textContent='✓ Copied!';
+    setTimeout(()=>{document.getElementById('backup-copy-btn').textContent='Copy all';},2000);
+  }catch(e){
+    navigator.clipboard&&navigator.clipboard.writeText(ta.value).then(()=>{
+      document.getElementById('backup-copy-btn').textContent='✓ Copied!';
+      setTimeout(()=>{document.getElementById('backup-copy-btn').textContent='Copy all';},2000);
+    });
+  }
 }
 
 function importBackup(event){
@@ -3020,6 +3107,8 @@ function sysGenerateReport(){
       <td style="padding:5px 6px">${e.floc1_gpd||'—'}</td>
       <td style="padding:5px 6px">${e.saf1_flow||'—'}</td>
       <td style="padding:5px 6px">${e.saf1_eff_ph||'—'}</td>
+      <td style="padding:5px 6px">${e.saf1_sludge_pct||'—'}</td>
+      <td style="padding:5px 6px">${e.saf1_sludge_gal||'—'}</td>
       <td style="padding:5px 6px">${e.saf1_froth||'—'}</td>
       <td style="padding:5px 6px">${e.saf1_froth_gph||'—'}</td>
       <td style="padding:5px 6px">${e.mbbr_inf_ph||'—'}</td>
@@ -3102,6 +3191,8 @@ function sysGenerateReport(){
           <th style="padding:5px 6px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">Floc g/hr</th>
           <th style="padding:5px 6px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">Flow GPM</th>
           <th style="padding:5px 6px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">SAF1 pH</th>
+          <th style="padding:5px 6px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">Sludge%</th>
+          <th style="padding:5px 6px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">Sludge gal</th>
           <th style="padding:5px 6px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">Froth mV</th>
           <th style="padding:5px 6px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">Froth g/hr</th>
           <th style="padding:5px 6px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">MBBR in</th>
@@ -3229,7 +3320,7 @@ function safClearInputs(){
   ['pit_ph','pit_turb','pit_cod',
    'pe_ph','pe_turb','pe_cod',
    'bod_ph','bod_cod',
-   'city_ph','city_turb','city_cod','city_tss','city_flow_mgd'
+   'city_ph','city_turb','city_cod','city_tss','city_flow_mgd','city_sample_L'
   ].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
 }
 
@@ -3332,6 +3423,7 @@ function safCalculate(){
           ${tdPhCity(city.ph)}<td style="text-align:center;padding:10px 6px;font-weight:600">${tdVal(city.turb)}</td><td style="text-align:center;padding:10px 6px;font-weight:600">${tdVal(city.cod)}</td>
         </tr>
         ${city_tss>0?`<tr style="border-top:1px solid var(--border)"><td style="padding:6px 6px;font-size:11px;color:var(--text3)" colspan="3">City TSS</td><td style="text-align:center;padding:6px 6px;font-size:13px;font-weight:600">${city_tss.toFixed(2)} mg/L</td></tr>`:''}
+        ${safGv('city_sample_L')>0?`<tr style="border-top:1px solid var(--border)"><td style="padding:6px 6px;font-size:11px;color:var(--text3)" colspan="3">Sample size</td><td style="text-align:center;padding:6px 6px;font-size:13px;font-weight:600">${safGv('city_sample_L')} L</td></tr>`:''}
       </tbody>
     </table>`;
 
@@ -3385,7 +3477,7 @@ function safSaveLog(){
     pit_ph:safGv('pit_ph'),pit_turb:safGv('pit_turb'),pit_cod,
     pe_ph:safGv('pe_ph'),  pe_turb:safGv('pe_turb'),  pe_cod,
     bod_ph:safGv('bod_ph'),bod_turb:0, bod_cod:safGv('bod_cod'),
-    city_ph:safGv('city_ph'),city_turb:safGv('city_turb'),city_cod,city_tss:safGv('city_tss'),
+    city_ph:safGv('city_ph'),city_turb:safGv('city_turb'),city_cod,city_tss:safGv('city_tss'),sample_L:safGv('city_sample_L'),
     flow,ratio:safGv('city_bod_pct'),
     city_ph_pass:safGv('city_ph')>=PH_LO&&safGv('city_ph')<=PH_HI&&safGv('city_ph')>0,
     city_bod_lbs,city_bod_mgL,
@@ -3445,14 +3537,10 @@ function safConfirmClear(){safLog=[];safSaveStorage();safRenderLog();safRenderCh
 
 function safExportCSV(){
   if(!safLog.length){alert('No daily COD data to export yet.');return;}
-  const headers=['Date/Time','WW pH','WW Turbidity','WW COD','PE pH','PE Turbidity','PE COD','BOD pH','BOD Turbidity','BOD COD','City pH','City Turbidity','City COD','City TSS (mg/L)','City Flow (GPD)','BOD/COD Ratio (%)','Est. BOD to City (lbs/day)','Permit'];
-  const rows=safLog.map(e=>[`"${e.date}"`,e.pit_ph,e.pit_turb,e.pit_cod,e.pe_ph,e.pe_turb,e.pe_cod,e.bod_ph,"—",e.bod_cod,e.city_ph,e.city_turb,e.city_cod,e.city_tss||'',e.flow,e.ratio,e.city_bod_lbs>0?e.city_bod_lbs.toFixed(2):'',e.city_bod_lbs>0?(e.city_bod_lbs<=BOD_DAILY?'Pass':'FAIL'):''].join(','));
+  const headers=['Date/Time','WW pH','WW Turbidity','WW COD','PE pH','PE Turbidity','PE COD','BOD pH','BOD Turbidity','BOD COD','City pH','City Turbidity','City COD','City TSS (mg/L)','City Flow (GPD)','BOD/COD Ratio (%)','Sample Size (L)','Est. BOD to City (lbs/day)','Permit'];
+  const rows=safLog.map(e=>[`"${e.date}"`,e.pit_ph,e.pit_turb,e.pit_cod,e.pe_ph,e.pe_turb,e.pe_cod,e.bod_ph,"—",e.bod_cod,e.city_ph,e.city_turb,e.city_cod,e.city_tss||'',e.flow,e.ratio,e.sample_L||'',e.city_bod_lbs>0?e.city_bod_lbs.toFixed(2):'',e.city_bod_lbs>0?(e.city_bod_lbs<=BOD_DAILY?'Pass':'FAIL'):''].join(','));
   const csv=[headers.join(','),...rows].join('\n');
-  const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
-  const url=URL.createObjectURL(blob);
-  const a=document.createElement('a');
-  a.href=url;a.download='daily_cod_log_'+new Date().toISOString().slice(0,10)+'.csv';
-  document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);
+  downloadFile(csv,'daily_cod_log_'+new Date().toISOString().slice(0,10)+'.csv','text/csv;charset=utf-8;');
 }
 
 function safRenderCharts(){
@@ -3545,6 +3633,13 @@ function sysCalcMbbrVol(){
   if(el) el.textContent=vol!==null?vol.toLocaleString()+' gal':'—';
 }
 
+function sysCalcSaf1Sludge(){
+  const pct=sysGv('sys_saf1_sludge_pct');
+  const gal=+(2700*pct/100).toFixed(1);
+  const el=document.getElementById('sys_saf1_sludge_gal');
+  if(el) el.textContent=pct>0?gal.toLocaleString()+' gal':'—';
+}
+
 function sysCalcFroth1(){
   const mv=sysGv('sys_saf1_froth');
   const gpd=mv>=4?+((mv-4)*1.0625).toFixed(4):0;
@@ -3576,13 +3671,13 @@ function sysCalcPrimarySAF(){
   const gpd_floc=flow>0&&floc>0?+(floc*flow*60).toFixed(4):null;
   const ec=document.getElementById('sys_coag_gpd');
   const ef=document.getElementById('sys_floc1_gpd');
-  if(ec) ec.textContent=gpd_coag!==null?gpd_coag+' gal/day':'—';
-  if(ef) ef.textContent=gpd_floc!==null?gpd_floc+' gal/day':'—';
+  if(ec) ec.textContent=gpd_coag!==null?gpd_coag+' gal/hr':'—';
+  if(ef) ef.textContent=gpd_floc!==null?gpd_floc+' gal/hr':'—';
 }
 
 function sysClearInputs(){
   ['sys_pit_vol','sys_tank1_vol','sys_tank2_vol','sys_storage_ph',
-   'sys_neut_ph','sys_coag_dose','sys_floc1_dose','sys_saf1_flow','sys_saf1_eff_ph','sys_saf1_froth',
+   'sys_neut_ph','sys_coag_dose','sys_floc1_dose','sys_saf1_flow','sys_saf1_eff_ph','sys_saf1_sludge_pct','sys_saf1_froth',
    'sys_mbbr_inf_ph','sys_mbbr_eff_ph','sys_mbbr_do','sys_mbbr_depth','sys_sludge_depth',
    'sys_floc2_pct','sys_coag2_pct','sys_saf2_froth','sys_saf2_eff_ph','sys_saf2_turb',
    'sys_out_flow','sys_city_ph','sys_flume_gpm'
@@ -3590,6 +3685,7 @@ function sysClearInputs(){
   document.getElementById('sys_floc2_gpd').textContent='—';
   document.getElementById('sys_coag2_gph').textContent='—';
   document.getElementById('sys_coag_gpd').textContent='—';
+  document.getElementById('sys_saf1_sludge_gal').textContent='—';
   document.getElementById('sys_saf1_froth_gpd').textContent='—';
   document.getElementById('sys_saf2_froth_gpd').textContent='—';
   document.getElementById('sys_mbbr_vol_display').textContent='—';
@@ -3609,6 +3705,8 @@ function sysCalculate(){
   const coag=sysGv('sys_coag_dose'), floc1=sysGv('sys_floc1_dose');
   const saf1_flow=sysGv('sys_saf1_flow'), saf1_eff_ph=sysGv('sys_saf1_eff_ph');
   const saf1_froth=sysGv('sys_saf1_froth');
+  const saf1_sludge_pct=sysGv('sys_saf1_sludge_pct');
+  const saf1_sludge_gal=+(2700*saf1_sludge_pct/100).toFixed(1);
   const mbbr_inf_ph=sysGv('sys_mbbr_inf_ph'), mbbr_eff_ph=sysGv('sys_mbbr_eff_ph');
   const mbbr_do=sysGv('sys_mbbr_do'), mbbr_depth=sysGv('sys_mbbr_depth');
   const sludge_depth=sysGv('sys_sludge_depth');
@@ -3655,8 +3753,8 @@ function sysCalculate(){
     rr('Storage pH',storage_ph||'—','');
 
   // Primary SAF results
-  const coag_gpd=saf1_flow>0&&coag>0?+(coag*saf1_flow*1440).toFixed(4):null;
-  const floc1_gpd=saf1_flow>0&&floc1>0?+(floc1*saf1_flow*1440).toFixed(4):null;
+  const coag_gpd=saf1_flow>0&&coag>0?+(coag*saf1_flow*60).toFixed(4):null;
+  const floc1_gpd=saf1_flow>0&&floc1>0?+(floc1*saf1_flow*60).toFixed(4):null;
 
   document.getElementById('sys-saf1-results').innerHTML=
     rr('Neutralization tank pH',neut_ph||'—','')+
@@ -3666,6 +3764,8 @@ function sysCalculate(){
     rr('Flocculant usage',floc1_gpd!==null?floc1_gpd:'—','gal/hr')+
     rr('Flow',saf1_flow||'—','GPM')+
     rr('Effluent pH → MBBR',saf1_eff_ph||'—','',saf1_eff_ph>0?badge(saf1_eff_ph>=6.5&&saf1_eff_ph<=9.5?'OK':'Out of range',saf1_eff_ph>=6.5&&saf1_eff_ph<=9.5?'b-ok':'b-warn'):'')+
+    rr('Sludge tank',saf1_sludge_pct||'—','%',saf1_sludge_pct>=90?badge('Near full','b-bad'):saf1_sludge_pct>=70?badge('Monitor','b-warn'):saf1_sludge_pct>0?badge('OK','b-ok'):'')+
+    rr('Sludge volume',saf1_sludge_pct>0?saf1_sludge_gal.toLocaleString():'—','gal (2,700 gal = 100%)')+
     rr('Froth generator',saf1_froth||'—','mV')+
     rr('Froth usage',saf1_froth>0?+(17*saf1_froth/100).toFixed(4):'—','gal/hr (17 gal/day ÷ 24 at 100%)');
 
@@ -3709,6 +3809,7 @@ function sysSaveLog(){
     coag_dose:sysGv('sys_coag_dose'), coag_gpd:sysGv('sys_saf1_flow')>0&&sysGv('sys_coag_dose')>0?+(sysGv('sys_coag_dose')*sysGv('sys_saf1_flow')*60).toFixed(4):0,
     floc1_dose:sysGv('sys_floc1_dose'), floc1_gpd:sysGv('sys_saf1_flow')>0&&sysGv('sys_floc1_dose')>0?+(sysGv('sys_floc1_dose')*sysGv('sys_saf1_flow')*60).toFixed(4):0,
     saf1_flow:sysGv('sys_saf1_flow'), saf1_eff_ph:sysGv('sys_saf1_eff_ph'),
+    saf1_sludge_pct:sysGv('sys_saf1_sludge_pct'), saf1_sludge_gal:+(2700*sysGv('sys_saf1_sludge_pct')/100).toFixed(1),
     saf1_froth:sysGv('sys_saf1_froth'), saf1_froth_mv:sysGv('sys_saf1_froth'), saf1_froth_gpd:sysGv('sys_saf1_froth')>=4?+((sysGv('sys_saf1_froth')-4)*1.0625).toFixed(4):0, saf1_froth_gph:sysGv('sys_saf1_froth')>=4?+((sysGv('sys_saf1_froth')-4)*1.0625/24).toFixed(4):0,
     mbbr_inf_ph:sysGv('sys_mbbr_inf_ph'), mbbr_eff_ph:sysGv('sys_mbbr_eff_ph'),
     mbbr_do:sysGv('sys_mbbr_do'), mbbr_depth:sysGv('sys_mbbr_depth'),
@@ -3743,7 +3844,7 @@ function sysRenderLog(){
       <td style="white-space:nowrap">${new Date(e.ts).toLocaleString('en-US',{month:'numeric',day:'numeric',hour:'numeric',minute:'2-digit'})}</td>
       <td>${e.pit_vol||'—'}</td><td>${e.tank1_vol||'—'}</td><td>${e.tank2_vol||'—'}</td><td>${e.storage_ph||'—'}</td>
       <td>${e.neut_ph||'—'}</td><td>${e.coag_dose?e.coag_dose.toFixed(6):'—'}</td><td>${e.floc1_dose?e.floc1_dose.toFixed(6):'—'}</td>
-      <td>${e.saf1_flow||'—'}</td><td>${e.saf1_eff_ph||'—'}</td><td>${e.saf1_froth||'—'}%</td>
+      <td>${e.saf1_flow||'—'}</td><td>${e.saf1_eff_ph||'—'}</td><td>${e.saf1_sludge_pct||'—'}</td><td>${e.saf1_sludge_gal||'—'}</td><td>${e.saf1_froth||'—'}</td>
       <td>${e.mbbr_inf_ph||'—'}</td><td>${e.mbbr_eff_ph||'—'}</td>
       <td style="color:${e.mbbr_do>0&&e.mbbr_do<2?'var(--red)':e.mbbr_do>0&&e.mbbr_do<3?'var(--amber)':'inherit'}">${e.mbbr_do||'—'}</td>
       <td>${e.mbbr_depth||'—'}</td><td>${e.sludge_depth||'—'}</td>
@@ -3766,7 +3867,9 @@ function sysLoadEntry(i){
   set('sys_storage_ph',e.storage_ph);
   set('sys_neut_ph',e.neut_ph); set('sys_coag_dose',e.coag_dose?e.coag_dose.toFixed(6):'');
   set('sys_floc1_dose',e.floc1_dose?e.floc1_dose.toFixed(6):'');
-  set('sys_saf1_flow',e.saf1_flow); set('sys_saf1_eff_ph',e.saf1_eff_ph); set('sys_saf1_froth',e.saf1_froth); sysCalcFroth1();
+  set('sys_saf1_flow',e.saf1_flow); set('sys_saf1_eff_ph',e.saf1_eff_ph);
+  set('sys_saf1_sludge_pct',e.saf1_sludge_pct); sysCalcSaf1Sludge();
+  set('sys_saf1_froth',e.saf1_froth); sysCalcFroth1();
   set('sys_mbbr_inf_ph',e.mbbr_inf_ph); set('sys_mbbr_eff_ph',e.mbbr_eff_ph);
   set('sys_mbbr_do',e.mbbr_do); set('sys_mbbr_depth',e.mbbr_depth); sysCalcMbbrVol(); set('sys_sludge_depth',e.sludge_depth);
   set('sys_floc2_pct',e.floc2_pct); set('sys_coag2_pct',e.coag2_pct); sysCalcFloc2(); sysCalcCoag2(); sysCalcPrimarySAF();
@@ -3790,17 +3893,13 @@ function sysExportCSV(){
   const rows=sysLog.map(e=>[
     `"${e.label}"`,e.pit_vol,e.tank1_vol,e.tank2_vol,e.storage_ph,
     e.neut_ph,e.coag_dose?e.coag_dose.toFixed(6):'',e.coag_gpd||'',e.floc1_dose?e.floc1_dose.toFixed(6):'',e.floc1_gpd||'',
-    e.saf1_flow,e.saf1_eff_ph,e.saf1_froth,e.saf1_froth_gpd,
+    e.saf1_flow,e.saf1_eff_ph,e.saf1_sludge_pct,e.saf1_sludge_gal,e.saf1_froth,e.saf1_froth_gpd,
     e.mbbr_inf_ph,e.mbbr_eff_ph,e.mbbr_do,e.mbbr_depth,e.sludge_depth,
     e.coag2_pct,e.coag2_gph,e.floc2_pct,e.floc2_gpd,e.saf2_froth,e.saf2_froth_gpd,e.saf2_eff_ph,e.saf2_turb,
     e.out_flow,e.city_ph,e.flume
   ].join(','));
   const csv=[headers.join(','),...rows].join('\n');
-  const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
-  const url=URL.createObjectURL(blob);
-  const a=document.createElement('a');
-  a.href=url; a.download='sys_monitor_'+new Date().toISOString().slice(0,10)+'.csv';
-  document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+  downloadFile(csv,'sys_monitor_'+new Date().toISOString().slice(0,10)+'.csv','text/csv;charset=utf-8;');
 }
 
 function sysRenderCharts(){
