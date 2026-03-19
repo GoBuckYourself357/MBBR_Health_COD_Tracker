@@ -243,8 +243,9 @@ input[type=range]{width:100%;accent-color:var(--green);height:4px;margin:8px 0}
 @media print{
   body *{visibility:hidden}
   #pdf-overlay,#pdf-overlay *{visibility:visible}
-  #pdf-overlay{position:fixed;inset:0;overflow:visible;background:#fff}
-  #pdf-overlay>div:first-child{display:none}
+  #pdf-overlay{position:fixed;inset:0;overflow:visible!important;background:#fff;height:auto!important}
+  #pdf-overlay>div:first-child{display:none!important}
+  #pdf-content{max-height:none!important;overflow:visible!important;padding:20px!important}
 }
 
 /* GROWTH PHASE */
@@ -372,16 +373,16 @@ input[type=range]{width:100%;accent-color:var(--green);height:4px;margin:8px 0}
         <div class="field"><label>MBBR volume (gal)</label><input type="number" id="mbbr_vol" value="62891.5" step="1" min="0"></div>
         <div class="field"><label>Media fill (%)</label><input type="number" id="media_fill" value="50" step="1" min="0" max="70"></div>
         <div class="field"><label>Media SSA (m²/m³)</label><input type="number" id="media_ssa" value="500" step="10"></div>
-        <div class="field"><label>Temp (°C)</label><input type="number" id="temp" value="20" step="0.5"></div>
+        <div class="field"><label>Temp (°F)</label><input type="number" id="temp" value="68" step="1"></div>
       </div>
     </div>
 
     <div class="section-label">MBBR nitrogen readings</div>
     <div class="card">
       <div class="field-group">
-        <div class="field"><label>NH₃-N (mg/L)</label><input type="number" id="eff_nh3" value="" step="0.1" min="0" placeholder="0.00" oninput="sv('inf_nh3',this.value)"></div>
-        <div class="field"><label>NO₂-N (mg/L)</label><input type="number" id="eff_no2" value="" step="0.1" min="0" placeholder="0.00" oninput="sv('inf_no2',this.value)"></div>
-        <div class="field"><label>NO₃-N (mg/L)</label><input type="number" id="eff_no3" value="" step="0.1" min="0" placeholder="0.00" oninput="sv('inf_no3',this.value)"></div>
+        <div class="field"><label>Ammonia (mg/L)</label><input type="number" id="eff_nh3" value="" step="0.1" min="0" placeholder="0.00" oninput="sv('inf_nh3',this.value)"></div>
+        <div class="field"><label>Nitrite (mg/L)</label><input type="number" id="eff_no2" value="" step="0.1" min="0" placeholder="0.00" oninput="sv('inf_no2',this.value)"></div>
+        <div class="field"><label>Nitrate (mg/L)</label><input type="number" id="eff_no3" value="" step="0.1" min="0" placeholder="0.00" oninput="sv('inf_no3',this.value)"></div>
         <div class="field"><label>TKN (mg/L)</label><input type="number" id="eff_tkn" value="" step="0.5" min="0" placeholder="0.00" oninput="sv('inf_tkn',this.value)"></div>
       </div>
     </div>
@@ -629,8 +630,8 @@ input[type=range]{width:100%;accent-color:var(--green);height:4px;margin:8px 0}
       <div style="height:0.5px;background:var(--border);margin:12px 0 10px"></div>
       <div style="font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Step 3 — neutralizer pump setting → residual after treatment</div>
       <div class="field-group">
-        <div class="field"><label>Neutralizer pump output (mL/min)</label><input type="number" id="paa_pump_ml_min" value="" placeholder="0.00" step="0.1" min="0" oninput="calcNeutResidual('paa')"></div>
-        <div class="field"><label>Neutralizer stock conc (mg/mL)</label><input type="number" id="paa_stock_conc" value="125" step="1" min="1" oninput="calcNeutResidual('paa')"></div>
+        <div class="field"><label>Neutralizer pump output (mL/hr)</label><input type="number" id="paa_pump_ml_min" value="" placeholder="0.00" step="0.1" min="0" oninput="calcNeutResidual('paa')"></div>
+        <div class="field"><label>Neutralizer stock conc (mg/L)</label><input type="number" id="paa_stock_conc" value="300000" step="1" min="1" oninput="calcNeutResidual('paa')"></div>
       </div>
       <div id="paa-pump-result"></div>
     </div>
@@ -661,8 +662,8 @@ input[type=range]{width:100%;accent-color:var(--green);height:4px;margin:8px 0}
       <div style="height:0.5px;background:var(--border);margin:12px 0 10px"></div>
       <div style="font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Step 3 — neutralizer pump setting → residual after treatment</div>
       <div class="field-group">
-        <div class="field"><label>Neutralizer pump output (mL/min)</label><input type="number" id="cl2_pump_ml_min" value="" placeholder="0.00" step="0.1" min="0" oninput="calcNeutResidual('cl2')"></div>
-        <div class="field"><label>Neutralizer stock conc (mg/mL)</label><input type="number" id="cl2_stock_conc" value="125" step="1" min="1" oninput="calcNeutResidual('cl2')"></div>
+        <div class="field"><label>Neutralizer pump output (mL/hr)</label><input type="number" id="cl2_pump_ml_min" value="" placeholder="0.00" step="0.1" min="0" oninput="calcNeutResidual('cl2')"></div>
+        <div class="field"><label>Neutralizer stock conc (mg/L)</label><input type="number" id="cl2_stock_conc" value="300000" step="1" min="1" oninput="calcNeutResidual('cl2')"></div>
       </div>
       <div id="cl2-pump-result"></div>
     </div>
@@ -716,15 +717,15 @@ input[type=range]{width:100%;accent-color:var(--green);height:4px;margin:8px 0}
       <div class="result-row"><span class="rname">Main organics</span><span class="rval">Lactose, milk fat, whey proteins, casein — all highly biodegradable</span></div>
       <div class="result-row"><span class="rname">Fat / oil / grease (FOG)</span><span class="rval">Can coat biofilm media and block O₂ transfer — monitor closely</span></div>
       <div class="result-row"><span class="rname">CIP (clean-in-place) events</span><span class="rval">High pH, high COD, PAA or Cl₂ spikes — biggest shock load source in dairy</span></div>
-      <div class="result-row"><span class="rname">Ammonia source</span><span class="rval">Protein breakdown (casein, whey) — NH₃ loading directly tied to protein content</span></div>
+      <div class="result-row"><span class="rname">Ammonia source</span><span class="rval">Protein breakdown (casein, whey) — Ammonia loading directly tied to protein content</span></div>
       <div class="result-row"><span class="rname">Phosphorus source</span><span class="rval">Milk naturally high in P — dairy wastewater typically 10–50 mg/L</span></div>
     </div>
 
     <div class="card" style="margin-bottom:12px">
       <div class="card-title">Nitrogen — dairy-specific</div>
-      <div class="result-row"><span class="rname">NH₃-N in MBBR</span><span class="rval"><span class="badge b-ok">&lt; 1 mg/L</span> excellent &nbsp;<span class="badge b-warn">1–5 mg/L</span> acceptable &nbsp;<span class="badge b-bad">&gt; 5 mg/L</span> concern</span></div>
-      <div class="result-row"><span class="rname">NO₂-N</span><span class="rval"><span class="badge b-ok">&lt; 0.5 mg/L</span> normal &nbsp;<span class="badge b-warn">0.5–1 mg/L</span> elevated &nbsp;<span class="badge b-bad">&gt; 1 mg/L</span> nitrite lock</span></div>
-      <div class="result-row"><span class="rname">NO₃-N</span><span class="rval">Rises as NH₃ is oxidized — expected 10–30 mg/L in active nitrification</span></div>
+      <div class="result-row"><span class="rname">Ammonia in MBBR</span><span class="rval"><span class="badge b-ok">&lt; 1 mg/L</span> excellent &nbsp;<span class="badge b-warn">1–5 mg/L</span> acceptable &nbsp;<span class="badge b-bad">&gt; 5 mg/L</span> concern</span></div>
+      <div class="result-row"><span class="rname">Nitrite</span><span class="rval"><span class="badge b-ok">&lt; 0.5 mg/L</span> normal &nbsp;<span class="badge b-warn">0.5–1 mg/L</span> elevated &nbsp;<span class="badge b-bad">&gt; 1 mg/L</span> nitrite lock</span></div>
+      <div class="result-row"><span class="rname">Nitrate</span><span class="rval">Rises as NH₃ is oxidized — expected 10–30 mg/L in active nitrification</span></div>
       <div class="result-row"><span class="rname">Dairy TKN</span><span class="rval">Typically 50–200 mg/L raw — much higher than municipal due to protein load</span></div>
       <div class="result-row"><span class="rname">Nitrification competition</span><span class="rval">High COD dairy wastewater — heterotrophs outcompete nitrifiers for O₂. Keep DO high.</span></div>
     </div>
@@ -734,7 +735,7 @@ input[type=range]{width:100%;accent-color:var(--green);height:4px;margin:8px 0}
       <div class="result-row"><span class="rname">DO for nitrification</span><span class="rval"><span class="badge b-ok">≥ 3–4 mg/L</span> ideal &nbsp;<span class="badge b-warn">2–3 mg/L</span> marginal &nbsp;<span class="badge b-bad">&lt; 2 mg/L</span> limiting</span></div>
       <div class="result-row"><span class="rname">DO for high-COD dairy</span><span class="rval">May need 4–6 mg/L due to high O₂ demand from fat and protein oxidation</span></div>
       <div class="result-row"><span class="rname">FOG impact on O₂</span><span class="rval">Fats and oils reduce O₂ transfer efficiency — surface foam is a warning sign</span></div>
-      <div class="result-row"><span class="rname">DO saturation at 20°C</span><span class="rval">9.1 mg/L (decreases with rising temp and increasing salinity)</span></div>
+      <div class="result-row"><span class="rname">DO saturation at 68°F</span><span class="rval">9.1 mg/L (decreases with rising temp and increasing salinity)</span></div>
       <div class="result-row"><span class="rname">O₂ demand from dairy COD</span><span class="rval">~1.0–1.5 g O₂ per g COD removed</span></div>
     </div>
 
@@ -760,11 +761,11 @@ input[type=range]{width:100%;accent-color:var(--green);height:4px;margin:8px 0}
 
     <div class="card" style="margin-bottom:12px">
       <div class="card-title">Temperature</div>
-      <div class="result-row"><span class="rname">Optimal nitrification</span><span class="rval"><span class="badge b-ok">20 – 28°C</span></span></div>
-      <div class="result-row"><span class="rname">Dairy wastewater temp</span><span class="rval">Often arrives warm (30–40°C from pasteurization / CIP) — may need cooling before MBBR</span></div>
-      <div class="result-row"><span class="rname">Above 35°C</span><span class="rval"><span class="badge b-warn">Nitrifier activity begins to decline — AOB more sensitive than heterotrophs</span></span></div>
-      <div class="result-row"><span class="rname">Impaired (&lt; 10°C)</span><span class="rval"><span class="badge b-bad">Significant rate reduction — common in winter dairy operations</span></span></div>
-      <div class="result-row"><span class="rname">Temperature correction</span><span class="rval">Rate changes ~5.8% per °C from 20°C baseline (θ = 1.058)</span></div>
+      <div class="result-row"><span class="rname">Optimal nitrification</span><span class="rval"><span class="badge b-ok">68 – 82°F</span></span></div>
+      <div class="result-row"><span class="rname">Dairy wastewater temp</span><span class="rval">Often arrives warm (86–104°F from pasteurization / CIP) — may need cooling before MBBR</span></div>
+      <div class="result-row"><span class="rname">Above 95°F</span><span class="rval"><span class="badge b-warn">Nitrifier activity begins to decline — AOB more sensitive than heterotrophs</span></span></div>
+      <div class="result-row"><span class="rname">Impaired (&lt; 50°F)</span><span class="rval"><span class="badge b-bad">Significant rate reduction — common in winter dairy operations</span></span></div>
+      <div class="result-row"><span class="rname">Temperature correction</span><span class="rval">Rate changes ~5.8% per °C (10.4% per °F) from 68°F baseline (θ = 1.058)</span></div>
     </div>
 
     <div class="card" style="margin-bottom:12px">
@@ -772,7 +773,7 @@ input[type=range]{width:100%;accent-color:var(--green);height:4px;margin:8px 0}
       <div class="result-row"><span class="rname">Typical dairy influent COD</span><span class="rval">1,000 – 10,000 mg/L (vs 200–800 mg/L for municipal)</span></div>
       <div class="result-row"><span class="rname">BOD/COD ratio for dairy</span><span class="rval"><span class="badge b-info">0.20 – 0.35</span> — lower than municipal due to fats and refractory organics</span></div>
       <div class="result-row"><span class="rname">Surface area loading rate (SALR)</span><span class="rval"><span class="badge b-ok">5 – 15 g COD/m²·day</span> dairy design range (higher than municipal)</span></div>
-      <div class="result-row"><span class="rname">Nitrification SALR</span><span class="rval"><span class="badge b-ok">0.5 – 2.0 g NH₃-N/m²·day</span></span></div>
+      <div class="result-row"><span class="rname">Nitrification SALR</span><span class="rval"><span class="badge b-ok">0.5 – 2.0 g Ammonia-N/m²·day</span></span></div>
       <div class="result-row"><span class="rname">FOG loading concern</span><span class="rval">Fats &gt; 100 mg/L can foul media and reduce effective surface area — pre-treatment DAF recommended</span></div>
       <div class="result-row"><span class="rname">Whey / high-lactose events</span><span class="rval">Can double or triple COD overnight — use shock load detection alerts</span></div>
     </div>
@@ -857,7 +858,7 @@ input[type=range]{width:100%;accent-color:var(--green);height:4px;margin:8px 0}
       <div class="log-scroll"><div id="log-table-m"><p style="font-size:13px;color:var(--text3);text-align:center;padding:20px">No data yet. Enter parameters and tap + Log.</p></div></div>
     </div>
 
-    <div class="section-label">NH₃ & NO₃ trend (lbs/day)</div>
+    <div class="section-label">Ammonia & Nitrate trend (lbs/day)</div>
     <div class="card">
       <div class="chart-wrap" style="height:220px"><canvas id="trend-chart-m"></canvas></div>
     </div>
@@ -1086,12 +1087,53 @@ input[type=range]{width:100%;accent-color:var(--green);height:4px;margin:8px 0}
   <div style="position:sticky;top:0;background:#1D9E75;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;z-index:501;">
     <div style="font-size:15px;font-weight:600;color:#fff">Report preview</div>
     <div style="display:flex;gap:8px">
-      <button onclick="window.print()" style="background:#0F6E56;color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer">Print / Save PDF</button>
+      <button onclick="printFullReport()" style="background:#0F6E56;color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer">Print / Save PDF</button>
       <button onclick="closePDF()" style="background:rgba(255,255,255,.2);color:#fff;border:none;border-radius:8px;padding:8px 14px;font-size:13px;font-weight:600;cursor:pointer">✕ Close</button>
     </div>
   </div>
-  <div id="pdf-content" style="padding:20px;max-width:800px;margin:0 auto;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:#111;font-size:13px;line-height:1.5"></div>
+  <div id="pdf-content" style="padding:20px;max-width:800px;margin:0 auto;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:#111;font-size:13px;line-height:1.5;
+    --text-dark:#111;--text-mid:#222;--text-sub:#333;--text-light:#444;--green-dark:#0A4D2E;--green-label:#1D5E3A;--green-border:#1D9E75;--card-bg:#e8f5ee;--card-border:#b0d8c0;">
+  </div>
 </div>
+<style>
+/* PDF overlay content — print-friendly light theme */
+#pdf-content .result-row{display:flex;justify-content:space-between;align-items:flex-start;padding:6px 0;border-bottom:1px solid #ddd;font-size:13px}
+#pdf-content .rname{color:#222;flex:1;padding-right:8px}
+#pdf-content .rval{text-align:right;font-weight:600;color:#111;flex:1}
+#pdf-content .runit{color:#444;font-size:11px;margin-left:4px}
+#pdf-content .section-label{font-size:11px;font-weight:700;color:#1D5E3A;text-transform:uppercase;letter-spacing:.08em;border-bottom:1px solid #b0d8c0;padding-bottom:4px;margin:16px 0 8px}
+#pdf-content .card-title{font-size:11px;font-weight:700;color:#1D5E3A;text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px}
+#pdf-content .badge.b-ok{background:#c8edd8;color:#0A4D2E}
+#pdf-content .badge.b-warn{background:#f5ddb0;color:#5A3000}
+#pdf-content .badge.b-bad{background:#f5c8c8;color:#5A0000}
+#pdf-content .badge.b-info{background:#c8ddf5;color:#0A2D5A}
+#pdf-content .alert.a-ok{background:#c8edd8;color:#0A4D2E;border-left:3px solid #1D9E75}
+#pdf-content .alert.a-warn{background:#f5ddb0;color:#4A2800;border-left:3px solid #BA7517}
+#pdf-content .alert.a-bad{background:#f5c8c8;color:#4A0000;border-left:3px solid #A32D2D}
+#pdf-content .alert.a-info{background:#c8ddf5;color:#0A2040;border-left:3px solid #185FA5}
+#pdf-content .permit-card.permit-pass{background:#c8edd8;border-color:#1D9E75}
+#pdf-content .permit-card.permit-fail{background:#f5c8c8;border-color:#A32D2D}
+#pdf-content .permit-name{color:#111;font-weight:700}
+#pdf-content .permit-detail{color:#333;font-size:11px}
+#pdf-content .permit-value{color:#111;font-size:18px;font-weight:800}
+#pdf-content .permit-limit{color:#333;font-size:11px}
+#pdf-content .metric-card{background:#e8f5ee;border:1px solid #b0d8c0;border-radius:8px;padding:10px;text-align:center}
+#pdf-content .metric-label{font-size:10px;color:#1D5E3A;font-weight:700;text-transform:uppercase;letter-spacing:.06em}
+#pdf-content .metric-value{font-size:20px;font-weight:800;color:#111}
+#pdf-content .metric-unit{font-size:11px;color:#333}
+#pdf-content .divider{border:none;border-top:1px solid #ccc;margin:8px 0}
+#pdf-content .formula-box{background:#e8f5ee;border-left:3px solid #1D9E75;color:#111;font-family:monospace;font-size:12px;padding:8px 12px;margin:8px 0;border-radius:0 6px 6px 0}
+#pdf-content .log-table th{color:#1D5E3A;font-weight:700;border-bottom:2px solid #1D9E75;background:#e8f5ee}
+#pdf-content .log-table td{color:#111;border-bottom:1px solid #ddd}
+#pdf-content .chl-label{color:#1D5E3A;font-weight:700;font-size:10px;text-transform:uppercase}
+#pdf-content .chl-val{color:#111;font-size:22px;font-weight:800}
+#pdf-content .chl-unit{color:#333;font-size:11px}
+#pdf-content .stress-bar-name{color:#222}
+#pdf-content .stress-bar-val{color:#111}
+#pdf-content .health-score-num{color:#0A4D2E}
+#pdf-content .health-status{color:#111}
+#pdf-content .note{color:#333;font-size:11px}
+</style>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script>
@@ -1127,7 +1169,7 @@ function calcNeutResidual(chem){
   const safeThresh  = chem==='paa'?0.1:0.05;
 
   if(pump_ml_min===0){
-    el.innerHTML='<div class="alert a-info" style="margin-top:0">Enter neutralizer pump output (mL/min) to calculate remaining residual after treatment.</div>';
+    el.innerHTML='<div class="alert a-info" style="margin-top:0">Enter neutralizer pump output (mL/hr) to calculate remaining residual after treatment.</div>';
     return;
   }
   if(agent==='none'){
@@ -1136,10 +1178,11 @@ function calcNeutResidual(chem){
   }
 
   // How much neutralizer is being dosed into the stream (mg/L)?
-  // pump delivers: pump_ml_min × stock_conc mg/mL = mg/min of neutralizer
+  // pump delivers: pump_ml_min × (stock_conc/1000) mg/mL = mg/min of neutralizer
   // stream flow: gpm × 3785.41 mL/min
   // neutralizer conc in stream (mg/L) = mg/min ÷ (stream mL/min ÷ 1000)
-  const neut_mg_per_min   = pump_ml_min * stock_conc;
+  const pump_ml_min_calc  = pump_ml_min / 60;  // convert mL/hr to mL/min
+  const neut_mg_per_min   = pump_ml_min_calc * (stock_conc / 1000);
   const stream_mL_per_min = gpm * 3785.41;
   const neut_conc_in_stream_mgL = +(neut_mg_per_min / (stream_mL_per_min / 1000)).toFixed(2);
 
@@ -1169,7 +1212,7 @@ function calcNeutResidual(chem){
       <div style="font-size:32px;font-weight:800;color:${color};line-height:1;margin-bottom:4px">${remaining} <span style="font-size:14px;font-weight:500;color:var(--text3)">mg/L</span></div>
       <div style="margin-bottom:10px">${badge(statusTxt,statusCls)}</div>
       ${rr('Influent '+label+' titrated',sanitizer_residual,'mg/L')}
-      ${rr('Neutralizer pump output',pump_ml_min,'mL/min')}
+      ${rr('Neutralizer pump output',pump_ml_min,'mL/hr')}
       ${rr('Neutralizer in stream',neut_conc_in_stream_mgL,'mg/L ('+neutNames[agent]+')')}
       ${rr(label+' consumed by neutralizer',sanitizer_consumed,'mg/L')}
       ${rr(label+' remaining',remaining,'mg/L')}
@@ -1195,7 +1238,7 @@ function calcDiag(){
   const inf_cod=gv('inf_cod'),eff_cod=gv('eff_cod');
   const inf_tss=gv('inf_tss'),eff_tss=gv('eff_tss');
   const eff_do=gv('eff_do'),eff_ph=gv('eff_ph');
-  const flow=gv('flow_mgd'),temp=gv('temp');
+  const flow=gv('flow_mgd'),temp=toC(gv('temp'));
   const eff_no2=gv('eff_no2'),eff_alk=gv('eff_alk');
   const paa_res=gv('paa_residual'),paa_gpm=gv('paa_gpm')||130;
   const cl2_res=gv('cl2_residual'),cl2_gpm=gv('cl2_gpm')||130;
@@ -1206,8 +1249,8 @@ function calcDiag(){
   // These are weight ratios — lbs neutralizer per lb sanitizer at 1 mg/L
   const neutRatios={sodium_thiosulfate:2.2,sodium_bisulfite:1.5,ascorbic_acid:2.5,none:0};
   const neutNames={sodium_thiosulfate:'Sodium thiosulfate',sodium_bisulfite:'Sodium bisulfite',ascorbic_acid:'Ascorbic acid',none:'None'};
-  // Stock solution concentrations (% w/v → g/100mL → mg/mL)
-  const neutStockMgPerMl={sodium_thiosulfate:125,sodium_bisulfite:380,ascorbic_acid:100,none:1};
+  // Stock solution concentrations in mg/L
+  const neutStockMgPerMl={sodium_thiosulfate:125000,sodium_bisulfite:380000,ascorbic_acid:100000,none:1000};
 
   function neutCalc(residual, gpm, agent){
     const ratio=neutRatios[agent]||0;
@@ -1217,9 +1260,9 @@ function calcDiag(){
     const neut_lbs_day=+(neut_conc_mgL*flow_mgd*8.34).toFixed(2);           // lbs/day
     const neut_lbs_min=+(neut_lbs_day/1440).toFixed(4);                      // lbs/min
     const neut_oz_min=+(neut_lbs_min*16).toFixed(2);                         // oz/min
-    // mL of stock solution per L of stream: (mg/L needed) / (mg/mL of stock)
-    const stockConc=neutStockMgPerMl[agent]||1;
-    const neut_mL_per_L=+(neut_conc_mgL/stockConc).toFixed(4);              // mL stock / L stream
+    // mL of stock per L of stream: (mg/L needed) / (mg/L stock ÷ 1000 = mg/mL)
+    const stockConc=neutStockMgPerMl[agent]||1000;
+    const neut_mL_per_L=+(neut_conc_mgL/(stockConc/1000)).toFixed(4);       // mL stock / L stream
     return{ratio,neut_conc_mgL,flow_gpd,flow_mgd,neut_lbs_day,neut_lbs_min,neut_oz_min,neut_mL_per_L,stockConc};
   }
 
@@ -1235,7 +1278,7 @@ function calcDiag(){
     (paa_neutralizer!=='none'?
       '<div class="divider"></div>'+
       rr('Neutralizer required',pN.neut_conc_mgL,'mg/L in stream')+
-      rr('',pN.neut_mL_per_L,'mL/L in stream ('+pN.stockConc+' mg/mL stock)')+
+      rr('',pN.neut_mL_per_L,'mL/L in stream ('+pN.stockConc+' mg/L stock)')+
       rr('Neutralizer dose rate',pN.neut_lbs_day.toLocaleString(),'lbs/day')+
       rr('',pN.neut_lbs_min,'lbs/min')+
       rr('',pN.neut_oz_min,'oz/min')+
@@ -1257,7 +1300,7 @@ function calcDiag(){
     (cl2_neutralizer!=='none'?
       '<div class="divider"></div>'+
       rr('Neutralizer required',cN.neut_conc_mgL,'mg/L in stream')+
-      rr('',cN.neut_mL_per_L,'mL/L in stream ('+cN.stockConc+' mg/mL stock)')+
+      rr('',cN.neut_mL_per_L,'mL/L in stream ('+cN.stockConc+' mg/L stock)')+
       rr('Neutralizer dose rate',cN.neut_lbs_day.toLocaleString(),'lbs/day')+
       rr('',cN.neut_lbs_min,'lbs/min')+
       rr('',cN.neut_oz_min,'oz/min')+
@@ -1430,7 +1473,7 @@ function calcDiag(){
     {name:'Nitrogen shock',active:nitrogenShock,detail:`NH₃ in MBBR: ${eff_nh3_diag} mg/L. High NH₃ from protein breakdown — check if production increased.`,sev:nitrogenScore},
     {name:'DO crash',active:doShock,detail:`DO: ${eff_do} mg/L (threshold: 1.0 mg/L). High dairy COD increases O₂ demand — check aeration.`,sev:doScore},
     {name:'pH excursion',active:phShock,detail:`pH: ${eff_ph}. Dairy risk: acid CIP below 6.5 stops nitrification, caustic CIP above 9.5 causes free ammonia toxicity.`,sev:phScore},
-    {name:'Temperature stress',active:tempShock,detail:`Temp: ${temp}°C (optimal: 20–28°C). Check if hot CIP or pasteurizer water is entering the MBBR.`,sev:tempScore},
+    {name:'Temperature stress',active:tempShock,detail:`Temp: ${Math.round(temp*9/5+32)}°F (optimal: 68–82°F). Check if hot CIP or pasteurizer water is entering the MBBR.`,sev:tempScore},
     {name:'Nitrite lock',active:no2Lock,detail:`NO₂: ${eff_no2} mg/L (threshold: 1.0 mg/L). Common after CIP chemical shock to NOB population.`,sev:no2Score},
   ];
   let shockHTML='';
@@ -1452,8 +1495,8 @@ function calcDiag(){
   if(paa_res>0.5)toxIssues.push({name:'Peracetic acid',val:paa_res+' mg/L',threshold:'0.5 mg/L',action:'Likely from CIP PAA sanitizing step. PAA half-life is pH and temperature dependent — lower pH and lower temp slow breakdown. Allow additional contact time or increase neutralizer dose before MBBR inlet.'});
   if(eff_no2>1.0)toxIssues.push({name:'Nitrite / free nitrous acid',val:eff_no2+' mg/L',threshold:'1.0 mg/L',action:'Elevated NO₂ often follows a CIP chemical shock that selectively damaged the NOB (Nitrobacter) population. AOB recovers faster than NOB. Maintain stable conditions — nitrifier balance typically restores in 1–3 weeks.'});
   if(eff_ph>0&&(eff_ph<6.5||eff_ph>9.5))toxIssues.push({name:'pH out of permit range',val:eff_ph.toFixed(2),threshold:'6.5–9.5',action:'In dairy, sudden pH drops often trace to acid CIP (nitric/phosphoric acid) or lactic acid from lactose fermentation. Sudden pH spikes trace to caustic CIP (NaOH). Identify and equalize or neutralize the source before MBBR.'});
-  if(temp>35)toxIssues.push({name:'High temperature stress',val:temp+'°C',threshold:'≤35°C',action:'Hot CIP water, pasteurizer discharge, or warm dairy process water may be entering the MBBR. Temperatures above 35°C reduce nitrifier activity. Investigate source and add cooling or equalization if needed.'});
-  if(temp<8)toxIssues.push({name:'Cold temperature inhibition',val:temp+'°C',threshold:'≥8°C',action:'Cold weather or cold dairy process water is slowing nitrification. Expect elevated NH₃ and reduced nitrifier activity. Monitor closely and reduce loading if effluent NH₃ climbs.'});
+  if(temp>35)toxIssues.push({name:'High temperature stress',val:Math.round(temp*9/5+32)+'°F',threshold:'≤95°F',action:'Hot CIP water, pasteurizer discharge, or warm dairy process water may be entering the MBBR. Temperatures above 95°F reduce nitrifier activity. Investigate source and add cooling or equalization if needed.'});
+  if(temp<8)toxIssues.push({name:'Cold temperature inhibition',val:Math.round(temp*9/5+32)+'°F',threshold:'≥46°F',action:'Cold weather or cold dairy process water is slowing nitrification. Expect elevated NH₃ and reduced nitrifier activity. Monitor closely and reduce loading if effluent NH₃ climbs.'});
   if(!toxIssues.length){toxHTML='<div class="alert a-ok">No active chemical inhibition or toxicity conditions detected.</div>';}
   else{toxIssues.forEach(t=>{toxHTML+=`<div class="rec-card bad" style="margin-bottom:8px"><div class="rec-title">${t.name} — ${t.val} (threshold: ${t.threshold})</div><div class="rec-body">${t.action}</div></div>`;});}
   document.getElementById('toxicity-results').innerHTML=toxHTML;
@@ -1486,6 +1529,7 @@ function delEvent(i){stressEvents.splice(i,1);saveEvents();renderEvents();update
 function clearEvents(){stressEvents=[];saveEvents();renderEvents();updateEventCount();}
 
 function gv(id){return parseFloat(document.getElementById(id).value)||0}
+function toC(f){return +((f-32)*5/9).toFixed(2)}  // °F → °C for calculations
 function sv(id,v){document.getElementById(id).value=v}
 function lbs(c,f){return +(c*f*8.34).toFixed(2)}
 function pct(a,b){return a>0?+((a-b)/a*100).toFixed(2):0}
@@ -1585,7 +1629,7 @@ function calculate(){
   const flow=gv('flow_mgd');
   const inf={nh3:gv('inf_nh3'),no2:gv('inf_no2'),no3:gv('inf_no3'),tkn:gv('inf_tkn'),alk:gv('inf_alk'),p:gv('inf_p'),tss:gv('inf_tss'),vss:gv('inf_vss'),do_:gv('inf_do'),cod:gv('inf_cod'),ph:gv('inf_ph')};
   const eff={nh3:gv('eff_nh3'),no2:gv('eff_no2'),no3:gv('eff_no3'),tkn:gv('eff_tkn'),alk:gv('eff_alk'),p:gv('eff_p'),tss:gv('eff_tss'),vss:gv('eff_vss'),do_:gv('eff_do'),cod:gv('eff_cod'),ph:gv('eff_ph')};
-  const va=gv('vol_acids'),imhoff=gv('imhoff'),temp=gv('temp'),vgal=gv('mbbr_vol'),fill=gv('media_fill'),ssa=gv('media_ssa');
+  const va=gv('vol_acids'),imhoff=gv('imhoff'),temp=toC(gv('temp')),vgal=gv('mbbr_vol'),fill=gv('media_fill'),ssa=gv('media_ssa');
   const ratio=gv('bod_cod_pct')/100;
   const bl=bioLabel(ratio);
   document.getElementById('biodegrad_label').innerHTML=`<span class="badge ${bl.c}">${bl.t}</span>`;
@@ -1666,16 +1710,16 @@ function calculate(){
 
   // NITRIFICATION
   let na='';
-  if(eff.nh3>3)na+=`<div class="alert a-warn">NH₃ at ${eff.nh3} mg/L — may indicate nitrification stress or incomplete nitrification.</div>`;
+  if(eff.nh3>3)na+=`<div class="alert a-warn">Ammonia at ${eff.nh3} mg/L — may indicate nitrification stress or incomplete nitrification.</div>`;
   if(eff.no2>0.5)na+=`<div class="alert a-warn">Nitrite ${eff.no2} mg/L — possible nitrite lock.</div>`;
   if(eff.nh3<1&&eff.no2<0.3)na+=`<div class="alert a-ok">NH₃ and NO₂ both low — nitrification performing well.</div>`;
   if(eff.do_<2)na+=`<div class="alert a-bad">DO ${eff.do_} mg/L — low for MBBR biofilm, may limit nitrification.</div>`;
   document.getElementById('nitri-alerts-mobile').innerHTML=na;
   document.getElementById('nitri-metrics-mobile').innerHTML=
-    rr('NH₃-N in MBBR',eff.nh3,'mg/L')+
-    rr('NO₂-N in MBBR',eff.no2,'mg/L',eff.no2>0.5?badge('Elevated','b-warn'):badge('Normal','b-ok'))+
-    rr('NO₃-N in MBBR',eff.no3,'mg/L')+
-    rr('k_T at '+temp+'°C',kT,'hr⁻¹')+
+    rr('Ammonia in MBBR',eff.nh3,'mg/L')+
+    rr('Nitrite in MBBR',eff.no2,'mg/L',eff.no2>0.5?badge('Elevated','b-warn'):badge('Normal','b-ok'))+
+    rr('Nitrate in MBBR',eff.no3,'mg/L')+
+    rr('k_T at '+Math.round(temp*9/5+32)+'°F',kT,'hr⁻¹')+
     rr('O₂ required for nitrification',o2req,'mg/L')+
     rr('Alk. consumed by nitrification',alkCons,'mg/L CaCO₃')+
     rr('Media surface area',ma.toFixed(2),'m²')+
@@ -1760,7 +1804,7 @@ function calculate(){
     nrHTML += `<div class="alert a-warn">Phosphorus is deficient by ${Math.abs(p_surplus).toFixed(2)} mg/L relative to your BOD load. Unusual for dairy — check if P is being chemically precipitated upstream.</div>`;
   else
     nrHTML += `<div class="alert a-ok">Nutrients are sufficient for your organic load. Both N and P exceed the 100:5:1 minimum — typical for dairy wastewater.</div>`;
-  nrHTML += `<p class="note" style="margin-top:8px">Total N calculated as NH₃-N + NO₂-N + NO₃-N. BOD estimated from effluent COD × BOD/COD ratio. Dairy wastewater is rarely nutrient-limited due to naturally high protein and phosphorus content.</p>`;
+  nrHTML += `<p class="note" style="margin-top:8px">Total N calculated as Ammonia + Nitrite + Nitrate. BOD estimated from effluent COD × BOD/COD ratio. Dairy wastewater is rarely nutrient-limited due to naturally high protein and phosphorus content.</p>`;
   document.getElementById('nutrient-ratio-results').innerHTML=nrHTML;
 
   // CARBON — TOC ESTIMATE & C:N RATIO
@@ -1854,8 +1898,8 @@ function calculate(){
 
   // POUNDS
   const params=[
-    {n:'NH₃-N (MBBR)',i:inf.nh3,e:eff.nh3},{n:'NO₂-N (MBBR)',i:inf.no2,e:eff.no2},
-    {n:'NO₃-N (MBBR)',i:inf.no3,e:eff.no3},{n:'TKN (MBBR)',i:inf.tkn,e:eff.tkn},
+    {n:'Ammonia (MBBR)',i:inf.nh3,e:eff.nh3},{n:'Nitrite (MBBR)',i:inf.no2,e:eff.no2},
+    {n:'Nitrate (MBBR)',i:inf.no3,e:eff.no3},{n:'TKN (MBBR)',i:inf.tkn,e:eff.tkn},
     {n:'COD influent',i:inf.cod,e:0},{n:'COD effluent',i:0,e:eff.cod},
     {n:'BOD (est. effluent)',i:0,e:effBOD.val},
     {n:'Alkalinity',i:inf.alk,e:0},{n:'Phosphorus',i:inf.p,e:0},
@@ -1897,7 +1941,7 @@ function saveToLog(){
 
 // GROWTH PHASE CALCULATION
 function calcGrowth(){
-  const eff_nh3=gv('eff_nh3'),eff_do=gv('eff_do'),temp=gv('temp');
+  const eff_nh3=gv('eff_nh3'),eff_do=gv('eff_do'),temp=toC(gv('temp'));
   const inf_nh3=gv('inf_nh3'),inf_vss=gv('inf_vss'),eff_vss=gv('eff_vss');
   const inf_tss=gv('inf_tss'),eff_tss=gv('eff_tss');
   const eff_no2=gv('eff_no2'),eff_alk=gv('eff_alk'),eff_p=gv('eff_p');
@@ -1992,12 +2036,12 @@ function calcGrowth(){
     <div class="monod-visual">${bars.join('')}</div>`;
 
   document.getElementById('monod-results').innerHTML=
-    rr('μ_max (20°C)',mu_max,'hr⁻¹')+
-    rr('μ_max (temp-corrected '+temp+'°C)',mu_T,'hr⁻¹')+
+    rr('μ_max (68°F)',mu_max,'hr⁻¹')+
+    rr('μ_max (temp-corrected '+Math.round(temp*9/5+32)+'°F)',mu_T,'hr⁻¹')+
     rr('Substrate factor (NH₃)',+(eff_nh3/(ks+eff_nh3)).toFixed(2),'')+
     rr('DO limitation factor',+(eff_do/(ko+eff_do)).toFixed(2),'')+
     rr('Actual μ (net of decay)',mu_actual_T,'hr⁻¹',badge(mu_actual_T>0?'Growing':'Declining',mu_actual_T>0?'b-ok':'b-bad'))+
-    rr('Doubling time',td===Infinity?'N/A':td+'','min')+
+    rr('Doubling time (reproduction rate)',td===Infinity?'N/A':td+'','min')+
     rr('Observed yield Y_obs',obs_yield.toFixed(2),'g VSS/g COD');
 
   // Phase banner
@@ -2009,7 +2053,7 @@ function calcGrowth(){
 
   // Growth metrics
   document.getElementById('growth-metrics').innerHTML=`
-    <div class="growth-stat"><div class="gs-label">Net growth rate</div><div class="gs-val">${mu_actual_T}</div><div class="gs-unit">hr⁻¹ at ${temp}°C</div></div>
+    <div class="growth-stat"><div class="gs-label">Net growth rate</div><div class="gs-val">${mu_actual_T}</div><div class="gs-unit">hr⁻¹ at ${Math.round(temp*9/5+32)}°F</div></div>
     <div class="growth-stat"><div class="gs-label">Min SRT for nitrifiers</div><div class="gs-val">${srt_min_days===999?'>60':srt_min_days}</div><div class="gs-unit">days ${badge(washout_risk?'Washout risk':'Safe',washout_risk?'b-bad':'b-ok')}</div></div>
     <div class="growth-stat"><div class="gs-label">Net VSS production</div><div class="gs-val">${net_vss_prod}</div><div class="gs-unit">mg VSS/L</div></div>
     <div class="growth-stat"><div class="gs-label">Est. biofilm loading</div><div class="gs-val">${est_thickness_um}</div><div class="gs-unit">mg VSS/m² removed</div></div>`;
@@ -2020,7 +2064,7 @@ function calcGrowth(){
     rr('AOB growth rate (actual)',mu_actual_T,'hr⁻¹',badge(mu_actual_T>=nitrifier_mu_min?'Active':'At risk',mu_actual_T>=nitrifier_mu_min?'b-ok':'b-bad'))+
     rr('Current SRT',srt,'days',badge(srt>=srt_min_days?'Adequate':'Too short',srt>=srt_min_days?'b-ok':'b-bad'))+
     rr('Min SRT to prevent washout',srt_min_days===999?'>60':srt_min_days,'days')+
-    rr('NH₃ substrate limitation',nh3_limiting?'YES — <0.5 mg/L':'No','',nh3_limiting?badge('Limiting','b-warn'):badge('OK','b-ok'))+
+    rr('Ammonia substrate limitation',nh3_limiting?'YES — <0.5 mg/L':'No','',nh3_limiting?badge('Limiting','b-warn'):badge('OK','b-ok'))+
     rr('DO limitation',do_limiting?'YES — <1.5 mg/L':'No','',do_limiting?badge('Limiting','b-bad'):badge('OK','b-ok'))+
     rr('Alkalinity limitation',alk_limiting?'YES — <80 mg/L':'No','',alk_limiting?badge('Limiting','b-bad'):badge('OK','b-ok'))+
     rr('Phosphorus limitation',p_limiting?'YES — <0.1 mg/L':'No','',p_limiting?badge('Limiting','b-warn'):badge('OK','b-ok'));
@@ -2053,17 +2097,43 @@ function calcGrowth(){
 
 function renderLog(){
   if(!logData.length){document.getElementById('log-table-m').innerHTML='<p style="font-size:13px;color:var(--text3);text-align:center;padding:20px">No data yet.</p>';return}
-  let h=`<table class="log-table"><thead><tr><th>Date</th><th>NH₃</th><th>COD</th><th>BOD</th><th>BOD lbs</th><th>BOD</th><th>pH</th><th>pH</th><th>TSS</th><th>Alk</th><th></th></tr></thead><tbody>`;
+  let h=`<p style="font-size:11px;color:var(--text3);margin-bottom:8px;text-align:center">Double-tap any row to load into Input tab</p>`;
+  h+=`<table class="log-table"><thead><tr><th>Date</th><th>Ammonia</th><th>COD</th><th>BOD</th><th>BOD lbs</th><th>BOD</th><th>pH</th><th>pH</th><th>TSS</th><th>Alk</th><th></th></tr></thead><tbody>`;
   logData.forEach((e,i)=>{
-    h+=`<tr><td>${e.date}</td><td>${e.eff_nh3}</td><td>${e.eff_cod}</td><td>${e.eff_bod}</td><td>${e.bod_lbs}</td>
+    h+=`<tr ondblclick="loadMbbrEntry(${i})" style="cursor:pointer" title="Double-click to load into Input tab">
+    <td>${e.date}</td><td>${e.eff_nh3}</td><td>${e.eff_cod}</td><td>${e.eff_bod}</td><td>${e.bod_lbs}</td>
     <td><span class="badge ${e.bod_pass?'b-ok':'b-bad'}">${e.bod_pass?'Pass':'FAIL'}</span></td>
     <td>${e.eff_ph}</td>
     <td><span class="badge ${e.ph_pass?'b-ok':'b-bad'}">${e.ph_pass?'OK':'!'}</span></td>
     <td>${e.eff_tss}</td><td>${e.alk}</td>
-    <td><button class="del-btn" onclick="delLog(${i})">×</button></td></tr>`;
+    <td><button class="del-btn" onclick="event.stopPropagation();delLog(${i})">×</button></td></tr>`;
   });
   h+='</tbody></table>';
   document.getElementById('log-table-m').innerHTML=h;
+}
+
+function loadMbbrEntry(i){
+  const e=logData[i];
+  if(!e) return;
+  const set=(id,v)=>{const el=document.getElementById(id);if(el)el.value=v||'';};
+  // Flow
+  set('flow_mgd', e.flow);
+  sv('flow_gpd', e.flow ? +(e.flow*1e6).toFixed(0) : '');
+  // Nitrogen
+  set('eff_nh3', e.eff_nh3); sv('inf_nh3', e.eff_nh3);
+  set('eff_no3', e.eff_no3); sv('inf_no3', e.eff_no3);
+  // COD
+  set('inf_cod', e.inf_cod);
+  set('eff_cod', e.eff_cod);
+  // Chemistry
+  set('eff_ph', e.eff_ph);   sv('inf_ph', e.eff_ph);
+  set('eff_alk', e.alk);     sv('inf_alk', e.alk);
+  // Solids
+  set('eff_tss', e.eff_tss); sv('inf_tss', e.eff_tss);
+  set('imhoff', e.imhoff);
+  // Switch to input tab and recalculate
+  showTab('input');
+  calculate();
 }
 function delLog(i){logData.splice(i,1);saveLog();renderLog();renderTrendCharts();updateLogCount();}
 function showClearConfirm(){
@@ -2123,8 +2193,8 @@ function renderTrendCharts(){
   const labels=logData.map((_,i)=>'#'+(i+1));
   if(tC)tC.destroy();if(bC)bC.destroy();if(tssC)tssC.destroy();
   tC=new Chart(document.getElementById('trend-chart-m').getContext('2d'),{type:'line',data:{labels,datasets:[
-    {label:'NH₃-N lbs/day',data:logData.map(e=>e.nh3_lbs),borderColor:'#1D9E75',backgroundColor:'rgba(29,158,117,.15)',tension:.3,fill:true},
-    {label:'NO₃-N lbs/day',data:logData.map(e=>e.no3_lbs),borderColor:'#EF9F27',backgroundColor:'rgba(239,159,39,.1)',tension:.3,fill:true}
+    {label:'Ammonia lbs/day',data:logData.map(e=>e.nh3_lbs),borderColor:'#1D9E75',backgroundColor:'rgba(29,158,117,.15)',tension:.3,fill:true},
+    {label:'Nitrate lbs/day',data:logData.map(e=>e.no3_lbs),borderColor:'#EF9F27',backgroundColor:'rgba(239,159,39,.1)',tension:.3,fill:true}
   ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#9fc5b5',font:{size:11}}}},scales:{x:{ticks:{color:'#5d8a78'}},y:{beginAtZero:true,ticks:{color:'#5d8a78'},grid:{color:'rgba(29,158,117,.1)'}}}}});
   bC=new Chart(document.getElementById('bod-trend-chart-m').getContext('2d'),{type:'line',data:{labels,datasets:[
     {label:'BOD to city',data:logData.map(e=>e.bod_lbs),borderColor:'#378ADD',backgroundColor:'rgba(55,138,221,.12)',tension:.3,fill:true},
@@ -2147,6 +2217,11 @@ calcNeutResidual('cl2');
 // ── MENU & UNIT SWITCHING ─────────────────────────────────────
 function exportPDF(){
   const mbbr=document.getElementById('unit-mbbr').classList.contains('active');
+
+  // Force full recalculation so all result elements are populated regardless of which tab is visible
+  if(mbbr){ calculate(); calcGrowth(); calcDiag(); }
+  else { safCalculate(); }
+
   const now=new Date().toLocaleString();
 
   // Helper to safely get element innerHTML or blank
@@ -2183,7 +2258,7 @@ function exportPDF(){
         ${inputRow('Flow (MGD)',val('flow_mgd'))}
         ${inputRow('Flow (GPD)',val('flow_gpd'))}
         ${inputRow('MBBR volume (gal)',val('mbbr_vol'))}
-        ${inputRow('Temp (°C)',val('temp'))}
+        ${inputRow('Temp (°F)',val('temp'))}
         ${inputRow('NH₃-N (mg/L)',val('eff_nh3'))}
         ${inputRow('NO₂-N (mg/L)',val('eff_no2'))}
         ${inputRow('NO₃-N (mg/L)',val('eff_no3'))}
@@ -2447,6 +2522,77 @@ function exportPDF(){
   document.getElementById('pdf-content').innerHTML=content;
   document.getElementById('pdf-overlay').style.display='block';
   document.getElementById('pdf-overlay').scrollTop=0;
+}
+
+function printFullReport(){
+  const content=document.getElementById('pdf-content').innerHTML;
+  const win=window.open('','_blank','width=900,height=700');
+  win.document.write(`<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Dairy Wastewater Report</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:#111;font-size:13px;line-height:1.5;padding:20px;max-width:800px;margin:0 auto;background:#fff}
+  .result-row{display:flex;justify-content:space-between;align-items:flex-start;padding:6px 0;border-bottom:1px solid #ddd;font-size:13px}
+  .rname{color:#222;flex:1}
+  .rval{text-align:right;font-weight:600;color:#111;flex:1}
+  .runit{color:#444;font-size:11px;margin-left:4px}
+  .badge{display:inline-block;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;margin-left:6px}
+  .b-ok{background:#c8edd8;color:#0A4D2E}
+  .b-warn{background:#f5ddb0;color:#5A3000}
+  .b-bad{background:#f5c8c8;color:#5A0000}
+  .b-info{background:#c8ddf5;color:#0A2D5A}
+  .alert{padding:8px 12px;border-radius:6px;margin-bottom:6px;font-size:12px;border-left:3px solid}
+  .a-ok{background:#c8edd8;color:#0A4D2E;border-color:#1D9E75}
+  .a-warn{background:#f5ddb0;color:#4A2800;border-color:#BA7517}
+  .a-bad{background:#f5c8c8;color:#4A0000;border-color:#A32D2D}
+  .a-info{background:#c8ddf5;color:#0A2040;border-color:#185FA5}
+  .permit-card{border-radius:8px;padding:10px 14px;margin-bottom:8px;border:1px solid}
+  .permit-pass{background:#c8edd8;border-color:#1D9E75}
+  .permit-fail{background:#f5c8c8;border-color:#A32D2D}
+  .permit-name{font-weight:700;font-size:13px;margin-bottom:2px;color:#111}
+  .permit-detail{font-size:11px;color:#333;margin-bottom:6px}
+  .permit-bottom{display:flex;justify-content:space-between;align-items:center}
+  .permit-value{font-size:18px;font-weight:800;color:#111}
+  .permit-limit{font-size:11px;color:#333}
+  .metric-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+  .metric-card{background:#e8f5ee;border-radius:8px;padding:10px;text-align:center;border:1px solid #b0d8c0}
+  .metric-label{font-size:10px;color:#1D5E3A;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px}
+  .metric-value{font-size:20px;font-weight:800;color:#111}
+  .metric-unit{font-size:11px;color:#333}
+  .divider{border:none;border-top:1px solid #ccc;margin:8px 0}
+  .formula-box{background:#e8f5ee;border-left:3px solid #1D9E75;padding:8px 12px;font-family:monospace;font-size:12px;margin:8px 0;border-radius:0 6px 6px 0;color:#111}
+  .cod-highlights{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px}
+  .cod-highlight,.chl-label,.chl-val,.chl-unit,.chl-note{display:block}
+  .chl-label{font-size:10px;color:#1D5E3A;font-weight:700;text-transform:uppercase}
+  .chl-val{font-size:22px;font-weight:800;color:#111}
+  .chl-unit{font-size:11px;color:#333}
+  table{width:100%;border-collapse:collapse;font-size:12px}
+  th{text-align:left;padding:6px 8px;color:#1D5E3A;font-size:11px;font-weight:700;border-bottom:2px solid #1D9E75}
+  td{padding:6px 8px;border-bottom:1px solid #ddd;color:#111}
+  @media print{
+    body{padding:10px}
+    @page{margin:1.5cm;size:A4}
+    .no-print{display:none}
+  }
+</style>
+</head>
+<body>
+<div class="no-print" style="background:#1D9E75;color:#fff;padding:10px 16px;margin:-20px -20px 20px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:10">
+  <span style="font-weight:600;font-size:14px">Report preview — scroll to review, then print</span>
+  <button onclick="window.print()" style="background:#0F6E56;color:#fff;border:none;border-radius:6px;padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer">⬇ Save as PDF</button>
+</div>
+${content}
+<scr`+'ipt>'+`
+  // Auto-trigger print after a short delay to let content render
+  // User can also click the button above
+<`+'/script>'+`
+</body>
+</html>`);
+  win.document.close();
 }
 
 function closePDF(){
