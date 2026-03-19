@@ -339,9 +339,13 @@ input[type=range]{width:100%;accent-color:var(--green);height:4px;margin:8px 0}
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
       Export backup (.json)
     </button>
-    <button onclick="document.getElementById('backup-file-input').click();closeMenu();" style="width:100%;background:var(--bg3);color:var(--text2);border:1px solid var(--border);border-radius:10px;padding:10px;font-size:13px;font-weight:600;cursor:pointer;margin-bottom:10px;display:flex;align-items:center;justify-content:center;gap:8px">
+    <button onclick="document.getElementById('backup-file-input').click();closeMenu();" style="width:100%;background:var(--bg3);color:var(--text2);border:1px solid var(--border);border-radius:10px;padding:10px;font-size:13px;font-weight:600;cursor:pointer;margin-bottom:6px;display:flex;align-items:center;justify-content:center;gap:8px">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
       Import backup (.json)
+    </button>
+    <button onclick="showPasteImportBox();closeMenu();" style="width:100%;background:var(--bg3);color:var(--text2);border:1px solid var(--border);border-radius:10px;padding:10px;font-size:13px;font-weight:600;cursor:pointer;margin-bottom:10px;display:flex;align-items:center;justify-content:center;gap:8px">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>
+      Paste backup text
     </button>
     <input type="file" id="backup-file-input" accept=".json" style="display:none" onchange="importBackup(event)">
     <div id="backup-storage-info" style="font-size:11px;color:var(--text3);margin-bottom:10px;line-height:1.7"></div>
@@ -1316,6 +1320,18 @@ input[type=range]{width:100%;accent-color:var(--green);height:4px;margin:8px 0}
       <button onclick="sysGenerateReport()" style="flex:1;background:var(--green3);color:var(--green2);border:1px solid rgba(29,158,117,.4);border-radius:10px;padding:11px;font-size:14px;font-weight:600;cursor:pointer">Generate Report</button>
       <button onclick="document.getElementById('sys-date-picker').style.display='none'" style="flex:1;background:var(--bg3);color:var(--text2);border:1px solid var(--border);border-radius:10px;padding:11px;font-size:14px;font-weight:600;cursor:pointer">Cancel</button>
     </div>
+  </div>
+</div>
+
+<!-- PASTE IMPORT OVERLAY -->
+<div id="paste-import-box" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:700;align-items:center;justify-content:center;padding:16px">
+  <div style="background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:16px;width:100%;max-width:420px;max-height:85vh;display:flex;flex-direction:column;gap:10px">
+    <div style="font-size:14px;font-weight:700;color:var(--text)">Paste backup text</div>
+    <div style="font-size:12px;color:var(--text3);line-height:1.6">Paste the backup JSON text you copied from a previous export. Long-press in the box below and tap Paste.</div>
+    <textarea id="paste-import-content" style="flex:1;min-height:200px;background:var(--bg3);color:var(--text2);border:1px solid var(--border);border-radius:8px;padding:10px;font-size:11px;font-family:monospace;resize:none" placeholder="Paste your backup text here..."></textarea>
+    <div id="paste-import-error" style="display:none;background:rgba(226,75,74,.12);border:1px solid rgba(226,75,74,.4);border-radius:8px;padding:10px;font-size:12px;color:var(--red)"></div>
+    <button onclick="processPasteImport()" style="width:100%;background:var(--green3);color:var(--green2);border:1px solid rgba(29,158,117,.4);border-radius:10px;padding:12px;font-size:14px;font-weight:700;cursor:pointer">Import & merge</button>
+    <button onclick="document.getElementById('paste-import-box').style.display='none';document.getElementById('paste-import-content').value='';document.getElementById('paste-import-error').style.display='none';" style="width:100%;background:transparent;color:var(--text3);border:none;padding:6px;font-size:13px;cursor:pointer">Cancel</button>
   </div>
 </div>
 
@@ -2973,7 +2989,49 @@ function exportBackup(){
   showBackupCopyBox(json,filename,false);
 }
 
-function showBackupCopyBox(json,filename,alreadyCopied){
+function showPasteImportBox(){
+  document.getElementById('paste-import-content').value='';
+  document.getElementById('paste-import-error').style.display='none';
+  document.getElementById('paste-import-box').style.display='flex';
+  setTimeout(()=>document.getElementById('paste-import-content').focus(),200);
+}
+
+function processPasteImport(){
+  const text=document.getElementById('paste-import-content').value.trim();
+  const errEl=document.getElementById('paste-import-error');
+  errEl.style.display='none';
+  if(!text){
+    errEl.textContent='Nothing pasted yet — long-press in the text box and tap Paste first.';
+    errEl.style.display='block'; return;
+  }
+  try{
+    const backup=JSON.parse(text);
+    if(!backup.version){throw new Error('Invalid backup');}
+    // Reuse existing import logic
+    document.getElementById('paste-import-box').style.display='none';
+    document.getElementById('paste-import-content').value='';
+    // Feed into the same confirm flow
+    const mbbrNew=(backup.mbbr_log||[]).length;
+    const codNew=(backup.daily_cod_log||[]).length;
+    const sysNew=(backup.sys_monitor_log||[]).length;
+    const evNew=(backup.stress_events||[]).length;
+    const exported=backup.exported?new Date(backup.exported).toLocaleString():'unknown date';
+    document.getElementById('import-confirm-info').innerHTML=
+      `Backup from: <strong>${exported}</strong><br>`+
+      `MBBR log: <strong>${mbbrNew} entr${mbbrNew===1?'y':'ies'}</strong><br>`+
+      `Daily COD log: <strong>${codNew} entr${codNew===1?'y':'ies'}</strong><br>`+
+      `System monitor: <strong>${sysNew} entr${sysNew===1?'y':'ies'}</strong><br>`+
+      `Stress events: <strong>${evNew}</strong><br><br>`+
+      `<span style="color:var(--amber)">This will merge with your current data. Existing entries are kept.</span>`;
+    window._pendingBackup=backup;
+    document.getElementById('import-confirm-box').style.display='flex';
+  }catch(err){
+    errEl.textContent='Could not read backup — make sure you copied the full text and nothing is missing.';
+    errEl.style.display='block';
+  }
+}
+
+function showPasteImportBox2(){showPasteImportBox();}
   document.getElementById('backup-copy-filename').textContent=filename||'backup.json';
   document.getElementById('backup-copy-content').value=json;
   document.getElementById('backup-copy-box').style.display='flex';
