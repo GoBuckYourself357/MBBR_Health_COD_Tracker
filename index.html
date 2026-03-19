@@ -3032,7 +3032,8 @@ function processPasteImport(){
 }
 
 function showPasteImportBox2(){showPasteImportBox();}
-  document.getElementById('backup-copy-filename').textContent=filename||'backup.json';
+
+function showBackupCopyBox(json,filename,alreadyCopied){
   document.getElementById('backup-copy-content').value=json;
   document.getElementById('backup-copy-box').style.display='flex';
   if(alreadyCopied){
