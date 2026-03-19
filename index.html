@@ -1324,6 +1324,7 @@ input[type=range]{width:100%;accent-color:var(--green);height:4px;margin:8px 0}
   <div style="background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:16px;width:100%;max-width:420px;max-height:85vh;display:flex;flex-direction:column;gap:10px">
     <div style="font-size:14px;font-weight:700;color:var(--text)">Export backup data</div>
     <div style="font-size:11px;color:var(--text3)">File: <span id="backup-copy-filename" style="color:var(--green2);font-family:monospace"></span></div>
+    <div id="backup-copy-status"></div>
     <div style="font-size:12px;color:var(--text2);line-height:1.6">
       <strong>Option 1:</strong> Tap <em>Copy all</em> then paste into an email to your boss.<br>
       <strong>Option 2:</strong> Tap <em>Share as text</em> to open the Android share sheet.
@@ -2947,56 +2948,47 @@ function exportBackup(){
   const json=JSON.stringify(backup,null,2);
   const filename='dairy_calc_backup_'+new Date().toISOString().slice(0,10)+'.json';
 
-  // Try Median JavaScript Bridge first (Median.co WebView apps)
-  if(typeof median!=='undefined'&&median.share&&median.share.downloadFile){
-    // Create a blob URL and pass to Median's native downloader
-    const blob=new Blob([json],{type:'application/json'});
-    const url=URL.createObjectURL(blob);
-    median.share.downloadFile({url:url,open:true});
-    setTimeout(()=>URL.revokeObjectURL(url),5000);
+  // Try clipboard first — works in most WebViews including Median
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(json).then(()=>{
+      showBackupCopyBox(json,filename,true);
+    }).catch(()=>{
+      showBackupCopyBox(json,filename,false);
+    });
     return;
   }
 
-  // Try Web Share API with file
-  if(navigator.share&&navigator.canShare){
-    try{
-      const file=new File([json],filename,{type:'application/json'});
-      if(navigator.canShare({files:[file]})){
-        navigator.share({files:[file],title:'Dairy Calculator Backup',text:'Backup: '+filename})
-          .catch(e=>{ if(e.name!=='AbortError') showBackupCopyBox(json,filename); });
-        return;
-      }
-    }catch(e){}
-    // Text share fallback
-    navigator.share({title:'Dairy Calculator Backup — '+filename,text:json})
-      .catch(e=>{ if(e.name!=='AbortError') showBackupCopyBox(json,filename); });
-    return;
-  }
-
-  // Try blob download
+  // Try old-style copy
   try{
-    const blob=new Blob([json],{type:'application/json'});
-    const url=URL.createObjectURL(blob);
-    const a=document.createElement('a');
-    a.href=url; a.download=filename;
-    document.body.appendChild(a); a.click(); document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+    const ta=document.createElement('textarea');
+    ta.value=json; ta.style.position='fixed'; ta.style.opacity='0';
+    document.body.appendChild(ta); ta.focus(); ta.select();
+    const ok=document.execCommand('copy');
+    document.body.removeChild(ta);
+    showBackupCopyBox(json,filename,ok);
     return;
   }catch(e){}
 
-  // Always-works fallback
-  showBackupCopyBox(json,filename);
+  // Show copy box so user can copy manually
+  showBackupCopyBox(json,filename,false);
 }
 
-function showBackupCopyBox(json,filename){
+function showBackupCopyBox(json,filename,alreadyCopied){
   document.getElementById('backup-copy-filename').textContent=filename||'backup.json';
   document.getElementById('backup-copy-content').value=json;
   document.getElementById('backup-copy-box').style.display='flex';
-  // Auto-select all text for easy copying
-  setTimeout(()=>{
-    const ta=document.getElementById('backup-copy-content');
-    ta.focus();ta.select();ta.setSelectionRange(0,99999);
-  },100);
+  if(alreadyCopied){
+    document.getElementById('backup-copy-status').innerHTML=
+      '<div style="background:var(--green3);color:var(--green2);border:1px solid rgba(29,158,117,.4);border-radius:8px;padding:10px;font-size:13px;font-weight:600;text-align:center">✓ Backup copied to clipboard!<br><span style="font-weight:400;font-size:12px">Open Gmail → Compose → long-press in body → Paste</span></div>';
+    document.getElementById('backup-copy-btn').textContent='✓ Already copied';
+  } else {
+    document.getElementById('backup-copy-status').innerHTML='';
+    document.getElementById('backup-copy-btn').textContent='📋 Copy all';
+    setTimeout(()=>{
+      const ta=document.getElementById('backup-copy-content');
+      ta.focus();ta.select();ta.setSelectionRange(0,99999);
+    },100);
+  }
 }
 
 function shareBackupText(){
