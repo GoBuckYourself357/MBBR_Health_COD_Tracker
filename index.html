@@ -213,7 +213,7 @@ input[type=range]{width:100%;accent-color:var(--green);height:4px;margin:8px 0}
 .chart-wrap{position:relative;width:100%;margin:8px 0}
 
 /* BIODEGRAD DISPLAY */
-.biodegrad-display{background:var(--bg3);border-radius:10px;padding:11px 12px;font-size:14px;font-weight:600;color:var(--text)}
+.biodegrad-display{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:11px 12px;font-size:14px;font-weight:600;color:var(--text);opacity:0.85}
 
 /* HAMBURGER MENU */
 .hamburger{background:none;border:none;cursor:pointer;padding:6px;color:var(--text2);display:flex;flex-direction:column;gap:5px;justify-content:center}
@@ -302,9 +302,11 @@ input[type=range]{width:100%;accent-color:var(--green);height:4px;margin:8px 0}
 .diag-val{font-size:22px;font-weight:700;color:var(--text);line-height:1}
 .chk-item{display:flex;align-items:center;gap:6px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:7px 8px;cursor:pointer;font-size:11px;color:var(--text2);line-height:1.3;transition:background .15s,border-color .15s;user-select:none;-webkit-user-select:none}
 .chk-item.ok{background:rgba(29,158,117,.15);border-color:rgba(29,158,117,.5);color:var(--green2)}
+.chk-item.warn{background:rgba(239,159,39,.15);border-color:rgba(239,159,39,.5);color:var(--amber)}
 .chk-item.fail{background:rgba(226,75,74,.12);border-color:rgba(226,75,74,.4);color:var(--red)}
 .chk-dot{width:12px;height:12px;border-radius:50%;border:2px solid var(--border);flex-shrink:0;transition:background .15s,border-color .15s}
 .chk-item.ok .chk-dot{background:var(--green2);border-color:var(--green2)}
+.chk-item.warn .chk-dot{background:var(--amber);border-color:var(--amber)}
 .chk-item.fail .chk-dot{background:var(--red);border-color:var(--red)}
 .sop-section{margin-bottom:20px}
 .sop-section-title{font-size:13px;font-weight:700;color:var(--green2);text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid var(--border);padding-bottom:6px;margin-bottom:10px}
@@ -867,6 +869,42 @@ mark.sop-highlight{background:rgba(239,159,39,.4);border-radius:2px;color:inheri
       <div class="result-row"><span class="rname">Dairy nitrifier recovery</span><span class="rval">After a toxic CIP event, nitrifier population can take 1–3 weeks to fully recover — expect elevated NH₃ during this period</span></div>
     </div>
 
+    <div class="card" style="margin-bottom:12px">
+      <div class="card-title">MBBR microbial community — your biofilm</div>
+      <div style="font-size:11px;color:var(--text3);margin-bottom:10px">Mix of bacteria, archaea, fungi, protozoa, and specialized organisms</div>
+      <table style="width:100%;border-collapse:collapse;font-size:12px;margin-bottom:10px">
+        <thead>
+          <tr style="border-bottom:1px solid var(--border)">
+            <th style="text-align:left;padding:5px 8px;color:var(--text3);font-size:11px;font-weight:600">Functional role</th>
+            <th style="text-align:left;padding:5px 8px;color:var(--text3);font-size:11px;font-weight:600">Organisms (Genus/Order)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="border-bottom:1px solid var(--border)"><td style="padding:6px 8px;color:var(--text2)">Ammonia-Oxidizing Bacteria (AOB)</td><td style="padding:6px 8px;color:var(--text);font-weight:500">Nitrosomonas</td></tr>
+          <tr style="border-bottom:1px solid var(--border)"><td style="padding:6px 8px;color:var(--text2)">Nitrite-Oxidizing Bacteria (NOB)</td><td style="padding:6px 8px;color:var(--text);font-weight:500">Nitrospira</td></tr>
+          <tr style="border-bottom:1px solid var(--border)"><td style="padding:6px 8px;color:var(--text2)">Denitrifiers</td><td style="padding:6px 8px;color:var(--text);font-weight:500">Pseudomonas, Paracoccus, Alcaligenes, Flavobacterium, Thauera</td></tr>
+          <tr style="border-bottom:1px solid var(--border)"><td style="padding:6px 8px;color:var(--text2)">Anaerobic Ammonium Oxidation (Anammox)</td><td style="padding:6px 8px;color:var(--text);font-weight:500">Candidatus Brocadia</td></tr>
+          <tr style="border-bottom:1px solid var(--border)"><td style="padding:6px 8px;color:var(--text2)">Sulfate-Reducing Bacteria (SRB) — anaerobic, odor-causing</td><td style="padding:6px 8px;color:var(--text);font-weight:500">Found in some systems</td></tr>
+          <tr><td style="padding:6px 8px;color:var(--text2)">Heterotrophs (Organic matter removal)</td><td style="padding:6px 8px;color:var(--text);font-weight:500">Acinetobacter, Arcobacter, Clostridium, Rhodobacter, Sphaerotilus, Zooglea</td></tr>
+        </tbody>
+      </table>
+      <div class="result-row"><span class="rname" style="font-style:italic;font-weight:600">Proteobacteria</span><span class="rval">Most abundant phylum — dominant in biofilm and suspended sludge, major role in organic carbon removal</span></div>
+      <div class="result-row"><span class="rname" style="font-style:italic;font-weight:600">Bacteroidetes</span><span class="rval">Hydrolysis of macromolecules, especially active in anoxic conditions</span></div>
+      <div class="result-row"><span class="rname" style="font-style:italic;font-weight:600">Firmicutes</span><span class="rval">Common in both biofilm and suspended phases</span></div>
+      <div class="result-row"><span class="rname" style="font-style:italic;font-weight:600">Actinobacteria</span><span class="rval">Breaks down complex nitrogen and carbon sources</span></div>
+      <div class="result-row"><span class="rname" style="font-style:italic;font-weight:600">Other phyla</span><span class="rval">Acidobacteria, Chloroflexi, Planctomycetes, Verrucomicrobia</span></div>
+    </div>
+
+    <div class="card" style="margin-bottom:12px">
+      <div class="card-title">Organism stress indicators — what to watch</div>
+      <div class="result-row"><span class="rname" style="color:var(--red)">Nitrosomonas (AOB)</span><span class="rval">Rising ammonia · DO below 2 mg/L · temp above 95°F or below 50°F · pH outside 7–8 · CIP shock</span></div>
+      <div class="result-row"><span class="rname" style="color:var(--red)">Nitrospira (NOB)</span><span class="rval">Rising nitrite · DO below 1 mg/L — more O₂-sensitive than AOB</span></div>
+      <div class="result-row"><span class="rname" style="color:var(--amber)">Denitrifiers</span><span class="rval">Rising nitrate · insufficient carbon (C:N below 3:1)</span></div>
+      <div class="result-row"><span class="rname" style="color:var(--amber)">Heterotrophs competing</span><span class="rval">Very high BOD loading — outcompete nitrifiers for O₂ and media space</span></div>
+      <div class="result-row"><span class="rname" style="color:var(--amber)">Sphaerotilus (bulking)</span><span class="rval">Filamentous — proliferates under low DO or low nutrients, causes sludge bulking</span></div>
+      <div class="result-row"><span class="rname">Sulfate-Reducing Bacteria (SRB)</span><span class="rval">Rotten egg smell (hydrogen sulfide gas), metal corrosion — indicates anaerobic (oxygen-free) zones forming in the biofilm</span></div>
+    </div>
+
   </div>
 
   <!-- PANEL: LOG -->
@@ -1124,13 +1162,24 @@ mark.sop-highlight{background:rgba(239,159,39,.4);border-radius:2px;color:inheri
     </div>
 
     <!-- CHECKLIST -->
-    <div class="section-label">Pre-check inspection</div>
+    <div class="section-label">Primary SAF inspection</div>
     <div class="card" style="margin-bottom:12px">
       <div style="font-size:11px;color:var(--text3);margin-bottom:10px">Tap to toggle — green = acceptable, red = issue</div>
       <div id="sys-checklist" style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px"></div>
       <div id="sys-checklist-comment-wrap" style="display:none;margin-top:4px">
         <label style="font-size:11px;color:var(--text3);display:block;margin-bottom:4px">Comments / reason for any failures</label>
         <textarea id="sys_checklist_comment" rows="3" style="width:100%;background:var(--bg3);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:10px;font-size:13px;resize:none;box-sizing:border-box" placeholder="Describe any issues noted..."></textarea>
+      </div>
+    </div>
+
+    <!-- SECONDARY SAF INSPECTION -->
+    <div class="section-label">Secondary SAF inspection</div>
+    <div class="card" style="margin-bottom:12px">
+      <div style="font-size:11px;color:var(--text3);margin-bottom:10px">Tap to toggle — green = acceptable, red = issue</div>
+      <div id="sys-checklist2" style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px"></div>
+      <div id="sys-checklist2-comment-wrap" style="display:none;margin-top:4px">
+        <label style="font-size:11px;color:var(--text3);display:block;margin-bottom:4px">Comments / reason for any failures</label>
+        <textarea id="sys_checklist2_comment" rows="3" style="width:100%;background:var(--bg3);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:10px;font-size:13px;resize:none;box-sizing:border-box" placeholder="Describe any issues noted..."></textarea>
       </div>
     </div>
 
@@ -1192,7 +1241,8 @@ mark.sop-highlight{background:rgba(239,159,39,.4);border-radius:2px;color:inheri
         <div class="field"><label>Sludge tank (%)</label><input type="number" id="sys_saf1_sludge_pct" value="" step="0.1" min="0" max="100" placeholder="0.0" oninput="sysCalcSaf1Sludge()"></div>
         <div class="field"><label>Sludge volume (gal)</label><div class="biodegrad-display" id="sys_saf1_sludge_gal">—</div></div>
         <div class="field"><label>Froth generator (mV)</label><input type="number" id="sys_saf1_froth" value="" step="0.1" min="4" placeholder="4.0" oninput="sysCalcFroth1()"></div>
-        <div class="field"><label>Froth usage (gal/hr)</label><div class="biodegrad-display" id="sys_saf1_froth_gpd">—</div></div>
+        <div class="field"><label>Froth chemical (gal/hr)</label><div class="biodegrad-display" id="sys_saf1_froth_gpd">—</div></div>
+        <div class="field"><label>Froth dosing rate (GPM)</label><input type="number" id="sys_saf1_froth_gpm" value="" step="0.01" min="0" placeholder="0.00"></div>
       </div>
     </div>
 
@@ -1249,7 +1299,18 @@ mark.sop-highlight{background:rgba(239,159,39,.4);border-radius:2px;color:inheri
         <div class="field"><label>Flocculant dose (%)</label><input type="number" id="sys_floc2_pct" value="" step="0.1" min="0" max="100" placeholder="0.0" oninput="sysCalcFloc2()"></div>
         <div class="field"><label>Flocculant (gal/day)</label><div class="biodegrad-display" id="sys_floc2_gpd">—</div></div>
         <div class="field"><label>Froth generator (mV)</label><input type="number" id="sys_saf2_froth" value="" step="0.1" min="4" placeholder="4.0" oninput="sysCalcFroth2()"></div>
-        <div class="field"><label>Froth usage (gal/hr)</label><div class="biodegrad-display" id="sys_saf2_froth_gpd">—</div></div>
+        <div class="field"><label>Froth chemical (gal/hr)</label><div class="biodegrad-display" id="sys_saf2_froth_gpd">—</div></div>
+        <div class="field"><label>Froth dosing rate (GPM)</label><input type="number" id="sys_saf2_froth_gpm" value="" step="0.01" min="0" placeholder="0.00"></div>
+        <div class="field"><label>Effluent pH</label><input type="number" id="sys_saf2_eff_ph" value="" step="0.1" min="0" max="14" placeholder="—"></div>
+        <div class="field"><label>Polymer dilution tube (GPM)</label><input type="number" id="sys_saf2_poly_tube" value="" step="0.01" min="0" placeholder="0.00"></div>
+        <div class="field"><label>Polymer dilution lines (GPM)</label><input type="number" id="sys_saf2_poly_lines" value="" step="0.01" min="0" placeholder="0.00"></div>
+        <div class="field" style="grid-column:span 2"><label>Injectors running</label>
+          <div style="display:flex;gap:8px;margin-top:4px">
+            <label style="display:flex;align-items:center;gap:6px;font-size:13px;font-weight:400;cursor:pointer"><input type="checkbox" id="sys_inj1" style="width:18px;height:18px;cursor:pointer"> Injector 1</label>
+            <label style="display:flex;align-items:center;gap:6px;font-size:13px;font-weight:400;cursor:pointer"><input type="checkbox" id="sys_inj2" style="width:18px;height:18px;cursor:pointer"> Injector 2</label>
+            <label style="display:flex;align-items:center;gap:6px;font-size:13px;font-weight:400;cursor:pointer"><input type="checkbox" id="sys_inj3" style="width:18px;height:18px;cursor:pointer"> Injector 3</label>
+          </div>
+        </div>
         <div class="field"><label>Effluent pH</label><input type="number" id="sys_saf2_eff_ph" value="" step="0.1" min="0" max="14" placeholder="—"></div>
         <div class="field"><label>Effluent turbidity (NTU)</label><input type="number" id="sys_saf2_turb" value="" step="0.1" min="0" placeholder="—"></div>
         <div class="field"><label>Effluent flow → city (GPM)</label><input type="number" id="sys_saf2_eff_flow" value="" step="0.1" min="0" placeholder="0.00"></div>
@@ -1857,13 +1918,22 @@ function calcDiag(){
   // TOXICITY SUMMARY
   let toxHTML='';
   const toxIssues=[];
-  if(cl2_res>0.1)toxIssues.push({name:'Free chlorine',val:cl2_res+' mg/L',threshold:'0.1 mg/L',action:'Likely from CIP sanitizing step. Verify sodium thiosulfate or bisulfite neutralization upstream of MBBR. Test residual at the MBBR inlet — not just at the dosing point. Coordinate CIP discharge timing with operations.'});
-  if(paa_res>0.5)toxIssues.push({name:'Peracetic acid',val:paa_res+' mg/L',threshold:'0.5 mg/L',action:'Likely from CIP PAA sanitizing step. PAA half-life is pH and temperature dependent — lower pH and lower temp slow breakdown. Allow additional contact time or increase neutralizer dose before MBBR inlet.'});
-  if(eff_no2>1.0)toxIssues.push({name:'Nitrite / free nitrous acid',val:eff_no2+' mg/L',threshold:'1.0 mg/L',action:'Elevated NO₂ often follows a CIP chemical shock that selectively damaged the NOB (Nitrobacter) population. AOB recovers faster than NOB. Maintain stable conditions — nitrifier balance typically restores in 1–3 weeks.'});
-  if(eff_ph>0&&(eff_ph<6.5||eff_ph>9.5))toxIssues.push({name:'pH out of permit range',val:eff_ph.toFixed(2),threshold:'6.5–9.5',action:'In dairy, sudden pH drops often trace to acid CIP (nitric/phosphoric acid) or lactic acid from lactose fermentation. Sudden pH spikes trace to caustic CIP (NaOH). Identify and equalize or neutralize the source before MBBR.'});
-  if(temp>35)toxIssues.push({name:'High temperature stress',val:Math.round(temp*9/5+32)+'°F',threshold:'≤95°F',action:'Hot CIP water, pasteurizer discharge, or warm dairy process water may be entering the MBBR. Temperatures above 95°F reduce nitrifier activity. Investigate source and add cooling or equalization if needed.'});
-  if(temp<8)toxIssues.push({name:'Cold temperature inhibition',val:Math.round(temp*9/5+32)+'°F',threshold:'≥46°F',action:'Cold weather or cold dairy process water is slowing nitrification. Expect elevated NH₃ and reduced nitrifier activity. Monitor closely and reduce loading if effluent NH₃ climbs.'});
-  if(!toxIssues.length){toxHTML='<div class="alert a-ok">No active chemical inhibition or toxicity conditions detected.</div>';}
+  if(cl2_res>0.1)toxIssues.push({name:'Free chlorine — Nitrosomonas & Nitrospira at risk',val:cl2_res+' mg/L',threshold:'0.1 mg/L',action:'Likely from CIP sanitizing step. Both AOB (Nitrosomonas) and NOB (Nitrospira) are highly sensitive to free chlorine. Verify neutralization upstream. Test residual at MBBR inlet. Coordinate CIP discharge timing with operations.'});
+  if(paa_res>0.5)toxIssues.push({name:'Peracetic acid — AOB/NOB inhibition risk',val:paa_res+' mg/L',threshold:'0.5 mg/L',action:'PAA from CIP sanitizing step. Nitrosomonas and Nitrospira are vulnerable — expect elevated ammonia and rising nitrite if exposure continues. Allow additional contact time or increase neutralizer dose before MBBR inlet.'});
+  if(eff_no2>1.0)toxIssues.push({name:'Nitrite accumulation — Nitrospira (NOB) impaired',val:eff_no2+' mg/L',threshold:'1.0 mg/L',action:'Rising nitrite indicates Nitrospira (NOB) is damaged or outpaced by Nitrosomonas (AOB). Common after CIP chemical shock — AOB recovers faster than NOB. Maintain stable conditions. Nitrifier balance typically restores in 1–3 weeks.'});
+  if(eff_ph>0&&(eff_ph<6.5||eff_ph>9.5))toxIssues.push({name:'pH excursion — broad community stress',val:eff_ph.toFixed(2),threshold:'6.5–9.5',action:'pH below 6.5 stops Nitrosomonas activity completely. Above 9.5 causes free ammonia toxicity affecting AOB and NOB. Denitrifiers (Pseudomonas, Thauera) also stressed outside 6.5–8.5. In dairy, trace to acid CIP (nitric/phosphoric) or caustic CIP (NaOH).'});
+  if(temp>35)toxIssues.push({name:'High temperature — nitrifier activity declining',val:Math.round(temp*9/5+32)+'°F',threshold:'≤95°F',action:'Above 95°F Nitrosomonas (AOB) activity begins to decline — AOB more temperature-sensitive than heterotrophs. Heterotrophs (Acinetobacter, Zooglea) will continue to remove BOD but nitrification suffers. Check for hot CIP water or pasteurizer discharge entering the MBBR.'});
+  if(temp<8)toxIssues.push({name:'Cold temperature — nitrification severely reduced',val:Math.round(temp*9/5+32)+'°F',threshold:'≥46°F',action:'Below 46°F Nitrosomonas and Nitrospira activity drops sharply. Heterotrophs and denitrifiers also slow but are more cold-tolerant. Expect elevated ammonia and reduced overall treatment. Reduce loading if possible and monitor closely.'});
+  // DO-based organism alerts
+  if(eff_do>0&&eff_do<1.0)toxIssues.push({name:'Critical DO — Nitrospira (NOB) oxygen-starved',val:eff_do+' mg/L',threshold:'≥1.0 mg/L for NOB',action:'Nitrospira requires more DO than Nitrosomonas — below 1.0 mg/L NOB activity essentially stops, causing nitrite to accumulate. Check blower operation immediately. Sphaerotilus (filamentous heterotroph) can proliferate under low DO causing sludge bulking.'});
+  else if(eff_do>0&&eff_do<2.0)toxIssues.push({name:'Low DO — Nitrosomonas (AOB) under stress',val:eff_do+' mg/L',threshold:'≥2.0 mg/L for AOB',action:'Below 2.0 mg/L Nitrosomonas activity is significantly reduced. Both AOB and NOB compete for limited O₂. Heterotrophs (Acinetobacter, Rhodobacter) may outcompete nitrifiers for O₂ and biofilm space. Increase aeration.'});
+  // C:N ratio — heterotroph vs nitrifier competition
+  const inf_cod_h=gv('inf_cod'), inf_nh3_h=gv('inf_nh3');
+  if(inf_cod_h>0&&inf_nh3_h>0){
+    const cn=+(inf_cod_h/2.67/inf_nh3_h).toFixed(1);
+    if(cn>20)toxIssues.push({name:'High C:N ratio — heterotroph dominance risk',val:'C:N = '+cn,threshold:'< 15 preferred for nitrification',action:'Very high organic load relative to ammonia. Heterotrophs (Acinetobacter, Arcobacter, Clostridium) will compete aggressively with Nitrosomonas for O₂ and space on the biofilm media. Consider increasing DO setpoint during high BOD periods.'});
+  }
+  if(!toxIssues.length){toxHTML='<div class="alert a-ok">No active chemical inhibition or toxicity conditions detected. Microbial community conditions appear favorable.</div>';}
   else{toxIssues.forEach(t=>{toxHTML+=`<div class="rec-card bad" style="margin-bottom:8px"><div class="rec-title">${t.name} — ${t.val} (threshold: ${t.threshold})</div><div class="rec-body">${t.action}</div></div>`;});}
   document.getElementById('toxicity-results').innerHTML=toxHTML;
 
@@ -3315,6 +3385,7 @@ function sysGenerateReport(){
       <td style="padding:5px 6px">${e.saf1_sludge_gal||'—'}</td>
       <td style="padding:5px 6px">${e.saf1_froth||'—'}</td>
       <td style="padding:5px 6px">${e.saf1_froth_gph||'—'}</td>
+      <td style="padding:5px 6px">${e.saf1_froth_gpm||'—'}</td>
       <td style="padding:5px 6px">${e.blower_id||'—'}</td><td style="padding:5px 6px">${e.blower_psi||'—'}</td><td style="padding:5px 6px">${e.blower_filter_psi||'—'}</td><td style="padding:5px 6px">${e.blower_temp||'—'}</td><td style="padding:5px 6px">${e.blower_id||'—'}</td><td style="padding:5px 6px">${e.blower_psi||'—'}</td><td style="padding:5px 6px">${e.blower_filter_psi||'—'}</td><td style="padding:5px 6px">${e.blower_temp||'—'}</td><td style="padding:5px 6px">${e.mbbr_inf_ph||'—'}</td>
       <td style="padding:5px 6px">${e.mbbr_eff_ph||'—'}</td>
       <td style="padding:5px 6px">${e.mbbr_do||'—'}</td>
@@ -3327,6 +3398,7 @@ function sysGenerateReport(){
       <td style="padding:5px 6px">${e.floc2_gpd||'—'}</td>
       <td style="padding:5px 6px">${e.saf2_froth||'—'}</td>
       <td style="padding:5px 6px">${e.saf2_froth_gph||'—'}</td>
+      <td style="padding:5px 6px">${e.saf2_froth_gpm||'—'}</td>
       <td style="padding:5px 6px">${e.saf2_eff_ph||'—'}</td>
       <td style="padding:5px 6px">${e.saf2_turb||'—'}</td>
       <td style="padding:5px 6px">${e.city_ph||'—'}</td>
@@ -3401,6 +3473,7 @@ function sysGenerateReport(){
           <th style="padding:5px 6px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">Sludge gal</th>
           <th style="padding:5px 6px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">Froth mV</th>
           <th style="padding:5px 6px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">Froth g/hr</th>
+          <th style="padding:5px 6px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">Froth GPM</th>
           <th style="padding:5px 6px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">Blower</th><th style="padding:5px 6px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">PSI</th><th style="padding:5px 6px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">Flt PSI</th><th style="padding:5px 6px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">Blwr °F</th><th style="padding:5px 6px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">MBBR in</th>
           <th style="padding:5px 6px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">MBBR out</th>
           <th style="padding:5px 6px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">DO</th>
@@ -3413,6 +3486,7 @@ function sysGenerateReport(){
           <th style="padding:5px 6px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">Floc2 g/hr</th>
           <th style="padding:5px 6px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">Froth2 mV</th>
           <th style="padding:5px 6px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">Froth2 g/hr</th>
+          <th style="padding:5px 6px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">Froth2 GPM</th>
           <th style="padding:5px 6px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">SAF2 pH</th>
           <th style="padding:5px 6px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">Turb NTU</th>
           <th style="padding:5px 6px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">SAF2 GPM</th>
@@ -3480,12 +3554,26 @@ function sysGenerateReport(){
       const fails=last.checklist_items.filter(i=>i.state==='fail');
       const oks=last.checklist_items.filter(i=>i.state==='ok');
       return `<div style="margin-bottom:16px">
-        <div style="font-size:10px;font-weight:700;color:#1D5E3A;text-transform:uppercase;letter-spacing:.08em;border-bottom:1px solid #b0d8c0;padding-bottom:4px;margin-bottom:8px">Pre-check inspection — last entry of day</div>
+        <div style="font-size:10px;font-weight:700;color:#1D5E3A;text-transform:uppercase;letter-spacing:.08em;border-bottom:1px solid #b0d8c0;padding-bottom:4px;margin-bottom:8px">Primary SAF inspection — last entry of day</div>
         <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:4px">
-          ${last.checklist_items.map(item=>`<div style="display:flex;align-items:center;gap:5px;padding:4px 6px;border-radius:6px;font-size:10px;background:${item.state==='ok'?'#c8edd8':item.state==='fail'?'#f5c8c8':'#f0f0f0'};color:${item.state==='ok'?'#0A4D2E':item.state==='fail'?'#5A0000':'#888'}"><span style="width:7px;height:7px;border-radius:50%;flex-shrink:0;display:inline-block;background:${item.state==='ok'?'#1D9E75':item.state==='fail'?'#A32D2D':'#ccc'}"></span>${item.label}</div>`).join('')}
+          ${last.checklist_items.map(item=>`<div style="display:flex;align-items:center;gap:5px;padding:4px 6px;border-radius:6px;font-size:10px;background:${item.state==='ok'?'#c8edd8':item.state==='warn'?'#faeeda':item.state==='fail'?'#f5c8c8':'#f0f0f0'};color:${item.state==='ok'?'#0A4D2E':item.state==='warn'?'#5A3000':item.state==='fail'?'#5A0000':'#888'}"><span style="width:7px;height:7px;border-radius:50%;flex-shrink:0;display:inline-block;background:${item.state==='ok'?'#1D9E75':item.state==='warn'?'#BA7517':item.state==='fail'?'#A32D2D':'#ccc'}"></span>${item.label}</div>`).join('')}
         </div>
         ${fails.length?`<div style="margin-top:8px;padding:8px 10px;background:#f5c8c8;border-radius:6px;font-size:11px;color:#5A0000;font-weight:600">${fails.length} item${fails.length>1?'s':''} flagged: ${fails.map(f=>f.label).join(' · ')}</div>`:''}
         ${last.checklist_comment?`<div style="margin-top:6px;padding:8px 10px;background:#f9f9f9;border:1px solid #ddd;border-radius:6px;font-size:11px;color:#333"><strong>Comment:</strong> ${last.checklist_comment}</div>`:''}
+      </div>`;
+    })()
+    }
+    ${(()=>{
+      const last2=entries.slice().reverse().find(e=>e.checklist2_items&&e.checklist2_items.length);
+      if(!last2) return '';
+      const fails2=last2.checklist2_items.filter(i=>i.state==='fail');
+      return `<div style="margin-bottom:16px">
+        <div style="font-size:10px;font-weight:700;color:#1D5E3A;text-transform:uppercase;letter-spacing:.08em;border-bottom:1px solid #b0d8c0;padding-bottom:4px;margin-bottom:8px">Secondary SAF inspection — last entry of day</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:4px">
+          ${last2.checklist2_items.map(item=>`<div style="display:flex;align-items:center;gap:5px;padding:4px 6px;border-radius:6px;font-size:10px;background:${item.state==='ok'?'#c8edd8':item.state==='warn'?'#faeeda':item.state==='fail'?'#f5c8c8':'#f0f0f0'};color:${item.state==='ok'?'#0A4D2E':item.state==='warn'?'#5A3000':item.state==='fail'?'#5A0000':'#888'}"><span style="width:7px;height:7px;border-radius:50%;flex-shrink:0;display:inline-block;background:${item.state==='ok'?'#1D9E75':item.state==='warn'?'#BA7517':item.state==='fail'?'#A32D2D':'#ccc'}"></span>${item.label}</div>`).join('')}
+        </div>
+        ${fails2.length?`<div style="margin-top:8px;padding:8px 10px;background:#f5c8c8;border-radius:6px;font-size:11px;color:#5A0000;font-weight:600">${fails2.length} item${fails2.length>1?'s':''} flagged: ${fails2.map(f=>f.label).join(' · ')}</div>`:''}
+        ${last2.checklist2_comment?`<div style="margin-top:6px;padding:8px 10px;background:#f9f9f9;border:1px solid #ddd;border-radius:6px;font-size:11px;color:#333"><strong>Comment:</strong> ${last2.checklist2_comment}</div>`:''}
       </div>`;
     })()}
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:30px;margin-top:24px">
@@ -3939,58 +4027,114 @@ function sysGv(id){return parseFloat(document.getElementById(id).value)||0;}
 function sysVal(id){return document.getElementById(id).value||'';}
 
 // ── CHECKLIST ─────────────────────────────────────────────────
-const SYS_CHECKLIST_ITEMS=[
-  'Water flowing to MBBR?',
-  'Alarms at PLC display OK?',
-  'Pipes & units free of leaks?',
-  'Room clean & access clear?',
-  'Controls timer operating?',
-  'Cleaning cycle engaging?',
-  'Catch container in place?',
-  'Coag chemical supply adequate?',
-  'Coag pump P1401 functioning?',
-  'Floc chemical supply adequate?',
-  'Floc pump P1801 functioning?',
-  'Effluent clear at start?',
-  'Sludge blanket firm (oatmeal)?',
-  'Skimmer system functioning?',
-  'Skimmer paddles in good repair?',
-  'Sludge compartment discharging?',
-  'Effluent clear at end?',
-  'Balance tank pH probe clean?'
+const SYS_PRIMARY_CHECKLIST_ITEMS=[
+  {label:'Water flowing to MBBR?'},
+  {label:'Alarms at HMI display OK?'},
+  {label:'Pipes & units free of leaks?'},
+  {label:'Room clean & access clear?'},
+  {label:'Controls timer operating?'},
+  {label:'Cleaning cycle engaging?'},
+  {label:'Catch container in place?'},
+  {label:'Coag chemical supply adequate?'},
+  {label:'Coag pump P1401 functioning?'},
+  {label:'Floc chemical supply adequate?'},
+  {label:'Floc pump P1801 functioning?'},
+  {label:'Effluent clear at start?', tristate:true},
+  {label:'Sludge blanket firm (oatmeal)?'},
+  {label:'Skimmer system functioning?'},
+  {label:'Skimmer paddles in good repair?'},
+  {label:'Sludge compartment discharging?'},
+  {label:'Effluent clear at end?', tristate:true},
+  {label:'Balance tank pH probe clean?'}
+];
+
+const SYS_SECONDARY_CHECKLIST_ITEMS=[
+  {label:'Effluent clear at start of check?', tristate:true},
+  {label:'Skimmer system functioning properly?'},
+  {label:'Skimmer paddles in good repair?'},
+  {label:'Sludge compartment discharging as expected?'},
+  {label:'Effluent clear at end of check?', tristate:true},
+  {label:'Chemical supply adequate?'}
 ];
 let sysCheckState={};
+let sysCheckState2={};
 
 function sysInitChecklist(){
   const el=document.getElementById('sys-checklist');
   if(!el) return;
   el.innerHTML='';
-  SYS_CHECKLIST_ITEMS.forEach((label,i)=>{
-    const state=sysCheckState[i]||'none'; // none, ok, fail
+  SYS_PRIMARY_CHECKLIST_ITEMS.forEach((item,i)=>{
+    const state=sysCheckState[i]||'none';
     const div=document.createElement('div');
-    div.className='chk-item'+(state==='ok'?' ok':state==='fail'?' fail':'');
-    div.innerHTML=`<div class="chk-dot"></div><span>${label}</span>`;
+    div.className='chk-item'+(state==='ok'?' ok':state==='warn'?' warn':state==='fail'?' fail':'');
+    const hint=item.tristate?'<span style="font-size:9px;opacity:.6;display:block">tap: ✓ / ~ / ✗</span>':'';
+    div.innerHTML=`<div class="chk-dot"></div><span>${item.label}${hint}</span>`;
     div.onclick=()=>sysToggleCheck(i);
     el.appendChild(div);
   });
 }
 
+function sysInitChecklist2(){
+  const el=document.getElementById('sys-checklist2');
+  if(!el) return;
+  el.innerHTML='';
+  SYS_SECONDARY_CHECKLIST_ITEMS.forEach((item,i)=>{
+    const state=sysCheckState2[i]||'none';
+    const div=document.createElement('div');
+    div.className='chk-item'+(state==='ok'?' ok':state==='warn'?' warn':state==='fail'?' fail':'');
+    const hint=item.tristate?'<span style="font-size:9px;opacity:.6;display:block">tap: ✓ / ~ / ✗</span>':'';
+    div.innerHTML=`<div class="chk-dot"></div><span>${item.label}${hint}</span>`;
+    div.onclick=()=>sysToggleCheck2(i);
+    el.appendChild(div);
+  });
+}
+
 function sysToggleCheck(i){
+  const item=SYS_PRIMARY_CHECKLIST_ITEMS[i];
   const current=sysCheckState[i]||'none';
-  sysCheckState[i]=current==='none'?'ok':current==='ok'?'fail':'none';
+  if(item.tristate){
+    sysCheckState[i]=current==='none'?'ok':current==='ok'?'warn':current==='warn'?'fail':'none';
+  } else {
+    sysCheckState[i]=current==='none'?'ok':current==='ok'?'fail':'none';
+  }
   sysInitChecklist();
-  // Show comment box if any failures
   const hasFail=Object.values(sysCheckState).some(v=>v==='fail');
+  const hasWarn=Object.values(sysCheckState).some(v=>v==='warn');
   const wrap=document.getElementById('sys-checklist-comment-wrap');
-  if(wrap) wrap.style.display=hasFail?'block':'none';
+  if(wrap) wrap.style.display=(hasFail||hasWarn)?'block':'none';
+}
+
+function sysToggleCheck2(i){
+  const item=SYS_SECONDARY_CHECKLIST_ITEMS[i];
+  const current=sysCheckState2[i]||'none';
+  if(item.tristate){
+    sysCheckState2[i]=current==='none'?'ok':current==='ok'?'warn':current==='warn'?'fail':'none';
+  } else {
+    sysCheckState2[i]=current==='none'?'ok':current==='ok'?'fail':'none';
+  }
+  sysInitChecklist2();
+  const hasFail=Object.values(sysCheckState2).some(v=>v==='fail');
+  const hasWarn=Object.values(sysCheckState2).some(v=>v==='warn');
+  const wrap=document.getElementById('sys-checklist2-comment-wrap');
+  if(wrap) wrap.style.display=(hasFail||hasWarn)?'block':'none';
 }
 
 function sysGetChecklistSummary(){
-  const total=SYS_CHECKLIST_ITEMS.length;
+  const total=SYS_PRIMARY_CHECKLIST_ITEMS.length;
   const ok=Object.values(sysCheckState).filter(v=>v==='ok').length;
+  const warn=Object.values(sysCheckState).filter(v=>v==='warn').length;
   const fail=Object.values(sysCheckState).filter(v=>v==='fail').length;
-  const unchecked=total-ok-fail;
-  return{total,ok,fail,unchecked,items:SYS_CHECKLIST_ITEMS.map((label,i)=>({label,state:sysCheckState[i]||'none'}))};
+  const unchecked=total-ok-warn-fail;
+  return{total,ok,warn,fail,unchecked,items:SYS_PRIMARY_CHECKLIST_ITEMS.map((item,i)=>({label:item.label,state:sysCheckState[i]||'none'}))};
+}
+
+function sysGetChecklist2Summary(){
+  const total=SYS_SECONDARY_CHECKLIST_ITEMS.length;
+  const ok=Object.values(sysCheckState2).filter(v=>v==='ok').length;
+  const warn=Object.values(sysCheckState2).filter(v=>v==='warn').length;
+  const fail=Object.values(sysCheckState2).filter(v=>v==='fail').length;
+  const unchecked=total-ok-warn-fail;
+  return{total,ok,warn,fail,unchecked,items:SYS_SECONDARY_CHECKLIST_ITEMS.map((item,i)=>({label:item.label,state:sysCheckState2[i]||'none'}))};
 }
 
 function sysResetChecklist(){
@@ -4002,8 +4146,18 @@ function sysResetChecklist(){
   if(ta) ta.value='';
 }
 
+function sysResetChecklist2(){
+  sysCheckState2={};
+  sysInitChecklist2();
+  const wrap=document.getElementById('sys-checklist2-comment-wrap');
+  if(wrap) wrap.style.display='none';
+  const ta=document.getElementById('sys_checklist2_comment');
+  if(ta) ta.value='';
+}
+
 // Init on load
 sysInitChecklist();
+sysInitChecklist2();
 
 function sysLoadLog(){
   try{const d=localStorage.getItem(SYS_LS);if(d){sysLog=JSON.parse(d);sysRenderLog();sysUpdateCount();}}catch(e){sysLog=[];}
@@ -4095,13 +4249,14 @@ function sysCalcPrimarySAF(){
 
 function sysClearInputs(){
   ['sys_pit_vol','sys_tank1_vol','sys_tank2_vol','sys_storage_ph',
-   'sys_neut_ph','sys_coag_dose','sys_floc1_dose','sys_saf1_flow','sys_saf1_eff_ph','sys_saf1_sludge_pct','sys_saf1_froth',
+   'sys_neut_ph','sys_coag_dose','sys_floc1_dose','sys_saf1_flow','sys_saf1_eff_ph','sys_saf1_sludge_pct','sys_saf1_froth_gpm','sys_saf1_froth',
    'sys_mbbr_inf_ph','sys_mbbr_eff_ph','sys_mbbr_do','sys_mbbr_depth','sys_mbbr_eff_flow','sys_sludge_depth','sys_blower_psi','sys_blower_filter_psi','sys_blower_temp',
-   'sys_floc2_pct','sys_coag2_pct','sys_saf2_froth','sys_saf2_eff_ph','sys_saf2_turb','sys_saf2_eff_flow',
+   'sys_floc2_pct','sys_coag2_pct','sys_saf2_froth','sys_saf2_eff_ph','sys_saf2_turb','sys_saf2_eff_flow','sys_saf2_poly_tube','sys_saf2_poly_lines','sys_saf2_froth_gpm',
    'sys_out_flow','sys_city_ph','sys_flume_gpm'
   ].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   document.getElementById('sys_floc2_gpd').textContent='—';
   sysResetChecklist();
+  sysResetChecklist2();
   const blSel=document.getElementById('sys_blower_id');if(blSel)blSel.value='';
   document.getElementById('sys_coag2_gph').textContent='—';
   document.getElementById('sys_coag_gpd').textContent='—';
@@ -4109,6 +4264,7 @@ function sysClearInputs(){
   document.getElementById('sys_sludge_vol').textContent='—';
   document.getElementById('sys_saf1_froth_gpd').textContent='—';
   document.getElementById('sys_saf2_froth_gpd').textContent='—';
+  ['sys_inj1','sys_inj2','sys_inj3'].forEach(id=>{const el=document.getElementById(id);if(el)el.checked=false;});
   document.getElementById('sys_mbbr_vol_display').textContent='—';
   document.getElementById('sys_floc1_gpd').textContent='—';
   // Set timestamp to now
@@ -4125,7 +4281,7 @@ function sysCalculate(){
   const neut_ph=sysGv('sys_neut_ph');
   const coag=sysGv('sys_coag_dose'), floc1=sysGv('sys_floc1_dose');
   const saf1_flow=sysGv('sys_saf1_flow'), saf1_eff_ph=sysGv('sys_saf1_eff_ph');
-  const saf1_froth=sysGv('sys_saf1_froth');
+  const saf1_froth=sysGv('sys_saf1_froth'), saf1_froth_gpm=sysGv('sys_saf1_froth_gpm');
   const saf1_sludge_pct=sysGv('sys_saf1_sludge_pct');
   const saf1_sludge_gal=+(2700*saf1_sludge_pct/100).toFixed(1);
   const mbbr_inf_ph=sysGv('sys_mbbr_inf_ph'), mbbr_eff_ph=sysGv('sys_mbbr_eff_ph');
@@ -4137,7 +4293,10 @@ function sysCalculate(){
   const sludge_depth=sysGv('sys_sludge_depth');
   const floc2_pct=sysGv('sys_floc2_pct'), floc2_gpd=+(17*floc2_pct/100).toFixed(4);
   const coag2_pct=sysGv('sys_coag2_pct');
-  const saf2_froth=sysGv('sys_saf2_froth'), saf2_eff_ph=sysGv('sys_saf2_eff_ph'), saf2_eff_flow=sysGv('sys_saf2_eff_flow');
+  const saf2_froth=sysGv('sys_saf2_froth'), saf2_eff_ph=sysGv('sys_saf2_eff_ph'), saf2_eff_flow=sysGv('sys_saf2_eff_flow'), saf2_froth_gpm=sysGv('sys_saf2_froth_gpm');
+  const saf2_poly_tube=sysGv('sys_saf2_poly_tube'), saf2_poly_lines=sysGv('sys_saf2_poly_lines');
+  const _i1=document.getElementById('sys_inj1'),_i2=document.getElementById('sys_inj2'),_i3=document.getElementById('sys_inj3');
+  const injectors=[_i1&&_i1.checked?'1':'',_i2&&_i2.checked?'2':'',_i3&&_i3.checked?'3':''].filter(Boolean).join(', ')||'None';
   const saf2_turb=sysGv('sys_saf2_turb');
   const out_flow=sysGv('sys_out_flow'), city_ph=sysGv('sys_city_ph');
   const flume=sysGv('sys_flume_gpm');
@@ -4158,10 +4317,15 @@ function sysCalculate(){
   if(saf1_eff_ph>0&&(saf1_eff_ph<6.5||saf1_eff_ph>9.5)) alerts+=`<div class="alert a-warn">Primary SAF effluent pH (${saf1_eff_ph.toFixed(2)}) outside 6.5–9.5 — will stress MBBR.</div>`;
   // Checklist summary
   const chkSum=sysGetChecklistSummary();
-  if(chkSum.fail>0) alerts+=`<div class="alert a-bad">${chkSum.fail} checklist item${chkSum.fail>1?'s':''} marked as issue — review before logging.</div>`;
+  const chk2Sum=sysGetChecklist2Summary();
+  if(chkSum.fail>0) alerts+=`<div class="alert a-bad">${chkSum.fail} Primary SAF item${chkSum.fail>1?'s':''} marked as issue.</div>`;
+  else if(chkSum.warn>0) alerts+=`<div class="alert a-warn">${chkSum.warn} Primary SAF item${chkSum.warn>1?'s':''} marked as marginal (yellow).</div>`;
   else if(chkSum.unchecked===chkSum.total) alerts+='';
-  else if(chkSum.ok===chkSum.total) alerts+=`<div class="alert a-ok">All ${chkSum.total} checklist items acceptable.</div>`;
-  else if(chkSum.unchecked>0) alerts+=`<div class="alert a-info">${chkSum.ok} of ${chkSum.total} checklist items checked — ${chkSum.unchecked} remaining.</div>`;
+  else if(chkSum.ok===chkSum.total) alerts+=`<div class="alert a-ok">All ${chkSum.total} Primary SAF checklist items acceptable.</div>`;
+  else if(chkSum.unchecked>0) alerts+=`<div class="alert a-info">${chkSum.ok} of ${chkSum.total} Primary SAF items checked — ${chkSum.unchecked} remaining.</div>`;
+  if(chk2Sum.fail>0) alerts+=`<div class="alert a-bad">${chk2Sum.fail} Secondary SAF item${chk2Sum.fail>1?'s':''} marked as issue.</div>`;
+  else if(chk2Sum.warn>0) alerts+=`<div class="alert a-warn">${chk2Sum.warn} Secondary SAF item${chk2Sum.warn>1?'s':''} marked as marginal (yellow).</div>`;
+  else if(chk2Sum.ok===chk2Sum.total&&chk2Sum.total>0) alerts+=`<div class="alert a-ok">All Secondary SAF checklist items acceptable.</div>`;
 
   if(!alerts) alerts='<div class="alert a-ok">All monitored values within acceptable range.</div>';
   document.getElementById('sys-alerts').innerHTML=alerts;
@@ -4228,6 +4392,9 @@ function sysCalculate(){
     rr('Froth usage',saf2_froth>0?+(17*saf2_froth/100).toFixed(4):'—','gal/hr (17 gal/day ÷ 24 at 100%)')+
     rr('Effluent pH',saf2_eff_ph||'—','')+
     rr('Effluent turbidity',saf2_turb||'—','NTU')+
+    rr('Polymer dilution tube',saf2_poly_tube||'—','GPM')+
+    rr('Polymer dilution lines',saf2_poly_lines||'—','GPM')+
+    rr('Injectors running',injectors,'')+
     rr('Effluent flow → city',saf2_eff_flow||'—','GPM');
 
   // Discharge results
@@ -4243,10 +4410,13 @@ function sysSaveLog(){
   const floc2_pct=sysGv('sys_floc2_pct');
   const chk=sysGetChecklistSummary();
   const chkComment=document.getElementById('sys_checklist_comment')?document.getElementById('sys_checklist_comment').value.trim():'';
+  const chk2=sysGetChecklist2Summary();
   sysLog.push({
     ts, label:new Date(ts).toLocaleString(),
     checklist_ok:chk.ok, checklist_fail:chk.fail, checklist_unchecked:chk.unchecked,
     checklist_items:chk.items, checklist_comment:chkComment,
+    checklist2_ok:chk2.ok, checklist2_fail:chk2.fail, checklist2_items:chk2.items,
+    checklist2_comment:document.getElementById('sys_checklist2_comment')?document.getElementById('sys_checklist2_comment').value.trim():'',
     pit_vol:sysGv('sys_pit_vol'),
     tank1_vol:sysGv('sys_tank1_vol'), tank2_vol:sysGv('sys_tank2_vol'),
     storage_ph:sysGv('sys_storage_ph'),
@@ -4282,7 +4452,7 @@ function sysRenderLog(){
     <th>Pit gal</th><th>T1 gal</th><th>T2 gal</th><th>St pH</th>
     <th>Neut pH</th><th>Coag</th><th>Floc1</th><th>Flow1</th><th>SAF1 pH</th><th>Froth1</th>
     <th>Blower</th><th>PSI</th><th>Filter PSI</th><th>Blwr °F</th><th>MBBR in pH</th><th>MBBR out pH</th><th>DO</th><th>Depth</th><th>Sludge</th>
-    <th>Coag2%</th><th>Coag2 GPH</th><th>Floc2%</th><th>Floc2 gpd</th><th>Froth1 mV</th><th>Froth1 gpd</th><th>Froth2 mV</th><th>Froth2 gpd</th><th>Froth2</th><th>SAF2 pH</th><th>Turb</th>
+    <th>Coag2%</th><th>Coag2 GPH</th><th>Floc2%</th><th>Floc2 gpd</th><th>Froth1 mV</th><th>Froth1 g/hr</th><th>Froth1 GPM</th><th>Froth2 mV</th><th>Froth2 g/hr</th><th>Froth2 GPM</th><th>Froth2</th><th>SAF2 pH</th><th>Turb</th>
     <th>Flow out</th><th>City pH</th><th>Flume</th>
     <th></th>
   </tr></thead><tbody>`;
@@ -4296,7 +4466,7 @@ function sysRenderLog(){
       <td>${e.blower_id||'—'}</td><td>${e.blower_psi||'—'}</td><td>${e.blower_filter_psi||'—'}</td><td>${e.blower_temp||'—'}</td><td>${e.mbbr_inf_ph||'—'}</td><td>${e.mbbr_eff_ph||'—'}</td>
       <td style="color:${e.mbbr_do>0&&e.mbbr_do<2?'var(--red)':e.mbbr_do>0&&e.mbbr_do<3?'var(--amber)':'inherit'}">${e.mbbr_do||'—'}</td>
       <td>${e.mbbr_depth||'—'}</td><td>${e.sludge_depth||'—'}</td>
-      <td>${e.coag2_pct||'—'}</td><td>${e.coag2_gph||'—'}</td><td>${e.floc2_pct||'—'}</td><td>${e.floc2_gpd||'—'}</td><td>${e.saf1_froth||'—'}</td><td>${e.saf1_froth_gpd||'—'}</td><td>${e.saf2_froth||'—'}</td><td>${e.saf2_froth_gpd||'—'}</td><td>${e.saf2_eff_ph||'—'}</td><td>${e.saf2_turb||'—'}</td><td>${e.saf2_eff_flow||'—'}</td>
+      <td>${e.coag2_pct||'—'}</td><td>${e.coag2_gph||'—'}</td><td>${e.floc2_pct||'—'}</td><td>${e.floc2_gpd||'—'}</td><td>${e.saf1_froth||'—'}</td><td>${e.saf1_froth_gpd||'—'}</td><td>${e.saf1_froth_gpm||'—'}</td><td>${e.saf2_froth||'—'}</td><td>${e.saf2_froth_gpd||'—'}</td><td>${e.saf2_froth_gpm||'—'}</td><td>${e.saf2_eff_ph||'—'}</td><td>${e.saf2_turb||'—'}</td><td>${e.saf2_eff_flow||'—'}</td>
       <td>${e.out_flow||'—'}</td>
       <td style="color:${e.city_ph>0?(city_ok?'var(--green2)':'var(--red)'):'inherit'}">${e.city_ph||'—'}</td>
       <td>${e.flume||'—'}</td>
@@ -4315,7 +4485,7 @@ function sysLoadEntry(i){
   set('sys_storage_ph',e.storage_ph);
   set('sys_neut_ph',e.neut_ph); set('sys_coag_dose',e.coag_dose?e.coag_dose.toFixed(6):'');
   set('sys_floc1_dose',e.floc1_dose?e.floc1_dose.toFixed(6):'');
-  set('sys_saf1_flow',e.saf1_flow); set('sys_saf1_eff_ph',e.saf1_eff_ph);
+  set('sys_saf1_flow',e.saf1_flow); set('sys_saf1_eff_ph',e.saf1_eff_ph); set('sys_saf1_froth_gpm',e.saf1_froth_gpm);
   set('sys_saf1_sludge_pct',e.saf1_sludge_pct); sysCalcSaf1Sludge();
   set('sys_saf1_froth',e.saf1_froth); sysCalcFroth1();
   // Restore checklist
@@ -4333,7 +4503,19 @@ function sysLoadEntry(i){
   set('sys_mbbr_inf_ph',e.mbbr_inf_ph); set('sys_mbbr_eff_ph',e.mbbr_eff_ph);
   set('sys_mbbr_do',e.mbbr_do); set('sys_mbbr_depth',e.mbbr_depth); sysCalcMbbrVol(); set('sys_sludge_depth',e.sludge_depth);
   set('sys_floc2_pct',e.floc2_pct); set('sys_coag2_pct',e.coag2_pct); sysCalcFloc2(); sysCalcCoag2(); sysCalcPrimarySAF();
-  set('sys_saf2_froth',e.saf2_froth); sysCalcFroth2(); set('sys_saf2_eff_ph',e.saf2_eff_ph); set('sys_saf2_turb',e.saf2_turb); set('sys_saf2_eff_flow',e.saf2_eff_flow);
+  set('sys_saf2_froth',e.saf2_froth); sysCalcFroth2(); set('sys_saf2_froth_gpm',e.saf2_froth_gpm); set('sys_saf2_eff_ph',e.saf2_eff_ph); set('sys_saf2_turb',e.saf2_turb); set('sys_saf2_eff_flow',e.saf2_eff_flow);
+  set('sys_saf2_poly_tube',e.saf2_poly_tube); set('sys_saf2_poly_lines',e.saf2_poly_lines);
+  const injs=(e.injectors||'').split(',').map(s=>s.trim());
+  ['1','2','3'].forEach(n=>{const el=document.getElementById('sys_inj'+n);if(el)el.checked=injs.includes(n);});
+  // Restore secondary checklist
+  sysCheckState2={};
+  if(e.checklist2_items){e.checklist2_items.forEach((item,i)=>{sysCheckState2[i]=item.state;});}
+  sysInitChecklist2();
+  const hasFail2=Object.values(sysCheckState2).some(v=>v==='fail');
+  const wrap2=document.getElementById('sys-checklist2-comment-wrap');
+  if(wrap2) wrap2.style.display=hasFail2?'block':'none';
+  const ta2=document.getElementById('sys_checklist2_comment');
+  if(ta2) ta2.value=e.checklist2_comment||'';
   set('sys_out_flow',e.out_flow); set('sys_city_ph',e.city_ph); set('sys_flume_gpm',e.flume);
   sysShowTab('input'); sysCalculate();
 }
@@ -4346,16 +4528,16 @@ function sysConfirmClear(){sysLog=[];sysSaveStorage();sysRenderLog();sysUpdateCo
 function sysExportCSV(){
   if(!sysLog.length){alert('No system monitor data to export yet.');return;}
   const headers=['Timestamp','Pit Vol (gal)','Tank1 Vol (gal)','Tank2 Vol (gal)','Storage pH',
-    'Neut Tank pH','Coag Dose (gal/gal)','Coag Usage (gal/hr)','Floc1 Dose (gal/gal)','Floc1 Usage (gal/hr)','SAF1 Flow (GPM)','SAF1 Eff pH','SAF1 Froth (mV)','SAF1 Froth (gal/hr)',
+    'Neut Tank pH','Coag Dose (gal/gal)','Coag Usage (gal/hr)','Floc1 Dose (gal/gal)','Floc1 Usage (gal/hr)','SAF1 Flow (GPM)','SAF1 Eff pH','SAF1 Froth (mV)','SAF1 Froth Chemical (gal/hr)','SAF1 Froth Rate (GPM)',
     'Blower ID','Blower PSI','Filter PSI','Blower Temp (°F)','MBBR Inf pH','MBBR Eff pH','MBBR DO (mg/L)','MBBR Eff Flow (GPM)','MBBR Depth (ft)','Sludge Depth (ft)','Sludge Vol (gal)',
-    'SAF2 Coag (%)','SAF2 Coag (GPH)','Floc2 (%)','Floc2 (gal/hr)','SAF2 Froth (mV)','SAF2 Froth (gal/hr)','SAF2 Eff pH','SAF2 Turb (NTU)','SAF2 Eff Flow (GPM)',
+    'SAF2 Coag (%)','SAF2 Coag (GPH)','Floc2 (%)','Floc2 (gal/hr)','SAF2 Froth (mV)','SAF2 Froth Chemical (gal/hr)','SAF2 Froth Rate (GPM)','SAF2 Eff pH','SAF2 Turb (NTU)','SAF2 Eff Flow (GPM)',
     'Outlet Flow (GPM)','City pH','Parshall Flume (GPM)'];
   const rows=sysLog.map(e=>[
     `"${e.label}"`,e.pit_vol,e.tank1_vol,e.tank2_vol,e.storage_ph,
     e.neut_ph,e.coag_dose?e.coag_dose.toFixed(6):'',e.coag_gpd||'',e.floc1_dose?e.floc1_dose.toFixed(6):'',e.floc1_gpd||'',
-    e.saf1_flow,e.saf1_eff_ph,e.saf1_sludge_pct,e.saf1_sludge_gal,e.saf1_froth,e.saf1_froth_gpd,
+    e.saf1_flow,e.saf1_eff_ph,e.saf1_sludge_pct,e.saf1_sludge_gal,e.saf1_froth,e.saf1_froth_gpd,e.saf1_froth_gpm,
     e.blower_id,e.blower_psi,e.blower_filter_psi,e.blower_temp,e.mbbr_inf_ph,e.mbbr_eff_ph,e.mbbr_do,e.mbbr_eff_flow,e.mbbr_depth,e.sludge_depth,e.sludge_vol,
-    e.coag2_pct,e.coag2_gph,e.floc2_pct,e.floc2_gpd,e.saf2_froth,e.saf2_froth_gpd,e.saf2_eff_ph,e.saf2_turb,e.saf2_eff_flow,
+    e.coag2_pct,e.coag2_gph,e.floc2_pct,e.floc2_gpd,e.saf2_froth,e.saf2_froth_gpd,e.saf2_froth_gpm,e.saf2_eff_ph,e.saf2_turb,e.saf2_eff_flow,
     e.out_flow,e.city_ph,e.flume
   ].join(','));
   const csv=[headers.join(','),...rows].join('\n');
