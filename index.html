@@ -300,7 +300,27 @@ input[type=range]{width:100%;accent-color:var(--green);height:4px;margin:8px 0}
 .diag-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
 .diag-stat{background:var(--bg3);border-radius:12px;padding:12px;border:1px solid var(--border);text-align:center}
 .diag-val{font-size:22px;font-weight:700;color:var(--text);line-height:1}
-.diag-lbl{font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-top:4px}
+.chk-item{display:flex;align-items:center;gap:6px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:7px 8px;cursor:pointer;font-size:11px;color:var(--text2);line-height:1.3;transition:background .15s,border-color .15s;user-select:none;-webkit-user-select:none}
+.chk-item.ok{background:rgba(29,158,117,.15);border-color:rgba(29,158,117,.5);color:var(--green2)}
+.chk-item.fail{background:rgba(226,75,74,.12);border-color:rgba(226,75,74,.4);color:var(--red)}
+.chk-dot{width:12px;height:12px;border-radius:50%;border:2px solid var(--border);flex-shrink:0;transition:background .15s,border-color .15s}
+.chk-item.ok .chk-dot{background:var(--green2);border-color:var(--green2)}
+.chk-item.fail .chk-dot{background:var(--red);border-color:var(--red)}
+.sop-section{margin-bottom:20px}
+.sop-section-title{font-size:13px;font-weight:700;color:var(--green2);text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid var(--border);padding-bottom:6px;margin-bottom:10px}
+.sop-article{background:var(--bg2);border:1px solid var(--border);border-radius:12px;margin-bottom:8px;overflow:hidden}
+.sop-article-header{padding:12px 14px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.sop-article-title{font-size:13px;font-weight:600;color:var(--text);line-height:1.4}
+.sop-article-body{display:none;padding:0 14px 14px;font-size:13px;color:var(--text2);line-height:1.7}
+.sop-article-body.open{display:block}
+.sop-article-body ol,.sop-article-body ul{padding-left:18px;margin:6px 0}
+.sop-article-body li{margin-bottom:4px}
+.sop-tip{background:var(--green3);border-left:3px solid var(--green2);border-radius:0 6px 6px 0;padding:8px 10px;margin:8px 0;font-size:12px;color:var(--green2)}
+.sop-warn{background:rgba(226,75,74,.1);border-left:3px solid var(--red);border-radius:0 6px 6px 0;padding:8px 10px;margin:8px 0;font-size:12px;color:var(--red)}
+.sop-article-body strong{color:var(--text)}
+.sop-chevron{flex-shrink:0;transition:transform .2s;opacity:.5}
+.sop-chevron.open{transform:rotate(180deg)}
+mark.sop-highlight{background:rgba(239,159,39,.4);border-radius:2px;color:inherit}
 </style>
 </head>
 <body>
@@ -315,7 +335,7 @@ input[type=range]{width:100%;accent-color:var(--green);height:4px;margin:8px 0}
     <div class="side-menu-title">Dairy Wastewater System</div>
     <button class="side-close" onclick="closeMenu()">×</button>
   </div>
-  <div class="menu-item active-unit" id="menu-mbbr" onclick="switchUnit('mbbr')">
+  <div class="menu-item" id="menu-mbbr" onclick="switchUnit('mbbr')">
     <div class="menu-icon"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M7 6V4M12 6V4M17 6V4"/><path d="M3 11h18"/></svg></div>
     <div><div class="menu-name">MBBR</div><div class="menu-desc">Moving Bed Biofilm Reactor</div></div>
     <div class="menu-dot"></div>
@@ -325,9 +345,14 @@ input[type=range]{width:100%;accent-color:var(--green);height:4px;margin:8px 0}
     <div><div class="menu-name">Daily COD Test</div><div class="menu-desc">WW · Primary Eff. · BOD · City</div></div>
     <div class="menu-dot"></div>
   </div>
-  <div class="menu-item" id="menu-sys" onclick="switchUnit('sys')">
+  <div class="menu-item active-unit" id="menu-sys" onclick="switchUnit('sys')">
     <div class="menu-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="3" width="20" height="18" rx="2"/><path d="M2 9h20"/><path d="M9 21V9"/><circle cx="5.5" cy="6" r="1"/><circle cx="9.5" cy="6" r="1"/></svg></div>
     <div><div class="menu-name">System Monitor</div><div class="menu-desc">Full plant · 2-hour tracking</div></div>
+    <div class="menu-dot"></div>
+  </div>
+  <div class="menu-item" id="menu-sop" onclick="switchUnit('sop')">
+    <div class="menu-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg></div>
+    <div><div class="menu-name">SOP / Help</div><div class="menu-desc">How to use this app</div></div>
     <div class="menu-dot"></div>
   </div>
   <div style="padding:16px;margin-top:auto;border-top:1px solid var(--border)">
@@ -354,7 +379,7 @@ input[type=range]{width:100%;accent-color:var(--green);height:4px;margin:8px 0}
 </div>
 
 <!-- MBBR UNIT -->
-<div class="unit-shell active" id="unit-mbbr">
+<div class="unit-shell" id="unit-mbbr">
 
 <!-- HEADER -->
 <div class="app-header">
@@ -1074,7 +1099,7 @@ input[type=range]{width:100%;accent-color:var(--green);height:4px;margin:8px 0}
 </div><!-- end unit-shell saf -->
 
 <!-- SYSTEM MONITOR UNIT -->
-<div class="unit-shell" id="unit-sys">
+<div class="unit-shell active" id="unit-sys">
 
 <div class="app-header">
   <button class="hamburger" onclick="openMenu()" aria-label="Menu">
@@ -1095,6 +1120,17 @@ input[type=range]{width:100%;accent-color:var(--green);height:4px;margin:8px 0}
     <div class="card" style="margin-bottom:12px">
       <div class="field-group">
         <div class="field" style="grid-column:span 2"><label>Date & time</label><input type="datetime-local" id="sys_timestamp" style="width:100%;padding:11px 12px;border:1px solid var(--border);border-radius:10px;background:var(--bg3);color:var(--text);font-size:15px"></div>
+      </div>
+    </div>
+
+    <!-- CHECKLIST -->
+    <div class="section-label">Pre-check inspection</div>
+    <div class="card" style="margin-bottom:12px">
+      <div style="font-size:11px;color:var(--text3);margin-bottom:10px">Tap to toggle — green = acceptable, red = issue</div>
+      <div id="sys-checklist" style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px"></div>
+      <div id="sys-checklist-comment-wrap" style="display:none;margin-top:4px">
+        <label style="font-size:11px;color:var(--text3);display:block;margin-bottom:4px">Comments / reason for any failures</label>
+        <textarea id="sys_checklist_comment" rows="3" style="width:100%;background:var(--bg3);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:10px;font-size:13px;resize:none;box-sizing:border-box" placeholder="Describe any issues noted..."></textarea>
       </div>
     </div>
 
@@ -1121,6 +1157,20 @@ input[type=range]{width:100%;accent-color:var(--green);height:4px;margin:8px 0}
         <div class="field"><label>Tank 1 level (gal)</label><input type="number" id="sys_tank1_vol" value="" step="500" min="0" max="50000" placeholder="0"></div>
         <div class="field"><label>Tank 2 level (gal)</label><input type="number" id="sys_tank2_vol" value="" step="500" min="0" max="50000" placeholder="0"></div>
         <div class="field"><label>Storage pH (shared)</label><input type="number" id="sys_storage_ph" value="" step="0.1" min="0" max="14" placeholder="—"></div>
+      </div>
+    </div>
+
+    <!-- FINAL DISCHARGE -->
+    <div class="section-label">Final discharge</div>
+    <div class="card" style="margin-bottom:12px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+        <div style="width:10px;height:10px;border-radius:50%;background:#5DCAA5;flex-shrink:0"></div>
+        <span style="font-size:12px;color:var(--text3)">Flow · City pH · Parshall flume</span>
+      </div>
+      <div class="field-group">
+        <div class="field"><label>Flow meter (GPM)</label><input type="number" id="sys_out_flow" value="" step="0.1" min="0" placeholder="0.00"></div>
+        <div class="field"><label>City pH</label><input type="number" id="sys_city_ph" value="" step="0.1" min="0" max="14" placeholder="—"></div>
+        <div class="field"><label>Parshall flume (GPM)</label><input type="number" id="sys_flume_gpm" value="" step="0.1" min="0" placeholder="0.00"></div>
       </div>
     </div>
 
@@ -1159,7 +1209,30 @@ input[type=range]{width:100%;accent-color:var(--green);height:4px;margin:8px 0}
         <div class="field"><label>DO (mg/L)</label><input type="number" id="sys_mbbr_do" value="" step="0.1" min="0" placeholder="—"></div>
         <div class="field"><label>Tank depth (ft)</label><input type="number" id="sys_mbbr_depth" value="" step="0.1" min="0" placeholder="—" oninput="sysCalcMbbrVol()"></div>
         <div class="field"><label>Tank volume (gal)</label><div class="biodegrad-display" id="sys_mbbr_vol_display">—</div></div>
-        <div class="field"><label>Sludge tank depth (ft)</label><input type="number" id="sys_sludge_depth" value="" step="0.1" min="0" placeholder="—"></div>
+        <div class="field"><label>Effluent flow → SAF (GPM)</label><input type="number" id="sys_mbbr_eff_flow" value="" step="0.1" min="0" placeholder="0.00"></div>
+        <div class="field"><label>Sludge tank depth (ft)</label><input type="number" id="sys_sludge_depth" value="" step="0.1" min="0" max="12.5" placeholder="—" oninput="sysCalcSludgeTank()"></div>
+        <div class="field"><label>Sludge volume (gal)</label><div class="biodegrad-display" id="sys_sludge_vol">—</div></div>
+      </div>
+    </div>
+
+    <!-- BLOWER -->
+    <div class="section-label">Blower</div>
+    <div class="card" style="margin-bottom:12px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+        <div style="width:10px;height:10px;border-radius:50%;background:#F39C12;flex-shrink:0"></div>
+        <span style="font-size:12px;color:var(--text3)">Aeration blower — pressure · filter · temp</span>
+      </div>
+      <div class="field-group">
+        <div class="field"><label>Blower on duty</label>
+          <select id="sys_blower_id" style="width:100%;padding:11px 12px;border:1px solid var(--border);border-radius:10px;background:var(--bg3);color:var(--text);font-size:15px">
+            <option value="">— Select —</option>
+            <option value="410">410</option>
+            <option value="412">412</option>
+          </select>
+        </div>
+        <div class="field"><label>Pressure (PSI)</label><input type="number" id="sys_blower_psi" value="" step="0.1" placeholder="0.0"></div>
+        <div class="field"><label>Filter pressure (PSI)</label><input type="number" id="sys_blower_filter_psi" value="" step="0.1" placeholder="-0.0"></div>
+        <div class="field"><label>Temp (°F)</label><input type="number" id="sys_blower_temp" value="" step="0.1" placeholder="—"></div>
       </div>
     </div>
 
@@ -1179,20 +1252,7 @@ input[type=range]{width:100%;accent-color:var(--green);height:4px;margin:8px 0}
         <div class="field"><label>Froth usage (gal/hr)</label><div class="biodegrad-display" id="sys_saf2_froth_gpd">—</div></div>
         <div class="field"><label>Effluent pH</label><input type="number" id="sys_saf2_eff_ph" value="" step="0.1" min="0" max="14" placeholder="—"></div>
         <div class="field"><label>Effluent turbidity (NTU)</label><input type="number" id="sys_saf2_turb" value="" step="0.1" min="0" placeholder="—"></div>
-      </div>
-    </div>
-
-    <!-- FINAL DISCHARGE -->
-    <div class="section-label">Final discharge</div>
-    <div class="card" style="margin-bottom:16px">
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
-        <div style="width:10px;height:10px;border-radius:50%;background:#5DCAA5;flex-shrink:0"></div>
-        <span style="font-size:12px;color:var(--text3)">Flow · City pH · Parshall flume</span>
-      </div>
-      <div class="field-group">
-        <div class="field"><label>Flow meter (GPM)</label><input type="number" id="sys_out_flow" value="" step="0.1" min="0" placeholder="0.00"></div>
-        <div class="field"><label>City pH</label><input type="number" id="sys_city_ph" value="" step="0.1" min="0" max="14" placeholder="—"></div>
-        <div class="field"><label>Parshall flume (GPM)</label><input type="number" id="sys_flume_gpm" value="" step="0.1" min="0" placeholder="0.00"></div>
+        <div class="field"><label>Effluent flow → city (GPM)</label><input type="number" id="sys_saf2_eff_flow" value="" step="0.1" min="0" placeholder="0.00"></div>
       </div>
     </div>
 
@@ -1215,6 +1275,9 @@ input[type=range]{width:100%;accent-color:var(--green);height:4px;margin:8px 0}
 
     <div class="section-label">Primary SAF</div>
     <div class="card"><div id="sys-saf1-results"></div></div>
+
+    <div class="section-label">Blower</div>
+    <div class="card"><div id="sys-blower-results"></div></div>
 
     <div class="section-label">MBBR</div>
     <div class="card"><div id="sys-mbbr-results"></div></div>
@@ -1351,6 +1414,37 @@ input[type=range]{width:100%;accent-color:var(--green);height:4px;margin:8px 0}
     <button onclick="document.getElementById('backup-copy-box').style.display='none'" style="width:100%;background:transparent;color:var(--text3);border:none;padding:6px;font-size:13px;cursor:pointer">Close</button>
   </div>
 </div>
+
+<!-- SOP UNIT -->
+<div class="unit-shell" id="unit-sop">
+
+<div class="app-header">
+  <button class="hamburger" onclick="openMenu()" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+  <div style="flex:1;margin-left:10px">
+    <div class="app-title">SOP / Help</div>
+    <div class="app-subtitle">Standard operating procedures</div>
+  </div>
+  <div class="header-badge">SOP</div>
+</div>
+
+<div class="scroll-area" id="sop-scroll-area" style="padding:16px">
+
+  <!-- SEARCH -->
+  <div style="position:sticky;top:0;z-index:10;background:var(--bg);padding-bottom:10px;margin:-16px -16px 0;padding:10px 16px 10px">
+    <div style="position:relative">
+      <svg style="position:absolute;left:10px;top:50%;transform:translateY(-50%);opacity:.4" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" id="sop-search" placeholder="Search instructions..." oninput="sopSearch()" style="width:100%;padding:10px 10px 10px 34px;background:var(--bg3);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:14px;box-sizing:border-box">
+    </div>
+    <div id="sop-search-count" style="font-size:11px;color:var(--text3);text-align:center;margin-top:6px;display:none"></div>
+  </div>
+
+  <div id="sop-content" style="margin-top:10px"></div>
+
+</div><!-- end sop scroll-area -->
+
+</div><!-- end unit-shell sop -->
 
 </div><!-- end app-shell -->
 
@@ -2378,7 +2472,7 @@ function renderLog(){
     <td>${e.eff_ph}</td>
     <td><span class="badge ${e.ph_pass?'b-ok':'b-bad'}">${e.ph_pass?'OK':'!'}</span></td>
     <td>${e.eff_tss}</td><td>${e.alk}</td>
-    <td><button class="del-btn" onclick="event.stopPropagation();delLog(${i})">×</button></td></tr>`;
+    <td><button class="del-btn" onclick="event.stopPropagation();confirmDelEntry(this,'mbbr',${i})">×</button></td></tr>`;
   });
   h+='</tbody></table>';
   document.getElementById('log-table-m').innerHTML=h;
@@ -2407,6 +2501,31 @@ function loadMbbrEntry(i){
   showTab('input');
   calculate();
 }
+let _delTimer=null;
+function confirmDelEntry(btn,type,i){
+  if(btn.dataset.confirming==='1'){
+    // Second tap — actually delete
+    clearTimeout(_delTimer);
+    btn.dataset.confirming='';
+    btn.textContent='×';
+    btn.style.color='';btn.style.fontSize='';btn.style.fontWeight='';
+    if(type==='mbbr') delLog(i);
+    else if(type==='saf') safDelLog(i);
+    else if(type==='sys') sysDelLog(i);
+  } else {
+    // First tap — ask to confirm
+    btn.dataset.confirming='1';
+    btn.textContent='Sure?';
+    btn.style.color='var(--red)';btn.style.fontSize='11px';btn.style.fontWeight='700';
+    // Auto-reset after 3 seconds if no second tap
+    _delTimer=setTimeout(()=>{
+      btn.dataset.confirming='';
+      btn.textContent='×';
+      btn.style.color='';btn.style.fontSize='';btn.style.fontWeight='';
+    },3000);
+  }
+}
+
 function delLog(i){logData.splice(i,1);saveLog();renderLog();renderTrendCharts();updateLogCount();}
 function showClearConfirm(){
   if(!logData.length)return;
@@ -3155,7 +3274,8 @@ function sysUpdateDateCount(){
   document.getElementById('sys-date-entry-count').textContent=
     entries.length>0?`${entries.length} entr${entries.length===1?'y':'ies'} found for ${new Date(date+'T12:00:00').toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'})}`:'No entries found for this date.';
 }
-document.getElementById('sys-report-date')?.addEventListener('change',sysUpdateDateCount);
+const _srdEl=document.getElementById('sys-report-date');
+if(_srdEl) _srdEl.addEventListener('change',sysUpdateDateCount);
 
 function sysGenerateReport(){
   const date=document.getElementById('sys-report-date').value;
@@ -3195,9 +3315,10 @@ function sysGenerateReport(){
       <td style="padding:5px 6px">${e.saf1_sludge_gal||'—'}</td>
       <td style="padding:5px 6px">${e.saf1_froth||'—'}</td>
       <td style="padding:5px 6px">${e.saf1_froth_gph||'—'}</td>
-      <td style="padding:5px 6px">${e.mbbr_inf_ph||'—'}</td>
+      <td style="padding:5px 6px">${e.blower_id||'—'}</td><td style="padding:5px 6px">${e.blower_psi||'—'}</td><td style="padding:5px 6px">${e.blower_filter_psi||'—'}</td><td style="padding:5px 6px">${e.blower_temp||'—'}</td><td style="padding:5px 6px">${e.blower_id||'—'}</td><td style="padding:5px 6px">${e.blower_psi||'—'}</td><td style="padding:5px 6px">${e.blower_filter_psi||'—'}</td><td style="padding:5px 6px">${e.blower_temp||'—'}</td><td style="padding:5px 6px">${e.mbbr_inf_ph||'—'}</td>
       <td style="padding:5px 6px">${e.mbbr_eff_ph||'—'}</td>
       <td style="padding:5px 6px">${e.mbbr_do||'—'}</td>
+      <td style="padding:5px 6px">${e.mbbr_eff_flow||'—'}</td>
       <td style="padding:5px 6px">${e.mbbr_depth||'—'}</td>
       <td style="padding:5px 6px">${e.sludge_depth||'—'}</td>
       <td style="padding:5px 6px">${e.coag2_pct||'—'}</td>
@@ -3232,6 +3353,7 @@ function sysGenerateReport(){
   const avgMbbrDepth=avg(entries.map(e=>e.mbbr_depth||0));
   const avgMbbrVol=avgMbbrDepth!==null?+(avgMbbrDepth*2756).toFixed(0):null;
   const avgSludgeDepth=avg(entries.map(e=>e.sludge_depth||0));
+  const avgSludgeVol=avgSludgeDepth!==null?(avgSludgeDepth<=3.8?+(avgSludgeDepth/3.8*1000).toFixed(0):+(1000+(avgSludgeDepth-3.8)*800).toFixed(0)):null;
   const avgSaf2EffPh=avg(entries.map(e=>e.saf2_eff_ph||0));
   const avgTurb=avg(entries.map(e=>e.saf2_turb||0));
   const avgCityPh=avg(entries.map(e=>e.city_ph||0));
@@ -3279,9 +3401,10 @@ function sysGenerateReport(){
           <th style="padding:5px 6px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">Sludge gal</th>
           <th style="padding:5px 6px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">Froth mV</th>
           <th style="padding:5px 6px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">Froth g/hr</th>
-          <th style="padding:5px 6px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">MBBR in</th>
+          <th style="padding:5px 6px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">Blower</th><th style="padding:5px 6px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">PSI</th><th style="padding:5px 6px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">Flt PSI</th><th style="padding:5px 6px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">Blwr °F</th><th style="padding:5px 6px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">MBBR in</th>
           <th style="padding:5px 6px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">MBBR out</th>
           <th style="padding:5px 6px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">DO</th>
+          <th style="padding:5px 6px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">Eff GPM</th>
           <th style="padding:5px 6px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">Depth ft</th>
           <th style="padding:5px 6px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">Sludge ft</th>
           <th style="padding:5px 6px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">Coag2%</th>
@@ -3292,6 +3415,7 @@ function sysGenerateReport(){
           <th style="padding:5px 6px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">Froth2 g/hr</th>
           <th style="padding:5px 6px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">SAF2 pH</th>
           <th style="padding:5px 6px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">Turb NTU</th>
+          <th style="padding:5px 6px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">SAF2 GPM</th>
           <th style="padding:5px 6px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">City pH</th>
           <th style="padding:5px 6px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">Out GPM</th>
           <th style="padding:5px 6px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">Flume GPM</th>
@@ -3338,17 +3462,32 @@ function sysGenerateReport(){
           ${pRow('MBBR tank depth',fmt(avgMbbrDepth),'ft avg')}
           ${pRow('MBBR tank volume',avgMbbrVol!==null?parseInt(avgMbbrVol).toLocaleString():'—','gal avg (2,756 gal/ft)')}
           ${pRow('Sludge depth',fmt(avgSludgeDepth),'ft avg')}
+          ${pRow('Sludge volume',avgSludgeVol!==null?parseInt(avgSludgeVol).toLocaleString():'—','gal avg (max 12.5 ft = 7,960 gal)')}
           ${pRow('Turbidity',fmt(avgTurb),'NTU avg')}
         </table>
       </div>
     </div>
-    <div style="background:${city_ph_ok?'#c8edd8':'#f5c8c8'};border:2px solid ${city_ph_ok?'#1D9E75':'#A32D2D'};border-radius:8px;padding:12px;display:flex;align-items:center;gap:12px;margin-bottom:20px">
+    <div style="background:${city_ph_ok?'#c8edd8':'#f5c8c8'};border:2px solid ${city_ph_ok?'#1D9E75':'#A32D2D'};border-radius:8px;padding:12px;display:flex;align-items:center;gap:12px;margin-bottom:16px">
       <div style="font-size:28px">${city_ph_ok?'✓':'!'}</div>
       <div>
         <div style="font-size:13px;font-weight:700;color:${city_ph_ok?'#0A4D2E':'#5A0000'}">City pH — ${city_ph_ok?'Within permit range':'Outside permit range'}</div>
         <div style="font-size:11px;color:${city_ph_ok?'#1D5E3A':'#7A1F1F'};margin-top:2px">Average city pH: ${fmt(avgCityPh)} · Permit range: 6.5–9.5</div>
       </div>
     </div>
+    ${(()=>{
+      const last=entries.slice().reverse().find(e=>e.checklist_items&&e.checklist_items.length);
+      if(!last) return '';
+      const fails=last.checklist_items.filter(i=>i.state==='fail');
+      const oks=last.checklist_items.filter(i=>i.state==='ok');
+      return `<div style="margin-bottom:16px">
+        <div style="font-size:10px;font-weight:700;color:#1D5E3A;text-transform:uppercase;letter-spacing:.08em;border-bottom:1px solid #b0d8c0;padding-bottom:4px;margin-bottom:8px">Pre-check inspection — last entry of day</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:4px">
+          ${last.checklist_items.map(item=>`<div style="display:flex;align-items:center;gap:5px;padding:4px 6px;border-radius:6px;font-size:10px;background:${item.state==='ok'?'#c8edd8':item.state==='fail'?'#f5c8c8':'#f0f0f0'};color:${item.state==='ok'?'#0A4D2E':item.state==='fail'?'#5A0000':'#888'}"><span style="width:7px;height:7px;border-radius:50%;flex-shrink:0;display:inline-block;background:${item.state==='ok'?'#1D9E75':item.state==='fail'?'#A32D2D':'#ccc'}"></span>${item.label}</div>`).join('')}
+        </div>
+        ${fails.length?`<div style="margin-top:8px;padding:8px 10px;background:#f5c8c8;border-radius:6px;font-size:11px;color:#5A0000;font-weight:600">${fails.length} item${fails.length>1?'s':''} flagged: ${fails.map(f=>f.label).join(' · ')}</div>`:''}
+        ${last.checklist_comment?`<div style="margin-top:6px;padding:8px 10px;background:#f9f9f9;border:1px solid #ddd;border-radius:6px;font-size:11px;color:#333"><strong>Comment:</strong> ${last.checklist_comment}</div>`:''}
+      </div>`;
+    })()}
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:30px;margin-top:24px">
       <div><div style="border-top:1px solid #555;padding-top:6px;font-size:11px;color:#555">Operator signature</div></div>
       <div><div style="border-top:1px solid #555;padding-top:6px;font-size:11px;color:#555">Supervisor review</div></div>
@@ -3360,6 +3499,119 @@ function sysGenerateReport(){
   document.getElementById('pdf-overlay').style.display='block';
   document.getElementById('pdf-overlay').scrollTop=0;
 }
+
+// ── SOP / HELP ────────────────────────────────────────────────
+const SOP_SECTIONS=[
+{title:'Getting started',articles:[
+  {title:'Overview — what this app does',body:`<p>This app has four sections accessible from the <strong>hamburger menu</strong> (three lines ☰) in the top-left corner:</p><ul><li><strong>System Monitor</strong> — your main daily tool. Record readings from every part of the plant every 2 hours.</li><li><strong>Daily COD Test</strong> — enter lab results from your COD samples.</li><li><strong>MBBR Calculator</strong> — advanced biological calculations. You likely won't need this often.</li><li><strong>SOP / Help</strong> — this guide.</li></ul><div class="sop-tip">💡 The app saves all your data automatically. You never need to hit a save button — just tap <strong>+ Log</strong> when done entering readings.</div>`},
+  {title:'How to navigate between tabs',body:`<p>Each section has tabs at the <strong>bottom of the screen</strong>:</p><ul><li><strong>Enter</strong> — where you type in your readings</li><li><strong>Results</strong> — calculated results and alerts</li><li><strong>Trends</strong> — charts of how values change over time</li><li><strong>Log</strong> — your saved history of all past entries</li></ul><p>Tap any tab to switch. Your data stays in Enter until you tap <strong>+ Log</strong> to save it.</p>`},
+  {title:'How to switch between sections',body:`<p>Tap the <strong>three lines (☰)</strong> in the top-left corner to open the menu, then tap whichever section you want. The active section is highlighted in green.</p>`},
+]},
+{title:'System Monitor — daily use',articles:[
+  {title:'What is the System Monitor?',body:`<p>The System Monitor is your main 2-hour check log. Every 2 hours you go through the plant and enter readings. It tracks everything from the pit to final city discharge.</p><p>Entry order follows plant flow:</p><ol><li>Pre-check inspection (checklist)</li><li>Pit volume</li><li>Storage tanks</li><li>Final discharge (City pH, flow)</li><li>Primary SAF</li><li>MBBR</li><li>Blower</li><li>Secondary SAF</li></ol>`},
+  {title:'How to complete the pre-check inspection',body:`<p>At the top of the Enter tab is a checklist of 18 inspection items. Go through this list first:</p><ol><li>Tap once — turns <strong>green</strong> = acceptable</li><li>Tap again — turns <strong>red</strong> = issue found</li><li>Tap again — back to unchecked</li></ol><p>If any item turns red, a <strong>comment box</strong> appears below. Type in what the issue was.</p><div class="sop-tip">💡 If everything is normal you don't have to check every item — but always mark red if something is wrong.</div>`},
+  {title:'How to enter your 2-hour readings',body:`<p>Work top to bottom in the Enter tab:</p><ol><li><strong>Timestamp</strong> — auto-fills to right now. Change it if needed.</li><li><strong>Pit</strong> — enter pit volume in gallons (max 12,000)</li><li><strong>Storage tanks</strong> — Tank 1 level, Tank 2 level, shared pH</li><li><strong>Final discharge</strong> — outlet flow (GPM), city pH, Parshall flume (GPM)</li><li><strong>Primary SAF</strong> — neutralization pH, effluent pH, coag dose, flocculant dose, flow, sludge tank %, froth mV</li><li><strong>MBBR</strong> — influent pH, effluent pH, DO, tank depth, effluent flow, sludge depth</li><li><strong>Blower</strong> — select blower 410 or 412, pressure PSI, filter pressure PSI (negative), temp °F</li><li><strong>Secondary SAF</strong> — coag %, flocculant %, froth mV, effluent pH, turbidity, effluent flow</li></ol><div class="sop-tip">💡 You don't have to fill in every field. Fill in what you have and tap <strong>+ Log</strong>.</div>`},
+  {title:'What are the auto-calculated fields?',body:`<p>Some fields calculate automatically as you type — you do not enter these yourself:</p><ul><li><strong>Coag usage (gal/hr)</strong> — dose rate × flow</li><li><strong>Flocculant usage (gal/hr)</strong> — dose rate × flow</li><li><strong>Froth usage (gal/hr)</strong> — calculated from mV reading using (mV − 4) × 1.0625 ÷ 24</li><li><strong>Sludge volume (gal)</strong> — calculated from depth you enter</li><li><strong>MBBR tank volume</strong> — depth × 2,756 gal/ft</li></ul>`},
+  {title:'How to save a log entry',body:`<p>When finished entering readings:</p><ol><li>Tap the <strong>+ Log</strong> button at the bottom of the Enter tab</li><li>Entry saves automatically — the Log tab count increases by 1</li></ol><div class="sop-warn">⚠️ Do not close the app without tapping + Log — unsaved entries will be lost.</div><div class="sop-tip">💡 The app does NOT clear fields after saving. On your next round, just update the numbers that changed and tap + Log again.</div>`},
+  {title:'How to view results and alerts',body:`<p>After entering readings, tap the <strong>Results</strong> tab at the bottom. At the top you will see alert boxes:</p><ul><li><strong>Red</strong> — needs immediate attention (pit near flooding, DO too low, city pH out of permit)</li><li><strong>Yellow</strong> — monitor closely</li><li><strong>Green</strong> — all good</li></ul><p>Below alerts are detailed readings for each section with status badges.</p>`},
+  {title:'How to recall a past entry',body:`<ol><li>Tap the <strong>Log</strong> tab</li><li>Find the entry you want</li><li><strong>Double-tap</strong> the row</li><li>All values load back into the Enter tab</li><li>Tap <strong>Results</strong> to review calculations for that entry</li></ol>`},
+  {title:'How to delete a single entry',body:`<p>In the <strong>Log</strong> tab, each row has a small <strong>× button</strong> on the right. Tap it to delete that entry. There is no undo, so be careful.</p>`},
+  {title:'How to view trends and charts',body:`<p>Tap the <strong>Trends</strong> tab to see 6 charts:</p><ul><li>pH through the entire system (with permit limit lines)</li><li>Flow rates (GPM)</li><li>Storage tank levels</li><li>MBBR dissolved oxygen and depths</li><li>Chemical dosing rates</li><li>Secondary SAF turbidity and froth</li></ul><p>Charts only appear once you have at least 2 saved entries.</p>`},
+  {title:'How to print the daily report',body:`<ol><li>Make sure you are on <strong>System Monitor</strong></li><li>Tap the <strong>hamburger menu (☰)</strong></li><li>Tap <strong>Export to PDF</strong></li><li>A date picker appears — select the date to report</li><li>Tap <strong>Generate Report</strong></li><li>The report preview opens — scroll to review</li><li>Tap <strong>Print / Save PDF</strong></li></ol><p>The report includes all entries for that day, daily totals and averages, pre-check inspection results, city pH permit status, and signature lines.</p>`},
+]},
+{title:'Daily COD Test',articles:[
+  {title:'What is the Daily COD Test?',body:`<p>This is where you enter your lab sample results. You test samples from 4 points in the plant:</p><ul><li>🔴 <strong>BOD (raw wastewater)</strong> — pH only (too turbid for turbidity test)</li><li>🟡 <strong>WW (wastewater)</strong> — pH, turbidity, COD</li><li>🔵 <strong>Primary effluent</strong> — pH, turbidity, COD</li><li>🟢 <strong>City (final discharge)</strong> — pH, turbidity, COD, TSS, flow, BOD/COD ratio</li></ul>`},
+  {title:'How to enter COD test results',body:`<ol><li>Go to <strong>Daily COD Test</strong> from the hamburger menu</li><li>Enter readings for each sampling point</li><li>The City card has extra fields: TSS (mg/L), Flow (GPD), BOD/COD ratio</li><li>Tap <strong>Calculate</strong> to see results</li><li>Tap <strong>+ Log</strong> to save</li></ol><div class="sop-tip">💡 City flow is in <strong>GPD (gallons per day)</strong> — enter the full number, for example 180,000 not 0.18.</div>`},
+  {title:'How to understand COD results',body:`<p>In the <strong>Results</strong> tab you will see:</p><ul><li><strong>Permit compliance</strong> — green = passing, red = failing. Checks city pH (must be 6.5–9.5) and BOD lbs/day (max 800 daily, 650 weekly average).</li><li><strong>Lab results table</strong> — all entered values in one place</li><li><strong>Removal efficiency</strong> — how much COD is being removed. Good = 70%+, Moderate = 40–70%, Low = under 40%.</li><li><strong>BOD to city</strong> — estimated BOD discharge in mg/L and lbs/day</li></ul><div class="sop-warn">⚠️ If BOD lbs/day shows red, you are at or over your permit limit. Notify your supervisor immediately.</div>`},
+  {title:'How to recall a past COD entry',body:`<p>In the <strong>Log</strong> tab, <strong>double-tap</strong> any row to load it back into the Enter tab with all values populated automatically.</p>`},
+  {title:'How to print the Daily COD report',body:`<ol><li>Make sure you are on <strong>Daily COD Test</strong></li><li>Tap the <strong>hamburger menu (☰)</strong></li><li>Tap <strong>Export to PDF</strong></li><li>A report preview opens</li><li>Tap <strong>Print / Save PDF</strong></li></ol>`},
+]},
+{title:'Backing up and restoring data',articles:[
+  {title:'How to back up all your data',body:`<ol><li>Tap the <strong>hamburger menu (☰)</strong></li><li>Tap <strong>Export backup (.json)</strong></li><li>The app copies all your data to the clipboard and shows a confirmation box</li><li>Open your email, compose a new message, long-press in the body, tap <strong>Paste</strong></li><li>Send to yourself or your supervisor</li></ol><div class="sop-tip">💡 Do this weekly so you never lose your data. The backup contains ALL logs.</div>`},
+  {title:'How to restore data from a backup',body:`<ol><li>Open the backup email</li><li>Long-press the text → <strong>Select All</strong> → <strong>Copy</strong></li><li>Go back to the app → hamburger menu (☰)</li><li>Tap <strong>Paste backup text</strong></li><li>Long-press in the text box → <strong>Paste</strong></li><li>Tap <strong>Import & merge</strong> → Confirm</li></ol><div class="sop-tip">💡 Import merges with existing data — it does not delete anything already saved.</div>`},
+]},
+{title:'Understanding alerts and permit limits',articles:[
+  {title:'What are the permit limits?',body:`<p>Your facility permit requires:</p><ul><li><strong>BOD daily maximum:</strong> 800 lbs/day</li><li><strong>BOD weekly average:</strong> 650 lbs/day</li><li><strong>pH range:</strong> 6.5 – 9.5</li></ul><p>The app checks these automatically. If you are over a limit the reading turns red.</p>`},
+  {title:'Red city pH alert — what to do',body:`<p>City pH outside 6.5–9.5 is a permit violation. Steps:</p><ol><li>Note the time and exact pH reading</li><li>Check Primary SAF neutralization tank pH</li><li>Adjust coagulant dosing if needed</li><li>Notify your supervisor</li><li>Continue monitoring every check interval</li></ol>`},
+  {title:'Low DO alert — what to do',body:`<p>DO = Dissolved Oxygen in the MBBR tank. Bacteria need it to treat wastewater.</p><ul><li><strong>Below 3 mg/L</strong> — yellow warning, monitor closely</li><li><strong>Below 2 mg/L</strong> — red alert, critical. Check the blower immediately.</li></ul><p>If critically low: verify the blower is running and pressure readings are normal. Notify your supervisor.</p>`},
+  {title:'Pit flooding alert — what to do',body:`<p>The pit holds a maximum of 12,000 gallons.</p><ul><li><strong>Above 8,000 gal</strong> — yellow warning</li><li><strong>Above 10,000 gal</strong> — red alert, approaching flood</li></ul><p>If the pit is near full, check that pumps to the storage tanks are running.</p>`},
+]},
+{title:'Troubleshooting',articles:[
+  {title:'The app is not loading or looks blank',body:`<ol><li>Close the app completely and reopen it</li><li>Check your internet connection</li><li>If on the mobile app, check for an update</li><li>If on a browser, clear the cache and reload</li></ol><div class="sop-warn">⚠️ Do NOT uninstall the mobile app without first doing an Export backup — you will lose all your saved data.</div>`},
+  {title:'My saved entries are gone',body:`<p>Entries can be lost if the browser or app cache was cleared, or the app was uninstalled. If you have a recent backup email, follow the <strong>How to restore data from a backup</strong> steps above. Going forward, email a backup to yourself every week.</p>`},
+  {title:'The Export backup button does nothing',body:`<ol><li>Wait 5 seconds and try again</li><li>If a "Copy backup data" box appears — tap <strong>Copy all</strong>, then paste into an email</li></ol>`},
+  {title:'A number looks wrong',body:`<p>Check that you entered the correct units:</p><ul><li>Coag and flocculant doses — <strong>gal/gal</strong> (example: 0.00025)</li><li>Flow fields — <strong>GPM</strong></li><li>City flow in Daily COD — <strong>GPD</strong> (full number, e.g. 180,000)</li><li>Filter pressure on blower — <strong>negative number</strong> (e.g. -2.5)</li></ul><p>Tap <strong>Calculate</strong> again after correcting.</p>`},
+  {title:'How to clear all entries and start fresh',body:`<p>In the <strong>Log</strong> tab of any section, tap the <strong>Clear</strong> button and confirm.</p><div class="sop-warn">⚠️ Export a backup BEFORE clearing. Deleted entries cannot be recovered.</div>`},
+]},
+];
+
+function sopInit(){
+  const el=document.getElementById('sop-content');
+  if(!el) return;
+  el.innerHTML=SOP_SECTIONS.map((sec,si)=>`
+    <div class="sop-section" data-section="${si}">
+      <div class="sop-section-title">${sec.title}</div>
+      ${sec.articles.map((art,ai)=>`
+        <div class="sop-article" data-section="${si}" data-article="${ai}">
+          <div class="sop-article-header" onclick="sopToggle(${si},${ai})">
+            <div class="sop-article-title">${art.title}</div>
+            <svg class="sop-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <div class="sop-article-body" id="sop-body-${si}-${ai}">${art.body}</div>
+        </div>`).join('')}
+    </div>`).join('');
+}
+
+function sopToggle(si,ai){
+  const body=document.getElementById('sop-body-'+si+'-'+ai);
+  const chevron=body.previousElementSibling.querySelector('.sop-chevron');
+  const isOpen=body.classList.contains('open');
+  body.classList.toggle('open',!isOpen);
+  chevron.classList.toggle('open',!isOpen);
+}
+
+function sopSearch(){
+  const q=document.getElementById('sop-search').value.trim().toLowerCase();
+  const countEl=document.getElementById('sop-search-count');
+  if(!q){
+    document.querySelectorAll('.sop-section').forEach(s=>s.style.display='');
+    document.querySelectorAll('.sop-article').forEach(a=>a.style.display='');
+    SOP_SECTIONS.forEach((sec,si)=>sec.articles.forEach((art,ai)=>{
+      const body=document.getElementById('sop-body-'+si+'-'+ai);
+      if(body){body.classList.remove('open');body.innerHTML=art.body;}
+      const chev=body&&body.previousElementSibling&&body.previousElementSibling.querySelector('.sop-chevron');
+      if(chev) chev.classList.remove('open');
+    }));
+    countEl.style.display='none';
+    return;
+  }
+  const esc=q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+  let total=0;
+  SOP_SECTIONS.forEach((sec,si)=>{
+    let secVisible=false;
+    sec.articles.forEach((art,ai)=>{
+      const matches=art.title.toLowerCase().includes(q)||art.body.toLowerCase().includes(q);
+      const article=document.querySelector('.sop-article[data-section="'+si+'"][data-article="'+ai+'"]');
+      const body=document.getElementById('sop-body-'+si+'-'+ai);
+      const chev=article&&article.querySelector('.sop-chevron');
+      if(matches&&article&&body){
+        article.style.display='';
+        body.classList.add('open');
+        if(chev) chev.classList.add('open');
+        body.innerHTML=art.body.replace(new RegExp('('+esc+')','gi'),'<mark class="sop-highlight">$1</mark>');
+        secVisible=true; total++;
+      } else if(article){
+        article.style.display='none';
+      }
+    });
+    const secEl=document.querySelector('.sop-section[data-section="'+si+'"]');
+    if(secEl) secEl.style.display=secVisible?'':'none';
+  });
+  countEl.textContent=total+' result'+(total===1?'':'s')+' for "'+q+'"';
+  countEl.style.display='block';
+}
+
+sopInit();
 
 function openMenu(){
   updateStorageInfo();
@@ -3379,6 +3631,7 @@ function switchUnit(unit){
   if(unit==='saf') safShowTab('input');
   if(unit==='mbbr') showTab('input');
   if(unit==='sys') sysShowTab('input');
+  if(unit==='sop') document.getElementById('sop-scroll-area').scrollTop=0;
 }
 
 // ── DAILY COD TEST CALCULATOR ─────────────────────────────────
@@ -3592,7 +3845,7 @@ function safRenderLog(){
       <td>${e.city_ph||'—'}</td><td>${e.city_turb||'—'}</td><td>${e.city_cod||'—'}</td><td>${e.city_tss||'—'}</td>
       <td>${e.city_bod_lbs>0?e.city_bod_lbs.toFixed(2):'—'}</td>
       <td>${e.city_bod_lbs>0?`<span class="badge ${e.city_bod_lbs<=BOD_DAILY?'b-ok':'b-bad'}">${e.city_bod_lbs<=BOD_DAILY?'Pass':'FAIL'}</span>`:'—'}</td>
-      <td><button class="del-btn" onclick="event.stopPropagation();safDelLog(${i})">×</button></td>
+      <td><button class="del-btn" onclick="event.stopPropagation();confirmDelEntry(this,'saf',${i})">×</button></td>
     </tr>`;
   });
   h+='</tbody></table>';
@@ -3608,7 +3861,7 @@ function safLoadEntry(i){
   set('pe_ph',    e.pe_ph);    set('pe_turb',   e.pe_turb);   set('pe_cod',   e.pe_cod);
   set('bod_ph',   e.bod_ph);                                   set('bod_cod',  e.bod_cod);
   set('city_ph',  e.city_ph);  set('city_turb', e.city_turb); set('city_cod', e.city_cod);
-  set('city_tss', e.city_tss); set('city_flow_mgd', e.flow);  set('city_bod_pct', e.ratio);
+  set('city_tss', e.city_tss); set('city_flow_mgd', e.flow ? +(e.flow*1e6).toFixed(0) : '');  set('city_bod_pct', e.ratio);
   // Switch to enter tab and calculate
   safShowTab('input');
   safCalculate();
@@ -3685,6 +3938,73 @@ let sysCharts={};
 function sysGv(id){return parseFloat(document.getElementById(id).value)||0;}
 function sysVal(id){return document.getElementById(id).value||'';}
 
+// ── CHECKLIST ─────────────────────────────────────────────────
+const SYS_CHECKLIST_ITEMS=[
+  'Water flowing to MBBR?',
+  'Alarms at PLC display OK?',
+  'Pipes & units free of leaks?',
+  'Room clean & access clear?',
+  'Controls timer operating?',
+  'Cleaning cycle engaging?',
+  'Catch container in place?',
+  'Coag chemical supply adequate?',
+  'Coag pump P1401 functioning?',
+  'Floc chemical supply adequate?',
+  'Floc pump P1801 functioning?',
+  'Effluent clear at start?',
+  'Sludge blanket firm (oatmeal)?',
+  'Skimmer system functioning?',
+  'Skimmer paddles in good repair?',
+  'Sludge compartment discharging?',
+  'Effluent clear at end?',
+  'Balance tank pH probe clean?'
+];
+let sysCheckState={};
+
+function sysInitChecklist(){
+  const el=document.getElementById('sys-checklist');
+  if(!el) return;
+  el.innerHTML='';
+  SYS_CHECKLIST_ITEMS.forEach((label,i)=>{
+    const state=sysCheckState[i]||'none'; // none, ok, fail
+    const div=document.createElement('div');
+    div.className='chk-item'+(state==='ok'?' ok':state==='fail'?' fail':'');
+    div.innerHTML=`<div class="chk-dot"></div><span>${label}</span>`;
+    div.onclick=()=>sysToggleCheck(i);
+    el.appendChild(div);
+  });
+}
+
+function sysToggleCheck(i){
+  const current=sysCheckState[i]||'none';
+  sysCheckState[i]=current==='none'?'ok':current==='ok'?'fail':'none';
+  sysInitChecklist();
+  // Show comment box if any failures
+  const hasFail=Object.values(sysCheckState).some(v=>v==='fail');
+  const wrap=document.getElementById('sys-checklist-comment-wrap');
+  if(wrap) wrap.style.display=hasFail?'block':'none';
+}
+
+function sysGetChecklistSummary(){
+  const total=SYS_CHECKLIST_ITEMS.length;
+  const ok=Object.values(sysCheckState).filter(v=>v==='ok').length;
+  const fail=Object.values(sysCheckState).filter(v=>v==='fail').length;
+  const unchecked=total-ok-fail;
+  return{total,ok,fail,unchecked,items:SYS_CHECKLIST_ITEMS.map((label,i)=>({label,state:sysCheckState[i]||'none'}))};
+}
+
+function sysResetChecklist(){
+  sysCheckState={};
+  sysInitChecklist();
+  const wrap=document.getElementById('sys-checklist-comment-wrap');
+  if(wrap) wrap.style.display='none';
+  const ta=document.getElementById('sys_checklist_comment');
+  if(ta) ta.value='';
+}
+
+// Init on load
+sysInitChecklist();
+
 function sysLoadLog(){
   try{const d=localStorage.getItem(SYS_LS);if(d){sysLog=JSON.parse(d);sysRenderLog();sysUpdateCount();}}catch(e){sysLog=[];}
 }
@@ -3715,6 +4035,20 @@ function sysCalcMbbrVol(){
   const vol=depth>0?+(depth*2756).toFixed(0):null;
   const el=document.getElementById('sys_mbbr_vol_display');
   if(el) el.textContent=vol!==null?vol.toLocaleString()+' gal':'—';
+}
+
+function sysCalcSludgeTank(){
+  const depth=sysGv('sys_sludge_depth');
+  const el=document.getElementById('sys_sludge_vol');
+  if(!el||!depth) return void(el&&(el.textContent='—'));
+  let vol;
+  if(depth<=3.8){
+    vol=+(depth/3.8*1000).toFixed(0);
+  } else {
+    vol=+(1000+(depth-3.8)*800).toFixed(0);
+  }
+  const pct=+((depth/12.5)*100).toFixed(1);
+  el.textContent=parseInt(vol).toLocaleString()+' gal ('+pct+'%)';
 }
 
 function sysCalcSaf1Sludge(){
@@ -3762,14 +4096,17 @@ function sysCalcPrimarySAF(){
 function sysClearInputs(){
   ['sys_pit_vol','sys_tank1_vol','sys_tank2_vol','sys_storage_ph',
    'sys_neut_ph','sys_coag_dose','sys_floc1_dose','sys_saf1_flow','sys_saf1_eff_ph','sys_saf1_sludge_pct','sys_saf1_froth',
-   'sys_mbbr_inf_ph','sys_mbbr_eff_ph','sys_mbbr_do','sys_mbbr_depth','sys_sludge_depth',
-   'sys_floc2_pct','sys_coag2_pct','sys_saf2_froth','sys_saf2_eff_ph','sys_saf2_turb',
+   'sys_mbbr_inf_ph','sys_mbbr_eff_ph','sys_mbbr_do','sys_mbbr_depth','sys_mbbr_eff_flow','sys_sludge_depth','sys_blower_psi','sys_blower_filter_psi','sys_blower_temp',
+   'sys_floc2_pct','sys_coag2_pct','sys_saf2_froth','sys_saf2_eff_ph','sys_saf2_turb','sys_saf2_eff_flow',
    'sys_out_flow','sys_city_ph','sys_flume_gpm'
   ].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   document.getElementById('sys_floc2_gpd').textContent='—';
+  sysResetChecklist();
+  const blSel=document.getElementById('sys_blower_id');if(blSel)blSel.value='';
   document.getElementById('sys_coag2_gph').textContent='—';
   document.getElementById('sys_coag_gpd').textContent='—';
   document.getElementById('sys_saf1_sludge_gal').textContent='—';
+  document.getElementById('sys_sludge_vol').textContent='—';
   document.getElementById('sys_saf1_froth_gpd').textContent='—';
   document.getElementById('sys_saf2_froth_gpd').textContent='—';
   document.getElementById('sys_mbbr_vol_display').textContent='—';
@@ -3792,11 +4129,15 @@ function sysCalculate(){
   const saf1_sludge_pct=sysGv('sys_saf1_sludge_pct');
   const saf1_sludge_gal=+(2700*saf1_sludge_pct/100).toFixed(1);
   const mbbr_inf_ph=sysGv('sys_mbbr_inf_ph'), mbbr_eff_ph=sysGv('sys_mbbr_eff_ph');
-  const mbbr_do=sysGv('sys_mbbr_do'), mbbr_depth=sysGv('sys_mbbr_depth');
+  const mbbr_do=sysGv('sys_mbbr_do'), mbbr_depth=sysGv('sys_mbbr_depth'), mbbr_eff_flow=sysGv('sys_mbbr_eff_flow');
+  const blower_id=document.getElementById('sys_blower_id')?document.getElementById('sys_blower_id').value:'';
+  const blower_psi=sysGv('sys_blower_psi');
+  const blower_filter_psi=parseFloat(document.getElementById('sys_blower_filter_psi').value)||0;
+  const blower_temp=sysGv('sys_blower_temp');
   const sludge_depth=sysGv('sys_sludge_depth');
   const floc2_pct=sysGv('sys_floc2_pct'), floc2_gpd=+(17*floc2_pct/100).toFixed(4);
   const coag2_pct=sysGv('sys_coag2_pct');
-  const saf2_froth=sysGv('sys_saf2_froth'), saf2_eff_ph=sysGv('sys_saf2_eff_ph');
+  const saf2_froth=sysGv('sys_saf2_froth'), saf2_eff_ph=sysGv('sys_saf2_eff_ph'), saf2_eff_flow=sysGv('sys_saf2_eff_flow');
   const saf2_turb=sysGv('sys_saf2_turb');
   const out_flow=sysGv('sys_out_flow'), city_ph=sysGv('sys_city_ph');
   const flume=sysGv('sys_flume_gpm');
@@ -3815,6 +4156,13 @@ function sysCalculate(){
   if(mbbr_do>0&&mbbr_do<2) alerts+=`<div class="alert a-bad">MBBR DO ${mbbr_do} mg/L — critically low. Check aeration.</div>`;
   if(mbbr_do>0&&mbbr_do<3) alerts+=`<div class="alert a-warn">MBBR DO ${mbbr_do} mg/L — below optimal for nitrification.</div>`;
   if(saf1_eff_ph>0&&(saf1_eff_ph<6.5||saf1_eff_ph>9.5)) alerts+=`<div class="alert a-warn">Primary SAF effluent pH (${saf1_eff_ph.toFixed(2)}) outside 6.5–9.5 — will stress MBBR.</div>`;
+  // Checklist summary
+  const chkSum=sysGetChecklistSummary();
+  if(chkSum.fail>0) alerts+=`<div class="alert a-bad">${chkSum.fail} checklist item${chkSum.fail>1?'s':''} marked as issue — review before logging.</div>`;
+  else if(chkSum.unchecked===chkSum.total) alerts+='';
+  else if(chkSum.ok===chkSum.total) alerts+=`<div class="alert a-ok">All ${chkSum.total} checklist items acceptable.</div>`;
+  else if(chkSum.unchecked>0) alerts+=`<div class="alert a-info">${chkSum.ok} of ${chkSum.total} checklist items checked — ${chkSum.unchecked} remaining.</div>`;
+
   if(!alerts) alerts='<div class="alert a-ok">All monitored values within acceptable range.</div>';
   document.getElementById('sys-alerts').innerHTML=alerts;
   document.getElementById('sys-alert-dot').style.display=(city_ph>0&&!city_ph_ok||mbbr_do>0&&mbbr_do<2)?'block':'none';
@@ -3854,13 +4202,21 @@ function sysCalculate(){
     rr('Froth usage',saf1_froth>0?+(17*saf1_froth/100).toFixed(4):'—','gal/hr (17 gal/day ÷ 24 at 100%)');
 
   // MBBR results
+  document.getElementById('sys-blower-results').innerHTML=
+    rr('Blower on duty',blower_id||'—','')+
+    rr('Pressure',blower_psi||'—','PSI')+
+    rr('Filter pressure',blower_filter_psi!==0?blower_filter_psi:'—','PSI')+
+    rr('Temp',blower_temp||'—','°F');
+
   document.getElementById('sys-mbbr-results').innerHTML=
     rr('Influent pH',mbbr_inf_ph||'—','')+
     rr('Effluent pH',mbbr_eff_ph||'—','')+
     rr('DO',mbbr_do||'—','mg/L',mbbr_do>0?badge(mbbr_do>=3?'Good':mbbr_do>=2?'Low':'Critical',mbbr_do>=3?'b-ok':mbbr_do>=2?'b-warn':'b-bad'):'')+
+    rr('Effluent flow → SAF',mbbr_eff_flow||'—','GPM')+
     rr('Tank depth',mbbr_depth||'—','ft')+
     rr('Tank volume',mbbr_depth>0?(mbbr_depth*2756).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g,','):'—','gal (2,756 gal/ft)')+
-    rr('Sludge tank depth',sludge_depth||'—','ft');
+    rr('Sludge tank depth',sludge_depth||'—','ft')+
+    rr('Sludge volume',sludge_depth>0?(sludge_depth<=3.8?+(sludge_depth/3.8*1000).toFixed(0):+(1000+(sludge_depth-3.8)*800).toFixed(0)):'—','gal',sludge_depth>0?badge(sludge_depth>=12.5?'Overflow risk':'OK',sludge_depth>=12.5?'b-bad':sludge_depth>=10?'b-warn':'b-ok'):'');
 
   // Secondary SAF results
   document.getElementById('sys-saf2-results').innerHTML=
@@ -3871,7 +4227,8 @@ function sysCalculate(){
     rr('Froth generator',saf2_froth||'—','mV')+
     rr('Froth usage',saf2_froth>0?+(17*saf2_froth/100).toFixed(4):'—','gal/hr (17 gal/day ÷ 24 at 100%)')+
     rr('Effluent pH',saf2_eff_ph||'—','')+
-    rr('Effluent turbidity',saf2_turb||'—','NTU');
+    rr('Effluent turbidity',saf2_turb||'—','NTU')+
+    rr('Effluent flow → city',saf2_eff_flow||'—','GPM');
 
   // Discharge results
   document.getElementById('sys-discharge-results').innerHTML=
@@ -3884,8 +4241,12 @@ function sysCalculate(){
 function sysSaveLog(){
   const ts=document.getElementById('sys_timestamp').value||new Date().toISOString();
   const floc2_pct=sysGv('sys_floc2_pct');
+  const chk=sysGetChecklistSummary();
+  const chkComment=document.getElementById('sys_checklist_comment')?document.getElementById('sys_checklist_comment').value.trim():'';
   sysLog.push({
     ts, label:new Date(ts).toLocaleString(),
+    checklist_ok:chk.ok, checklist_fail:chk.fail, checklist_unchecked:chk.unchecked,
+    checklist_items:chk.items, checklist_comment:chkComment,
     pit_vol:sysGv('sys_pit_vol'),
     tank1_vol:sysGv('sys_tank1_vol'), tank2_vol:sysGv('sys_tank2_vol'),
     storage_ph:sysGv('sys_storage_ph'),
@@ -3896,7 +4257,10 @@ function sysSaveLog(){
     saf1_sludge_pct:sysGv('sys_saf1_sludge_pct'), saf1_sludge_gal:+(2700*sysGv('sys_saf1_sludge_pct')/100).toFixed(1),
     saf1_froth:sysGv('sys_saf1_froth'), saf1_froth_mv:sysGv('sys_saf1_froth'), saf1_froth_gpd:sysGv('sys_saf1_froth')>=4?+((sysGv('sys_saf1_froth')-4)*1.0625).toFixed(4):0, saf1_froth_gph:sysGv('sys_saf1_froth')>=4?+((sysGv('sys_saf1_froth')-4)*1.0625/24).toFixed(4):0,
     mbbr_inf_ph:sysGv('sys_mbbr_inf_ph'), mbbr_eff_ph:sysGv('sys_mbbr_eff_ph'),
-    mbbr_do:sysGv('sys_mbbr_do'), mbbr_depth:sysGv('sys_mbbr_depth'),
+    blower_id:document.getElementById('sys_blower_id')?document.getElementById('sys_blower_id').value:'',
+    blower_psi:sysGv('sys_blower_psi'), blower_filter_psi:parseFloat(document.getElementById('sys_blower_filter_psi').value)||0, blower_temp:sysGv('sys_blower_temp'),
+    mbbr_do:sysGv('sys_mbbr_do'), mbbr_depth:sysGv('sys_mbbr_depth'), mbbr_eff_flow:sysGv('sys_mbbr_eff_flow'),
+    sludge_vol:(()=>{const d=sysGv('sys_sludge_depth');return d?(d<=3.8?+(d/3.8*1000).toFixed(0):+(1000+(d-3.8)*800).toFixed(0)):0;})(),
     mbbr_vol_gal:sysGv('sys_mbbr_depth')>0?+(sysGv('sys_mbbr_depth')*2756).toFixed(0):0,
     sludge_depth:sysGv('sys_sludge_depth'),
     floc2_pct, floc2_gpd:+(17*floc2_pct/100).toFixed(4), coag2_pct:sysGv('sys_coag2_pct'), coag2_gph:+(26.7*sysGv('sys_coag2_pct')/100).toFixed(4),
@@ -3917,7 +4281,7 @@ function sysRenderLog(){
     <th>Time</th>
     <th>Pit gal</th><th>T1 gal</th><th>T2 gal</th><th>St pH</th>
     <th>Neut pH</th><th>Coag</th><th>Floc1</th><th>Flow1</th><th>SAF1 pH</th><th>Froth1</th>
-    <th>MBBR in pH</th><th>MBBR out pH</th><th>DO</th><th>Depth</th><th>Sludge</th>
+    <th>Blower</th><th>PSI</th><th>Filter PSI</th><th>Blwr °F</th><th>MBBR in pH</th><th>MBBR out pH</th><th>DO</th><th>Depth</th><th>Sludge</th>
     <th>Coag2%</th><th>Coag2 GPH</th><th>Floc2%</th><th>Floc2 gpd</th><th>Froth1 mV</th><th>Froth1 gpd</th><th>Froth2 mV</th><th>Froth2 gpd</th><th>Froth2</th><th>SAF2 pH</th><th>Turb</th>
     <th>Flow out</th><th>City pH</th><th>Flume</th>
     <th></th>
@@ -3929,14 +4293,14 @@ function sysRenderLog(){
       <td>${e.pit_vol||'—'}</td><td>${e.tank1_vol||'—'}</td><td>${e.tank2_vol||'—'}</td><td>${e.storage_ph||'—'}</td>
       <td>${e.neut_ph||'—'}</td><td>${e.coag_dose?e.coag_dose.toFixed(6):'—'}</td><td>${e.floc1_dose?e.floc1_dose.toFixed(6):'—'}</td>
       <td>${e.saf1_flow||'—'}</td><td>${e.saf1_eff_ph||'—'}</td><td>${e.saf1_sludge_pct||'—'}</td><td>${e.saf1_sludge_gal||'—'}</td><td>${e.saf1_froth||'—'}</td>
-      <td>${e.mbbr_inf_ph||'—'}</td><td>${e.mbbr_eff_ph||'—'}</td>
+      <td>${e.blower_id||'—'}</td><td>${e.blower_psi||'—'}</td><td>${e.blower_filter_psi||'—'}</td><td>${e.blower_temp||'—'}</td><td>${e.mbbr_inf_ph||'—'}</td><td>${e.mbbr_eff_ph||'—'}</td>
       <td style="color:${e.mbbr_do>0&&e.mbbr_do<2?'var(--red)':e.mbbr_do>0&&e.mbbr_do<3?'var(--amber)':'inherit'}">${e.mbbr_do||'—'}</td>
       <td>${e.mbbr_depth||'—'}</td><td>${e.sludge_depth||'—'}</td>
-      <td>${e.coag2_pct||'—'}</td><td>${e.coag2_gph||'—'}</td><td>${e.floc2_pct||'—'}</td><td>${e.floc2_gpd||'—'}</td><td>${e.saf1_froth||'—'}</td><td>${e.saf1_froth_gpd||'—'}</td><td>${e.saf2_froth||'—'}</td><td>${e.saf2_froth_gpd||'—'}</td><td>${e.saf2_eff_ph||'—'}</td><td>${e.saf2_turb||'—'}</td>
+      <td>${e.coag2_pct||'—'}</td><td>${e.coag2_gph||'—'}</td><td>${e.floc2_pct||'—'}</td><td>${e.floc2_gpd||'—'}</td><td>${e.saf1_froth||'—'}</td><td>${e.saf1_froth_gpd||'—'}</td><td>${e.saf2_froth||'—'}</td><td>${e.saf2_froth_gpd||'—'}</td><td>${e.saf2_eff_ph||'—'}</td><td>${e.saf2_turb||'—'}</td><td>${e.saf2_eff_flow||'—'}</td>
       <td>${e.out_flow||'—'}</td>
       <td style="color:${e.city_ph>0?(city_ok?'var(--green2)':'var(--red)'):'inherit'}">${e.city_ph||'—'}</td>
       <td>${e.flume||'—'}</td>
-      <td><button class="del-btn" onclick="event.stopPropagation();sysDelLog(${i})">×</button></td>
+      <td><button class="del-btn" onclick="event.stopPropagation();confirmDelEntry(this,'sys',${i})">×</button></td>
     </tr>`;
   });
   h+='</tbody></table>';
@@ -3954,10 +4318,22 @@ function sysLoadEntry(i){
   set('sys_saf1_flow',e.saf1_flow); set('sys_saf1_eff_ph',e.saf1_eff_ph);
   set('sys_saf1_sludge_pct',e.saf1_sludge_pct); sysCalcSaf1Sludge();
   set('sys_saf1_froth',e.saf1_froth); sysCalcFroth1();
+  // Restore checklist
+  sysCheckState={};
+  if(e.checklist_items){
+    e.checklist_items.forEach((item,i)=>{sysCheckState[i]=item.state;});
+  }
+  sysInitChecklist();
+  const hasFail=Object.values(sysCheckState).some(v=>v==='fail');
+  const wrap=document.getElementById('sys-checklist-comment-wrap');
+  if(wrap) wrap.style.display=hasFail?'block':'none';
+  const ta=document.getElementById('sys_checklist_comment');
+  if(ta) ta.value=e.checklist_comment||'';
+  set('sys_blower_psi',e.blower_psi); set('sys_blower_filter_psi',e.blower_filter_psi); set('sys_blower_temp',e.blower_temp);
   set('sys_mbbr_inf_ph',e.mbbr_inf_ph); set('sys_mbbr_eff_ph',e.mbbr_eff_ph);
   set('sys_mbbr_do',e.mbbr_do); set('sys_mbbr_depth',e.mbbr_depth); sysCalcMbbrVol(); set('sys_sludge_depth',e.sludge_depth);
   set('sys_floc2_pct',e.floc2_pct); set('sys_coag2_pct',e.coag2_pct); sysCalcFloc2(); sysCalcCoag2(); sysCalcPrimarySAF();
-  set('sys_saf2_froth',e.saf2_froth); sysCalcFroth2(); set('sys_saf2_eff_ph',e.saf2_eff_ph); set('sys_saf2_turb',e.saf2_turb);
+  set('sys_saf2_froth',e.saf2_froth); sysCalcFroth2(); set('sys_saf2_eff_ph',e.saf2_eff_ph); set('sys_saf2_turb',e.saf2_turb); set('sys_saf2_eff_flow',e.saf2_eff_flow);
   set('sys_out_flow',e.out_flow); set('sys_city_ph',e.city_ph); set('sys_flume_gpm',e.flume);
   sysShowTab('input'); sysCalculate();
 }
@@ -3971,15 +4347,15 @@ function sysExportCSV(){
   if(!sysLog.length){alert('No system monitor data to export yet.');return;}
   const headers=['Timestamp','Pit Vol (gal)','Tank1 Vol (gal)','Tank2 Vol (gal)','Storage pH',
     'Neut Tank pH','Coag Dose (gal/gal)','Coag Usage (gal/hr)','Floc1 Dose (gal/gal)','Floc1 Usage (gal/hr)','SAF1 Flow (GPM)','SAF1 Eff pH','SAF1 Froth (mV)','SAF1 Froth (gal/hr)',
-    'MBBR Inf pH','MBBR Eff pH','MBBR DO (mg/L)','MBBR Depth (ft)','Sludge Depth (ft)',
-    'SAF2 Coag (%)','SAF2 Coag (GPH)','Floc2 (%)','Floc2 (gal/hr)','SAF2 Froth (mV)','SAF2 Froth (gal/hr)','SAF2 Eff pH','SAF2 Turb (NTU)',
+    'Blower ID','Blower PSI','Filter PSI','Blower Temp (°F)','MBBR Inf pH','MBBR Eff pH','MBBR DO (mg/L)','MBBR Eff Flow (GPM)','MBBR Depth (ft)','Sludge Depth (ft)','Sludge Vol (gal)',
+    'SAF2 Coag (%)','SAF2 Coag (GPH)','Floc2 (%)','Floc2 (gal/hr)','SAF2 Froth (mV)','SAF2 Froth (gal/hr)','SAF2 Eff pH','SAF2 Turb (NTU)','SAF2 Eff Flow (GPM)',
     'Outlet Flow (GPM)','City pH','Parshall Flume (GPM)'];
   const rows=sysLog.map(e=>[
     `"${e.label}"`,e.pit_vol,e.tank1_vol,e.tank2_vol,e.storage_ph,
     e.neut_ph,e.coag_dose?e.coag_dose.toFixed(6):'',e.coag_gpd||'',e.floc1_dose?e.floc1_dose.toFixed(6):'',e.floc1_gpd||'',
     e.saf1_flow,e.saf1_eff_ph,e.saf1_sludge_pct,e.saf1_sludge_gal,e.saf1_froth,e.saf1_froth_gpd,
-    e.mbbr_inf_ph,e.mbbr_eff_ph,e.mbbr_do,e.mbbr_depth,e.sludge_depth,
-    e.coag2_pct,e.coag2_gph,e.floc2_pct,e.floc2_gpd,e.saf2_froth,e.saf2_froth_gpd,e.saf2_eff_ph,e.saf2_turb,
+    e.blower_id,e.blower_psi,e.blower_filter_psi,e.blower_temp,e.mbbr_inf_ph,e.mbbr_eff_ph,e.mbbr_do,e.mbbr_eff_flow,e.mbbr_depth,e.sludge_depth,e.sludge_vol,
+    e.coag2_pct,e.coag2_gph,e.floc2_pct,e.floc2_gpd,e.saf2_froth,e.saf2_froth_gpd,e.saf2_eff_ph,e.saf2_turb,e.saf2_eff_flow,
     e.out_flow,e.city_ph,e.flume
   ].join(','));
   const csv=[headers.join(','),...rows].join('\n');
@@ -4015,7 +4391,7 @@ function sysRenderCharts(){
     ds('Storage pH','storage_ph','#EF9F27'),
     ds('Neut tank pH','neut_ph','#E24B4A'),
     ds('SAF1 Eff pH','saf1_eff_ph','#378ADD'),
-    ds('MBBR Inf pH','mbbr_inf_ph','#9B59B6',[4,4]),
+    ds('Blower ID','Blower PSI','Filter PSI','Blower Temp (°F)','MBBR Inf pH','mbbr_inf_ph','#9B59B6',[4,4]),
     ds('MBBR Eff pH','mbbr_eff_ph','#1D9E75'),
     ds('SAF2 Eff pH','saf2_eff_ph','#5DCAA5',[4,4]),
     ds('City pH','city_ph','#F39C12'),
