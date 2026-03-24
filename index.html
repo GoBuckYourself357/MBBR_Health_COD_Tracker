@@ -323,6 +323,23 @@ input[type=range]{width:100%;accent-color:var(--green);height:4px;margin:8px 0}
 .sop-chevron{flex-shrink:0;transition:transform .2s;opacity:.5}
 .sop-chevron.open{transform:rotate(180deg)}
 mark.sop-highlight{background:rgba(239,159,39,.4);border-radius:2px;color:inherit}
+.pred-section{margin-bottom:20px}
+.pred-section-title{font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;padding-bottom:4px;border-bottom:1px solid var(--border)}
+.pred-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:8px}
+.pred-card.pred-ok{border-color:rgba(29,158,117,.4);background:rgba(29,158,117,.06)}
+.pred-card.pred-warn{border-color:rgba(239,159,39,.4);background:rgba(239,159,39,.06)}
+.pred-card.pred-bad{border-color:rgba(226,75,74,.4);background:rgba(226,75,74,.06)}
+.pred-card.pred-info{border-color:rgba(55,138,221,.3);background:rgba(55,138,221,.05)}
+.pred-title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px;display:flex;align-items:center;gap:8px}
+.pred-value{font-size:26px;font-weight:800;margin:6px 0 2px}
+.pred-value.ok{color:var(--green2)}
+.pred-value.warn{color:var(--amber)}
+.pred-value.bad{color:var(--red)}
+.pred-value.info{color:#378ADD}
+.pred-detail{font-size:12px;color:var(--text3);line-height:1.6}
+.pred-trend{font-size:11px;margin-top:6px;padding:5px 8px;border-radius:6px;background:var(--bg3);color:var(--text2)}
+.pred-no-data{font-size:12px;color:var(--text3);font-style:italic}
+.pred-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
 </style>
 </head>
 <body>
@@ -355,6 +372,11 @@ mark.sop-highlight{background:rgba(239,159,39,.4);border-radius:2px;color:inheri
   <div class="menu-item" id="menu-sop" onclick="switchUnit('sop')">
     <div class="menu-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg></div>
     <div><div class="menu-name">SOP / Help</div><div class="menu-desc">How to use this app</div></div>
+    <div class="menu-dot"></div>
+  </div>
+  <div class="menu-item" id="menu-pred" onclick="switchUnit('pred')">
+    <div class="menu-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/><line x1="2" y1="20" x2="22" y2="20"/></svg></div>
+    <div><div class="menu-name">Predictions</div><div class="menu-desc">Trends · forecasts · alerts</div></div>
     <div class="menu-dot"></div>
   </div>
   <div style="padding:16px;margin-top:auto;border-top:1px solid var(--border)">
@@ -626,6 +648,26 @@ mark.sop-highlight{background:rgba(239,159,39,.4);border-radius:2px;color:inheri
   <!-- PANEL: DIAGNOSTICS -->
   <div class="panel" id="panel-diag">
 
+    <div class="section-label">Operating mode</div>
+    <div class="card" style="margin-bottom:12px">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+        <div>
+          <div style="font-size:13px;font-weight:600;color:var(--text)">Low load / dormancy mode</div>
+          <div style="font-size:12px;color:var(--text3);margin-top:2px">Enable when plant is shutdown or running minimal flow. Adjusts health scoring thresholds — low DO and low ammonia will not trigger false alarms.</div>
+        </div>
+        <label style="flex-shrink:0;display:flex;align-items:center;gap:8px;cursor:pointer">
+          <div style="position:relative;width:48px;height:26px">
+            <input type="checkbox" id="dormancy-mode" style="opacity:0;width:0;height:0;position:absolute" onchange="dormancyToggle()">
+            <div id="dormancy-slider" style="position:absolute;inset:0;background:var(--border);border-radius:26px;transition:.3s;cursor:pointer"></div>
+            <div id="dormancy-knob" style="position:absolute;left:3px;top:3px;width:20px;height:20px;background:#fff;border-radius:50%;transition:.3s;box-shadow:0 1px 3px rgba(0,0,0,.3)"></div>
+          </div>
+        </label>
+      </div>
+      <div id="dormancy-status" style="display:none;margin-top:10px;padding:8px 12px;background:rgba(239,159,39,.12);border-left:3px solid var(--amber);border-radius:0 6px 6px 0;font-size:12px;color:var(--amber);font-weight:600">
+        ⚠ Dormancy mode active — blowers cycling intermittently, low load conditions. Health scoring adjusted. Log a stress event to record this shutdown period.
+      </div>
+    </div>
+
     <div class="section-label">System health index</div>
     <div class="card">
       <div class="health-ring">
@@ -720,6 +762,10 @@ mark.sop-highlight{background:rgba(239,159,39,.4);border-radius:2px;color:inheri
             <option value="low_do">Low DO event</option>
             <option value="ph_excursion">pH excursion</option>
             <option value="temp_shock">Temperature shock</option>
+            <option value="plant_shutdown">Plant shutdown / no flow</option>
+            <option value="low_load">Low load / dormancy period</option>
+            <option value="starvation_foam">Starvation foaming event</option>
+            <option value="intermittent_aeration">Intermittent aeration mode</option>
             <option value="other">Other</option>
           </select>
         </div>
@@ -903,6 +949,24 @@ mark.sop-highlight{background:rgba(239,159,39,.4);border-radius:2px;color:inheri
       <div class="result-row"><span class="rname" style="color:var(--amber)">Heterotrophs competing</span><span class="rval">Very high BOD loading — outcompete nitrifiers for O₂ and media space</span></div>
       <div class="result-row"><span class="rname" style="color:var(--amber)">Sphaerotilus (bulking)</span><span class="rval">Filamentous — proliferates under low DO or low nutrients, causes sludge bulking</span></div>
       <div class="result-row"><span class="rname">Sulfate-Reducing Bacteria (SRB)</span><span class="rval">Rotten egg smell (hydrogen sulfide gas), metal corrosion — indicates anaerobic (oxygen-free) zones forming in the biofilm</span></div>
+    </div>
+
+    <div class="card" style="margin-bottom:12px">
+      <div class="card-title">Plant shutdown — intermittent aeration & dormancy</div>
+      <div style="font-size:11px;color:var(--text3);margin-bottom:10px">Used during emergency plant shutdowns or extended low-load periods (e.g. yeast contamination, weekend shutdowns with no wastewater operators)</div>
+      <div class="result-row"><span class="rname" style="color:var(--blue)">What is intermittent aeration?</span><span class="rval">Cycling blowers on and off (e.g. off 12 min / on 4 min) to keep bacteria alive on minimal oxygen while there is little or no food in the water. Prevents anaerobic crash while conserving energy.</span></div>
+      <div class="result-row"><span class="rname">DO target during cycling</span><span class="rval">Allow DO to drop to 0.8–1.0 mg/L during off cycle · spike to 2.0–2.5 mg/L during on cycle · <strong style="color:var(--red)">never below 0.5 mg/L</strong> — Nitrospira dies faster than Nitrosomonas below this causing nitrite buildup on restart</span></div>
+      <div class="result-row"><span class="rname" style="color:var(--amber)">Starvation foaming</span><span class="rval">Heavy foam during shutdown = bacteria lysing when starved of food and oxygen. Cell contents release surfactants from dairy wastewater. Adding fresh wastewater provides substrate and resolves foam quickly — if it resolves in 1–2 hours the biofilm is healthy.</span></div>
+      <div class="result-row"><span class="rname">Anammox silver lining</span><span class="rval">Candidatus Brocadia thrives in intermittent low-oxygen conditions — may become more active during shutdown periods</span></div>
+      <div class="result-row"><span class="rname" style="color:var(--amber)">Watch for</span><span class="rval">Sphaerotilus filamentous bulking · SRB activity if anaerobic zones form · elevated nitrite when restarting (NOB recovery lag)</span></div>
+      <div style="height:0.5px;background:var(--border);margin:10px 0"></div>
+      <div class="card-title" style="margin-top:8px">Restart procedure after shutdown</div>
+      <div class="result-row"><span class="rname">Step 1</span><span class="rval">Restore full aeration first — bring DO back to 3+ mg/L before introducing wastewater</span></div>
+      <div class="result-row"><span class="rname">Step 2</span><span class="rval">Ramp up flow gradually — start at 25–50% of normal flow for the first few hours</span></div>
+      <div class="result-row"><span class="rname">Step 3</span><span class="rval">Monitor ammonia closely — expect a spike before nitrification recovers. Lag phase typically 1–5 days depending on shutdown duration.</span></div>
+      <div class="result-row"><span class="rname">Step 4</span><span class="rval">Watch nitrite — if NO₂ rises above 1 mg/L, Nitrospira (NOB) is not keeping up. Hold at reduced load until nitrite drops.</span></div>
+      <div class="result-row"><span class="rname">Step 5</span><span class="rval">Log a stress event in the Diag tab to document the shutdown period and restart date for future reference</span></div>
+      <div class="result-row"><span class="rname" style="color:var(--green2)">Good sign</span><span class="rval">Foam and DO issues resolving within 1–2 hours of adding wastewater = healthy resilient biofilm — bugs went to sleep, did not die</span></div>
     </div>
 
   </div>
@@ -1183,29 +1247,18 @@ mark.sop-highlight{background:rgba(239,159,39,.4);border-radius:2px;color:inheri
       </div>
     </div>
 
-    <!-- PIT -->
-    <div class="section-label">Pit</div>
+    <!-- STORAGE TANKS & PIT -->
+    <div class="section-label">Pit & storage tanks</div>
     <div class="card" style="margin-bottom:12px">
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
         <div style="width:10px;height:10px;border-radius:50%;background:#E24B4A;flex-shrink:0"></div>
-        <span style="font-size:12px;color:var(--text3)">Max 12,000 gal — floods above this</span>
+        <span style="font-size:12px;color:var(--text3)">Pit max 12,000 gal · 2 × 50,000 gal storage · shared pH probe</span>
       </div>
       <div class="field-group">
         <div class="field"><label>Pit volume (gal)</label><input type="number" id="sys_pit_vol" value="" step="100" min="0" max="12000" placeholder="0"></div>
-      </div>
-    </div>
-
-    <!-- STORAGE TANKS -->
-    <div class="section-label">Storage tanks</div>
-    <div class="card" style="margin-bottom:12px">
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
-        <div style="width:10px;height:10px;border-radius:50%;background:#EF9F27;flex-shrink:0"></div>
-        <span style="font-size:12px;color:var(--text3)">2 × 50,000 gal — one shared pH probe</span>
-      </div>
-      <div class="field-group">
+        <div class="field"><label>Storage pH (shared)</label><input type="number" id="sys_storage_ph" value="" step="0.1" min="0" max="14" placeholder="—"></div>
         <div class="field"><label>Tank 1 level (gal)</label><input type="number" id="sys_tank1_vol" value="" step="500" min="0" max="50000" placeholder="0"></div>
         <div class="field"><label>Tank 2 level (gal)</label><input type="number" id="sys_tank2_vol" value="" step="500" min="0" max="50000" placeholder="0"></div>
-        <div class="field"><label>Storage pH (shared)</label><input type="number" id="sys_storage_ph" value="" step="0.1" min="0" max="14" placeholder="—"></div>
       </div>
     </div>
 
@@ -1262,6 +1315,11 @@ mark.sop-highlight{background:rgba(239,159,39,.4);border-radius:2px;color:inheri
         <div class="field"><label>Effluent flow → SAF (GPM)</label><input type="number" id="sys_mbbr_eff_flow" value="" step="0.1" min="0" placeholder="0.00"></div>
         <div class="field"><label>Sludge tank depth (ft)</label><input type="number" id="sys_sludge_depth" value="" step="0.1" min="0" max="12.5" placeholder="—" oninput="sysCalcSludgeTank()"></div>
         <div class="field"><label>Sludge volume (gal)</label><div class="biodegrad-display" id="sys_sludge_vol">—</div></div>
+        <div class="field"><label>SAF2 coag dose (%)</label><input type="number" id="sys_coag2_pct" value="" step="0.1" min="0" max="100" placeholder="0.0" oninput="sysCalcCoag2()"></div>
+        <div class="field"><label>SAF2 coag rate (GPH)</label><div class="biodegrad-display" id="sys_coag2_gph">—</div></div>
+        <div class="field"><label>SAF2 effluent pH</label><input type="number" id="sys_saf2_eff_ph" value="" step="0.1" min="0" max="14" placeholder="—"></div>
+        <div class="field"><label>SAF2 turbidity (NTU)</label><input type="number" id="sys_saf2_turb" value="" step="0.1" min="0" placeholder="—"></div>
+        <div class="field"><label>SAF2 flow → city (GPM)</label><input type="number" id="sys_saf2_eff_flow" value="" step="0.1" min="0" placeholder="0.00"></div>
       </div>
     </div>
 
@@ -1277,11 +1335,11 @@ mark.sop-highlight{background:rgba(239,159,39,.4);border-radius:2px;color:inheri
           <select id="sys_blower_id" style="width:100%;padding:11px 12px;border:1px solid var(--border);border-radius:10px;background:var(--bg3);color:var(--text);font-size:15px">
             <option value="">— Select —</option>
             <option value="410">410</option>
-            <option value="412">412</option>
+            <option value="411">411</option>
           </select>
         </div>
         <div class="field"><label>Pressure (PSI)</label><input type="number" id="sys_blower_psi" value="" step="0.1" placeholder="0.0"></div>
-        <div class="field"><label>Filter pressure (PSI)</label><input type="number" id="sys_blower_filter_psi" value="" step="0.1" placeholder="-0.0"></div>
+        <div class="field"><label>Filter pressure (PSI) <span style="color:var(--text3);font-weight:400;font-size:11px">always negative</span></label><input type="number" id="sys_blower_filter_psi" value="" step="0.1" placeholder="0.0" oninput="if(this.value>0)this.value=-this.value"></div>
         <div class="field"><label>Temp (°F)</label><input type="number" id="sys_blower_temp" value="" step="0.1" placeholder="—"></div>
       </div>
     </div>
@@ -1294,14 +1352,11 @@ mark.sop-highlight{background:rgba(239,159,39,.4);border-radius:2px;color:inheri
         <span style="font-size:12px;color:var(--text3)">Flocculant · Froth · Effluent</span>
       </div>
       <div class="field-group">
-        <div class="field"><label>Coag dose (%)</label><input type="number" id="sys_coag2_pct" value="" step="0.1" min="0" max="100" placeholder="0.0" oninput="sysCalcCoag2()"></div>
-        <div class="field"><label>Coag rate (GPH)</label><div class="biodegrad-display" id="sys_coag2_gph">—</div></div>
         <div class="field"><label>Flocculant dose (%)</label><input type="number" id="sys_floc2_pct" value="" step="0.1" min="0" max="100" placeholder="0.0" oninput="sysCalcFloc2()"></div>
         <div class="field"><label>Flocculant (gal/day)</label><div class="biodegrad-display" id="sys_floc2_gpd">—</div></div>
         <div class="field"><label>Froth generator (mV)</label><input type="number" id="sys_saf2_froth" value="" step="0.1" min="4" placeholder="4.0" oninput="sysCalcFroth2()"></div>
         <div class="field"><label>Froth chemical (gal/hr)</label><div class="biodegrad-display" id="sys_saf2_froth_gpd">—</div></div>
         <div class="field"><label>Froth dosing rate (GPM)</label><input type="number" id="sys_saf2_froth_gpm" value="" step="0.01" min="0" placeholder="0.00"></div>
-        <div class="field"><label>Effluent pH</label><input type="number" id="sys_saf2_eff_ph" value="" step="0.1" min="0" max="14" placeholder="—"></div>
         <div class="field"><label>Polymer dilution tube (GPM)</label><input type="number" id="sys_saf2_poly_tube" value="" step="0.01" min="0" placeholder="0.00"></div>
         <div class="field"><label>Polymer dilution lines (GPM)</label><input type="number" id="sys_saf2_poly_lines" value="" step="0.01" min="0" placeholder="0.00"></div>
         <div class="field" style="grid-column:span 2"><label>Injectors running</label>
@@ -1311,9 +1366,6 @@ mark.sop-highlight{background:rgba(239,159,39,.4);border-radius:2px;color:inheri
             <label style="display:flex;align-items:center;gap:6px;font-size:13px;font-weight:400;cursor:pointer"><input type="checkbox" id="sys_inj3" style="width:18px;height:18px;cursor:pointer"> Injector 3</label>
           </div>
         </div>
-        <div class="field"><label>Effluent pH</label><input type="number" id="sys_saf2_eff_ph" value="" step="0.1" min="0" max="14" placeholder="—"></div>
-        <div class="field"><label>Effluent turbidity (NTU)</label><input type="number" id="sys_saf2_turb" value="" step="0.1" min="0" placeholder="—"></div>
-        <div class="field"><label>Effluent flow → city (GPM)</label><input type="number" id="sys_saf2_eff_flow" value="" step="0.1" min="0" placeholder="0.00"></div>
       </div>
     </div>
 
@@ -1476,9 +1528,33 @@ mark.sop-highlight{background:rgba(239,159,39,.4);border-radius:2px;color:inheri
   </div>
 </div>
 
-<!-- SOP UNIT -->
-<div class="unit-shell" id="unit-sop">
+<!-- PREDICTIONS UNIT -->
+<div class="unit-shell" id="unit-pred">
 
+<div class="app-header">
+  <button class="hamburger" onclick="openMenu()" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+  <div style="flex:1;margin-left:10px">
+    <div class="app-title">Predictions</div>
+    <div class="app-subtitle">Trends · forecasts · early warnings</div>
+  </div>
+  <div class="header-badge">AI</div>
+</div>
+
+<div class="scroll-area" id="pred-scroll-area" style="padding:16px">
+
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+    <div style="font-size:12px;color:var(--text3)" id="pred-data-summary">Loading data...</div>
+    <button onclick="predRun()" style="background:var(--green3);color:var(--green2);border:1px solid rgba(29,158,117,.4);border-radius:8px;padding:8px 14px;font-size:13px;font-weight:600;cursor:pointer">↻ Refresh</button>
+  </div>
+
+  <div id="pred-content"></div>
+
+</div>
+</div><!-- end unit-shell pred -->
+
+<div class="unit-shell" id="unit-sop">
 <div class="app-header">
   <button class="hamburger" onclick="openMenu()" aria-label="Menu">
     <span></span><span></span><span></span>
@@ -1747,8 +1823,9 @@ function calcDiag(){
   const eff_nh3_diag=gv('eff_nh3'),eff_no2_diag=gv('eff_no2');
   const nitrogenShock=eff_nh3_diag>20||(eff_nh3_diag>10&&eff_no2_diag>0.5);
   const nitrogenScore=Math.min(100,Math.round(Math.max(0,eff_nh3_diag>0?(eff_nh3_diag-10)/eff_nh3_diag*100:0)));
-  const doShock=eff_do<1.0;
-  const doScore=Math.min(100,Math.round(Math.max(0,(2.5-eff_do)/2.5*100)));
+  const dormancy=isDormancyMode();
+  const doShock=dormancy?false:eff_do<1.0;
+  const doScore=dormancy?0:Math.min(100,Math.round(Math.max(0,(2.5-eff_do)/2.5*100)));
   const phLow=eff_ph>0&&eff_ph<6.8,phHigh=eff_ph>8.5;
   const phShock=phLow||phHigh;
   const phScore=eff_ph>0?Math.min(100,Math.round(Math.max(0,phLow?(6.8-eff_ph)/1.5*100:(eff_ph-8.5)/1.0*100))):0;
@@ -1925,8 +2002,9 @@ function calcDiag(){
   if(temp>35)toxIssues.push({name:'High temperature — nitrifier activity declining',val:Math.round(temp*9/5+32)+'°F',threshold:'≤95°F',action:'Above 95°F Nitrosomonas (AOB) activity begins to decline — AOB more temperature-sensitive than heterotrophs. Heterotrophs (Acinetobacter, Zooglea) will continue to remove BOD but nitrification suffers. Check for hot CIP water or pasteurizer discharge entering the MBBR.'});
   if(temp<8)toxIssues.push({name:'Cold temperature — nitrification severely reduced',val:Math.round(temp*9/5+32)+'°F',threshold:'≥46°F',action:'Below 46°F Nitrosomonas and Nitrospira activity drops sharply. Heterotrophs and denitrifiers also slow but are more cold-tolerant. Expect elevated ammonia and reduced overall treatment. Reduce loading if possible and monitor closely.'});
   // DO-based organism alerts
-  if(eff_do>0&&eff_do<1.0)toxIssues.push({name:'Critical DO — Nitrospira (NOB) oxygen-starved',val:eff_do+' mg/L',threshold:'≥1.0 mg/L for NOB',action:'Nitrospira requires more DO than Nitrosomonas — below 1.0 mg/L NOB activity essentially stops, causing nitrite to accumulate. Check blower operation immediately. Sphaerotilus (filamentous heterotroph) can proliferate under low DO causing sludge bulking.'});
-  else if(eff_do>0&&eff_do<2.0)toxIssues.push({name:'Low DO — Nitrosomonas (AOB) under stress',val:eff_do+' mg/L',threshold:'≥2.0 mg/L for AOB',action:'Below 2.0 mg/L Nitrosomonas activity is significantly reduced. Both AOB and NOB compete for limited O₂. Heterotrophs (Acinetobacter, Rhodobacter) may outcompete nitrifiers for O₂ and biofilm space. Increase aeration.'});
+  if(eff_do>0&&eff_do<1.0&&!dormancy)toxIssues.push({name:'Critical DO — Nitrospira (NOB) oxygen-starved',val:eff_do+' mg/L',threshold:'≥1.0 mg/L for NOB',action:'Nitrospira requires more DO than Nitrosomonas — below 1.0 mg/L NOB activity essentially stops, causing nitrite to accumulate. Check blower operation immediately. Sphaerotilus (filamentous heterotroph) can proliferate under low DO causing sludge bulking.'});
+  else if(eff_do>0&&eff_do<2.0&&!dormancy)toxIssues.push({name:'Low DO — Nitrosomonas (AOB) under stress',val:eff_do+' mg/L',threshold:'≥2.0 mg/L for AOB',action:'Below 2.0 mg/L Nitrosomonas activity is significantly reduced. Both AOB and NOB compete for limited O₂. Heterotrophs (Acinetobacter, Rhodobacter) may outcompete nitrifiers for O₂ and biofilm space. Increase aeration.'});
+  if(dormancy&&eff_do>0)toxIssues.push({name:'Intermittent aeration — dormancy mode active',val:eff_do+' mg/L',threshold:'cycling intentionally',action:'Low DO thresholds are suppressed. Blower cycling is intentional to preserve biofilm during low-load period. Monitor that DO does not drop below 0.5 mg/L during off cycles — below this Nitrospira dies off faster than Nitrosomonas causing nitrite buildup on restart.'});
   // C:N ratio — heterotroph vs nitrifier competition
   const inf_cod_h=gv('inf_cod'), inf_nh3_h=gv('inf_nh3');
   if(inf_cod_h>0&&inf_nh3_h>0){
@@ -1942,11 +2020,27 @@ function calcDiag(){
   document.getElementById('diag-dot').style.display=diagAlert?'block':'none';
 }
 
+function dormancyToggle(){
+  const on=document.getElementById('dormancy-mode').checked;
+  const slider=document.getElementById('dormancy-slider');
+  const knob=document.getElementById('dormancy-knob');
+  const status=document.getElementById('dormancy-status');
+  slider.style.background=on?'var(--amber)':'var(--border)';
+  knob.style.left=on?'25px':'3px';
+  status.style.display=on?'block':'none';
+  calculate();calcGrowth();calcDiag();
+}
+
+function isDormancyMode(){
+  const el=document.getElementById('dormancy-mode');
+  return el&&el.checked;
+}
+
 function logStressEvent(){
   const type=document.getElementById('event-type').value;
   const notes=document.getElementById('event-notes').value.trim();
-  const typeLabels={hydraulic_shock:'Hydraulic shock',organic_shock:'Organic shock',nitrogen_shock:'Nitrogen shock',paa_exposure:'PAA exposure',chlorine_exposure:'Chlorine exposure',low_do:'Low DO event',ph_excursion:'pH excursion',temp_shock:'Temperature shock',other:'Other'};
-  const typeCls={hydraulic_shock:'b-warn',organic_shock:'b-warn',nitrogen_shock:'b-warn',paa_exposure:'b-bad',chlorine_exposure:'b-bad',low_do:'b-bad',ph_excursion:'b-warn',temp_shock:'b-warn',other:'b-info'};
+  const typeLabels={hydraulic_shock:'Hydraulic shock',organic_shock:'Organic shock',nitrogen_shock:'Nitrogen shock',paa_exposure:'PAA exposure',chlorine_exposure:'Chlorine exposure',low_do:'Low DO event',ph_excursion:'pH excursion',temp_shock:'Temperature shock',plant_shutdown:'Plant shutdown / no flow',low_load:'Low load / dormancy',starvation_foam:'Starvation foaming event',intermittent_aeration:'Intermittent aeration mode',other:'Other'};
+  const typeCls={hydraulic_shock:'b-warn',organic_shock:'b-warn',nitrogen_shock:'b-warn',paa_exposure:'b-bad',chlorine_exposure:'b-bad',low_do:'b-bad',ph_excursion:'b-warn',temp_shock:'b-warn',plant_shutdown:'b-bad',low_load:'b-warn',starvation_foam:'b-warn',intermittent_aeration:'b-info',other:'b-info'};
   stressEvents.unshift({date:new Date().toLocaleString(),type,label:typeLabels[type],cls:typeCls[type],notes:notes||'No additional notes.',flow:gv('flow_mgd'),eff_nh3:gv('eff_nh3'),eff_do:gv('eff_do'),paa:gv('paa_residual'),cl2:gv('cl2_residual'),ph:gv('eff_ph')});
   document.getElementById('event-notes').value='';
   saveEvents();renderEvents();updateEventCount();
@@ -2671,6 +2765,10 @@ calcNeutResidual('cl2');
 function exportPDF(){
   const mbbr=document.getElementById('unit-mbbr').classList.contains('active');
   const sys=document.getElementById('unit-sys').classList.contains('active');
+  const pred=document.getElementById('unit-pred').classList.contains('active');
+
+  // Predictions report
+  if(pred){ predExportPDF(); return; }
 
   // System monitor — show date picker first
   if(sys){ sysShowDatePicker(); return; }
@@ -3588,6 +3686,96 @@ function sysGenerateReport(){
   document.getElementById('pdf-overlay').scrollTop=0;
 }
 
+// ── PREDICTIONS ENGINE ───────────────────────────────────────
+function predLinReg(points){
+  // points = [{x, y}] where x is timestamp in hours, y is value
+  const n=points.length;
+  if(n<2) return null;
+  const sumX=points.reduce((a,p)=>a+p.x,0);
+  const sumY=points.reduce((a,p)=>a+p.y,0);
+  const sumXY=points.reduce((a,p)=>a+p.x*p.y,0);
+  const sumX2=points.reduce((a,p)=>a+p.x*p.x,0);
+  const denom=n*sumX2-sumX*sumX;
+  if(Math.abs(denom)<1e-10) return null;
+  const slope=(n*sumXY-sumX*sumY)/denom;
+  const intercept=(sumY-slope*sumX)/n;
+  const lastX=points[points.length-1].x;
+  const predict=(hoursAhead)=>slope*(lastX+hoursAhead)+intercept;
+  const r2=(()=>{
+    const yMean=sumY/n;
+    const ssTot=points.reduce((a,p)=>a+(p.y-yMean)**2,0);
+    const ssRes=points.reduce((a,p)=>a+(p.y-(slope*p.x+intercept))**2,0);
+    return ssTot>0?Math.max(0,1-ssRes/ssTot):0;
+  })();
+  return{slope,intercept,predict,r2,n,lastX};
+}
+
+function predHoursUntil(reg, target, direction){
+  // direction: 'up' = rising toward target, 'down' = falling toward target
+  if(!reg) return null;
+  const currentVal=reg.predict(0);
+  if(direction==='up'&&reg.slope<=0) return null;
+  if(direction==='down'&&reg.slope>=0) return null;
+  const hoursNeeded=(target-reg.intercept-reg.slope*reg.lastX)/reg.slope;
+  const hoursFromNow=hoursNeeded-reg.lastX+reg.lastX;
+  // simpler: hours until target from current
+  const h=(target-currentVal)/reg.slope;
+  return h>0?h:null;
+}
+
+function predFmt(hours){
+  if(hours===null||hours===undefined||!isFinite(hours)||hours<0) return null;
+  if(hours<24) return Math.round(hours)+' hr'+( Math.round(hours)===1?'':'s');
+  const days=hours/24;
+  if(days<14) return days.toFixed(1)+' days';
+  const weeks=days/7;
+  if(weeks<8) return weeks.toFixed(1)+' weeks';
+  return (days/30).toFixed(1)+' months';
+}
+
+function predConfidence(r2,n){
+  if(n<3) return 'Very low confidence (< 3 data points)';
+  if(r2<0.3) return 'Low confidence — data is scattered';
+  if(r2<0.6) return 'Moderate confidence';
+  if(r2<0.85) return 'Good confidence';
+  return 'High confidence';
+}
+
+function predTrendDir(slope,unit){
+  if(Math.abs(slope)<1e-10) return 'Stable';
+  const abs=Math.abs(slope);
+  let rate;
+  if(abs<0.001) rate='very slowly';
+  else if(abs<0.01) rate='slowly';
+  else if(abs<0.1) rate='moderately';
+  else rate='rapidly';
+  return (slope>0?'Rising ':'Falling ')+rate+' ('+slope.toFixed(4)+' '+unit+'/hr)';
+}
+
+function predCard(title, icon, valueStr, valueClass, detail, trend, cardClass){
+  return`<div class="pred-card ${cardClass||''}">
+    <div class="pred-title">${icon} ${title}</div>
+    <div class="pred-value ${valueClass}">${valueStr}</div>
+    <div class="pred-detail">${detail}</div>
+    ${trend?`<div class="pred-trend">${trend}</div>`:''}
+  </div>`;
+}
+
+function predNoData(title, icon, msg){
+  return`<div class="pred-card pred-info">
+    <div class="pred-title">${icon} ${title}</div>
+    <div class="pred-no-data">${msg||'Not enough data yet — need at least 2 log entries to predict.'}</div>
+  </div>`;
+}
+
+
+function predInit(){
+  if(document.getElementById('pred-content'))
+    document.getElementById('pred-content').innerHTML='<p style="color:var(--text3);font-size:13px;text-align:center;padding:40px 20px">Tap <strong>↻ Refresh</strong> to generate predictions from your log data.</p>';
+}
+
+predInit();
+
 // ── SOP / HELP ────────────────────────────────────────────────
 const SOP_SECTIONS=[
 {title:'Getting started',articles:[
@@ -3701,6 +3889,358 @@ function sopSearch(){
 
 sopInit();
 
+// ── PREDICTIONS ENGINE ───────────────────────────────────────
+function predExportPDF(){
+  predRun();
+  const predContent=document.getElementById('pred-content');
+  if(!predContent||!predContent.innerHTML.trim()){
+    alert('No predictions to print yet. Add more log entries first.');
+    return;
+  }
+  const now=new Date();
+  const dateStr=now.toLocaleString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric',hour:'numeric',minute:'2-digit'});
+  const content=`
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;border-bottom:3px solid #1D9E75;padding-bottom:14px;margin-bottom:20px">
+      <div>
+        <div style="font-size:22px;font-weight:800;color:#0F6E56">Predictions Report</div>
+        <div style="font-size:13px;color:#555;margin-top:4px">Dairy Wastewater Treatment System — Trend Analysis & Forecasts</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:12px;color:#888">Generated</div>
+        <div style="font-size:13px;font-weight:600;color:#111">${dateStr}</div>
+      </div>
+    </div>
+    <div style="font-size:11px;color:#888;margin-bottom:16px;padding:8px 12px;background:#f5faf8;border-radius:6px;border-left:3px solid #1D9E75">
+      Predictions are based on linear regression of all available log data. Confidence percentages indicate how well the trend fits the data — higher is more reliable. Dates are estimates and become more accurate as more data is logged.
+    </div>
+    ${predContent.innerHTML}`;
+  document.getElementById('pdf-content').innerHTML=content;
+  document.getElementById('pdf-overlay').style.display='block';
+  document.getElementById('pdf-overlay').scrollTop=0;
+}
+
+function predRun(){
+  const el=document.getElementById('pred-content');
+  const sumEl=document.getElementById('pred-data-summary');
+  if(!el) return;
+
+  // Gather all data
+  const sysEntries=sysLog.filter(e=>e.ts).sort((a,b)=>new Date(a.ts)-new Date(b.ts));
+  const safEntries=safLog.filter(e=>e.date).sort((a,b)=>new Date(a.date)-new Date(b.date));
+  const mbbrEntries=logData.filter(e=>e.date).sort((a,b)=>new Date(a.date)-new Date(b.date));
+
+  const totalEntries=sysEntries.length+safEntries.length+mbbrEntries.length;
+  sumEl.textContent=`${totalEntries} total log entries · ${sysEntries.length} system · ${safEntries.length} COD · ${mbbrEntries.length} MBBR`;
+
+  if(totalEntries<3){
+    el.innerHTML=`<div class="alert a-info">Not enough data yet — predictions improve as you log more entries. At least 3 entries needed per data source.</div>`;
+    return;
+  }
+
+  let html='';
+
+  // ── HELPER FUNCTIONS ──────────────────────────────────────
+  // Linear regression: returns {slope, intercept, r2}
+  function linReg(pts){
+    const n=pts.length;
+    if(n<2) return null;
+    const mx=pts.reduce((s,p)=>s+p.x,0)/n;
+    const my=pts.reduce((s,p)=>s+p.y,0)/n;
+    const num=pts.reduce((s,p)=>s+(p.x-mx)*(p.y-my),0);
+    const den=pts.reduce((s,p)=>s+(p.x-mx)**2,0);
+    if(den===0) return null;
+    const slope=num/den;
+    const intercept=my-slope*mx;
+    const ssr=pts.reduce((s,p)=>s+(p.y-(slope*p.x+intercept))**2,0);
+    const sst=pts.reduce((s,p)=>s+(p.y-my)**2,0);
+    const r2=sst>0?+(1-ssr/sst).toFixed(3):1;
+    return{slope,intercept,r2};
+  }
+
+  // Predict X when Y reaches target using regression
+  function predictWhen(pts,target){
+    const r=linReg(pts);
+    if(!r||r.slope===0) return null;
+    const x=(target-r.intercept)/r.slope;
+    return{x,r};
+  }
+
+  // Format days from now
+  function daysFromNow(tsMs){
+    const diff=(tsMs-Date.now())/(1000*60*60*24);
+    if(diff<0) return 'already passed';
+    if(diff<1) return 'within 24 hours';
+    if(diff<2) return 'tomorrow';
+    return Math.round(diff)+' days';
+  }
+
+  function predCard(title,status,body,detail,formula){
+    const colors={ok:'var(--green2)',warn:'var(--amber)',bad:'var(--red)',info:'var(--blue)'};
+    const bgs={ok:'var(--green3)',warn:'rgba(239,159,39,.12)',bad:'rgba(226,75,74,.1)',info:'rgba(56,138,221,.1)'};
+    const icons={ok:'✓',warn:'⚠',bad:'!',info:'ℹ'};
+    return`<div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;margin-bottom:12px;overflow:hidden">
+      <div style="padding:12px 14px;display:flex;align-items:center;gap:10px">
+        <div style="width:28px;height:28px;border-radius:50%;background:${bgs[status]};display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:${colors[status]};flex-shrink:0">${icons[status]}</div>
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:700;color:var(--text)">${title}</div>
+          <div style="font-size:12px;color:${colors[status]};font-weight:600;margin-top:2px">${body}</div>
+        </div>
+      </div>
+      ${detail?`<div style="padding:0 14px 12px;font-size:12px;color:var(--text2);line-height:1.6">${detail}</div>`:''}
+      ${formula?`<div class="no-print" style="padding:0 14px 12px;border-top:1px dashed var(--border);margin-top:0"><div style="font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin:8px 0 4px">Formula</div><div style="font-family:monospace;font-size:11px;color:var(--text2);background:var(--bg3);padding:8px 10px;border-radius:6px;line-height:1.7">${formula}</div></div>`:''}
+    </div>`;
+  }
+
+  function trendBadge(slope,unit,goodDir){
+    // goodDir: 'up' means rising is good, 'down' means falling is good
+    if(Math.abs(slope)<0.0001) return `<span style="color:var(--text3)">Stable</span>`;
+    const rising=slope>0;
+    const good=(goodDir==='up'&&rising)||(goodDir==='down'&&!rising);
+    const arrow=rising?'↑':'↓';
+    const color=good?'var(--green2)':'var(--red)';
+    return `<span style="color:${color}">${arrow} ${Math.abs(slope).toFixed(3)} ${unit}/entry</span>`;
+  }
+
+  // ── 1. SLUDGE TANK — 4000 GAL RUN PREDICTOR ──────────────
+  const sludgePts=sysEntries.filter(e=>e.sludge_depth>0).map((e,i)=>({x:i,y:e.sludge_depth,ts:new Date(e.ts).getTime()}));
+  if(sludgePts.length>=3){
+    const r=linReg(sludgePts);
+    if(r&&r.slope>0){
+      // Find target depth — at what depth does sludge vol warrant a 4000 gal call?
+      // 4000 gal = 1000 + (d-3.8)*800 => d = (4000-1000)/800 + 3.8 = 7.55 ft
+      const callDepth=8.175; // 4,500 gal = 1000+(d-3.8)*800 → d=8.175 ft
+      const latest=sludgePts[sludgePts.length-1];
+      const currentDepth=latest.y;
+      const currentVol=currentDepth<=3.8?+(currentDepth/3.8*1000).toFixed(0):+(1000+(currentDepth-3.8)*800).toFixed(0);
+      const entriesUntilCall=(callDepth-r.intercept)/r.slope - latest.x;
+      const msPerEntry=sludgePts.length>1?(sludgePts[sludgePts.length-1].ts-sludgePts[0].ts)/(sludgePts.length-1):7200000;
+      const msUntilCall=entriesUntilCall*msPerEntry;
+      const callTs=Date.now()+msUntilCall;
+      const callDate=new Date(callTs).toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
+      const status=msUntilCall<86400000?'bad':msUntilCall<259200000?'warn':'ok';
+      html+=predCard(
+        'MBBR sludge tank — 4,500 gal run',
+        status,
+        msUntilCall>0?`Call needed approx. ${daysFromNow(callTs)}`:'Call needed now',
+        `<div style="font-size:14px;font-weight:700;color:var(--text);margin:6px 0 10px;padding:8px 12px;background:var(--bg3);border-radius:8px;border-left:3px solid ${status==='bad'?'var(--red)':status==='warn'?'var(--amber)':'var(--green2)'}">
+          📅 Predicted call date: <strong>${callDate}</strong>
+        </div>
+        Current depth: <strong>${currentDepth} ft</strong> (${parseInt(currentVol).toLocaleString()} gal) · 
+        Target for 4,500 gal call: <strong>8.18 ft</strong> · 
+        Accumulation rate: <strong>${r.slope.toFixed(3)} ft/entry</strong> · 
+        Trend confidence: ${Math.round(r.r2*100)}%<br>
+        <em>Based on ${sludgePts.length} depth readings across all System Monitor logs.</em>`,
+      `Vol (ft ≤ 3.8): depth ÷ 3.8 × 1,000 gal<br>Vol (ft > 3.8): 1,000 + (depth − 3.8) × 800 gal<br>Target depth for 4,500 gal: (4,500 − 1,000) ÷ 800 + 3.8 = 8.175 ft<br>Predicted date: y = mx + b → solve for x when y = 8.175 ft → convert entries to time`
+      );
+    } else if(r&&r.slope<=0){
+      const latest=sludgePts[sludgePts.length-1];
+      const currentVol=latest.y<=3.8?+(latest.y/3.8*1000).toFixed(0):+(1000+(latest.y-3.8)*800).toFixed(0);
+      html+=predCard('MBBR sludge tank — 4,500 gal run','ok',
+        `Sludge level stable or declining — no call needed soon`,
+        `Current depth: <strong>${latest.y} ft</strong> (${parseInt(currentVol).toLocaleString()} gal) · Trend: stable or being managed`);
+    }
+  } else {
+    html+=predCard('MBBR sludge tank — 4,500 gal run','info','Need more data','Log at least 3 System Monitor entries with MBBR sludge depth readings to generate this prediction.');
+  }
+
+  // ── 2. CITY pH TREND ─────────────────────────────────────
+  const cityPhPts=[
+    ...sysEntries.filter(e=>e.city_ph>0).map((e,i)=>({x:new Date(e.ts).getTime(),y:e.city_ph})),
+    ...safEntries.filter(e=>e.city_ph>0).map(e=>({x:new Date(e.date).getTime(),y:e.city_ph}))
+  ].sort((a,b)=>a.x-b.x).map((p,i)=>({...p,xi:i}));
+
+  if(cityPhPts.length>=3){
+    const r=linReg(cityPhPts.map(p=>({x:p.xi,y:p.y})));
+    if(r){
+      const latest=cityPhPts[cityPhPts.length-1];
+      const msPerEntry=cityPhPts.length>1?(cityPhPts[cityPhPts.length-1].x-cityPhPts[0].x)/(cityPhPts.length-1):7200000;
+      let status='ok', body='City pH within permit range and stable', detail='';
+
+      if(r.slope<-0.01){
+        const ptsForPred=cityPhPts.map(p=>({x:p.xi,y:p.y}));
+        const pred=predictWhen(ptsForPred,6.5);
+        if(pred&&pred.x>latest.xi){
+          const msUntil=(pred.x-latest.xi)*msPerEntry;
+          status=msUntil<86400000?'bad':'warn';
+          body=`Declining — projected to hit pH 6.5 in ${daysFromNow(Date.now()+msUntil)}`;
+          detail=`Current: <strong>${latest.y.toFixed(2)}</strong> · Rate: ${r.slope.toFixed(3)} pH units/entry · Permit minimum: 6.5 · Confidence: ${Math.round(r.r2*100)}%`;
+        }
+      } else if(r.slope>0.01){
+        const ptsForPred=cityPhPts.map(p=>({x:p.xi,y:p.y}));
+        const pred=predictWhen(ptsForPred,9.5);
+        if(pred&&pred.x>latest.xi){
+          const msUntil=(pred.x-latest.xi)*msPerEntry;
+          status=msUntil<86400000?'bad':'warn';
+          body=`Rising — projected to hit pH 9.5 in ${daysFromNow(Date.now()+msUntil)}`;
+          detail=`Current: <strong>${latest.y.toFixed(2)}</strong> · Rate: +${r.slope.toFixed(3)} pH units/entry · Permit maximum: 9.5 · Confidence: ${Math.round(r.r2*100)}%`;
+        }
+      } else {
+        detail=`Current: <strong>${latest.y.toFixed(2)}</strong> · ${trendBadge(r.slope,'pH units','stable')} · Based on ${cityPhPts.length} readings`;
+      }
+      html+=predCard('City pH — permit compliance',status,body,detail,`Linear regression: y = mx + b (m = slope, b = intercept)<br>Permit violation at y = 6.5 (low) or y = 9.5 (high)<br>Solve: x = (target − b) ÷ m → convert entry index to timestamp`);
+    }
+  } else {
+    html+=predCard('City pH — permit compliance','info','Need more data','Log at least 3 city pH readings across any module.');
+  }
+
+  // ── 3. MBBR DO TREND ─────────────────────────────────────
+  const doPts=[
+    ...sysEntries.filter(e=>e.mbbr_do>0).map((e,i)=>({x:new Date(e.ts).getTime(),y:e.mbbr_do})),
+    ...mbbrEntries.filter(e=>e.eff_do>0).map(e=>({x:new Date(e.date).getTime(),y:e.eff_do}))
+  ].sort((a,b)=>a.x-b.x).map((p,i)=>({...p,xi:i}));
+
+  if(doPts.length>=3){
+    const r=linReg(doPts.map(p=>({x:p.xi,y:p.y})));
+    if(r){
+      const latest=doPts[doPts.length-1];
+      const msPerEntry=doPts.length>1?(doPts[doPts.length-1].x-doPts[0].x)/(doPts.length-1):7200000;
+      let status='ok', body=`DO stable at ${latest.y} mg/L`, detail='';
+
+      if(r.slope<-0.005){
+        const pred=predictWhen(doPts.map(p=>({x:p.xi,y:p.y})),2.0);
+        if(pred&&pred.x>latest.xi){
+          const msUntil=(pred.x-latest.xi)*msPerEntry;
+          status=msUntil<86400000?'bad':'warn';
+          body=`Declining — projected to hit critical 2.0 mg/L in ${daysFromNow(Date.now()+msUntil)}`;
+          detail=`Current: <strong>${latest.y} mg/L</strong> · Rate: ${r.slope.toFixed(4)} mg/L/entry · Confidence: ${Math.round(r.r2*100)}%<br>Below 2.0 mg/L Nitrosomonas (AOB) activity severely reduced.`;
+        } else {
+          status='warn';
+          body=`DO declining — monitor blower output`;
+          detail=`Current: <strong>${latest.y} mg/L</strong> · Trend: ${trendBadge(r.slope,'mg/L','up')}`;
+        }
+      } else {
+        detail=`Current: <strong>${latest.y} mg/L</strong> · ${trendBadge(r.slope,'mg/L','up')} · Based on ${doPts.length} readings`;
+      }
+      html+=predCard('MBBR dissolved oxygen',status,body,detail,`Linear regression: y = mx + b<br>Critical threshold: y = 2.0 mg/L (Nitrosomonas stress)<br>Solve: x = (2.0 − b) ÷ m → convert to time<br>dDO/dt = rate of change per 2-hr interval`);
+    }
+  } else {
+    html+=predCard('MBBR dissolved oxygen','info','Need more data','Log at least 3 DO readings.');
+  }
+
+  // ── 4. BLOWER FILTER PRESSURE TREND ─────────────────────
+  const filterPts=sysEntries.filter(e=>e.blower_filter_psi&&e.blower_filter_psi<0)
+    .map((e,i)=>({x:i,y:Math.abs(e.blower_filter_psi)}));
+
+  if(filterPts.length>=3){
+    const r=linReg(filterPts);
+    if(r){
+      const latest=filterPts[filterPts.length-1];
+      let status='ok', body=`Filter pressure stable at -${latest.y.toFixed(1)} PSI`, detail='';
+      // Rising absolute value = increasing restriction = filter getting dirty
+      if(r.slope>0.02){
+        status='warn';
+        body=`Filter pressure increasing — filter may need attention`;
+        detail=`Current: <strong>-${latest.y.toFixed(1)} PSI</strong> · Restriction increasing at ${r.slope.toFixed(3)} PSI/entry · A rising negative filter pressure indicates the air filter is becoming restricted. Check and replace filter media if needed.`;
+      } else {
+        detail=`Current: <strong>-${latest.y.toFixed(1)} PSI</strong> · ${trendBadge(r.slope,'PSI','down')} · Based on ${filterPts.length} readings`;
+      }
+      html+=predCard('Blower filter pressure',status,body,detail,`Filter restriction = |filter PSI| (absolute value)<br>Linear regression on |filter PSI| over time<br>Rising slope > 0.02 PSI/entry = increasing restriction`);
+    }
+  } else {
+    html+=predCard('Blower filter pressure','info','Need more data','Log at least 3 blower filter pressure readings.');
+  }
+
+  // ── 5. COD REMOVAL EFFICIENCY TREND ──────────────────────
+  const codPts=safEntries.filter(e=>e.cod_removal_pct>0)
+    .map((e,i)=>({x:i,y:e.cod_removal_pct}));
+
+  if(codPts.length>=3){
+    const r=linReg(codPts);
+    if(r){
+      const latest=codPts[codPts.length-1];
+      let status=latest.y>=70?'ok':latest.y>=40?'warn':'bad';
+      let body=`Current removal: ${latest.y}%`, detail='';
+      if(r.slope<-0.5){
+        status='warn';
+        body=`COD removal declining — ${latest.y}% (was ${codPts[0].y}% at first entry)`;
+        detail=`Rate of decline: ${Math.abs(r.slope).toFixed(2)}% per entry · Good = 70%+, Moderate = 40–70%, Low = below 40%`;
+      } else {
+        detail=`${trendBadge(r.slope,'%','up')} · Target: ≥70% · Based on ${codPts.length} COD test entries`;
+      }
+      html+=predCard('COD removal efficiency',status,body,detail,`Removal % = (influent COD − effluent COD) ÷ influent COD × 100<br>Linear regression on removal % over all COD test entries<br>Target: ≥ 70% · Declining slope < −0.5%/entry triggers warning`);
+    }
+  } else {
+    html+=predCard('COD removal efficiency','info','Need more data','Log at least 3 Daily COD test entries.');
+  }
+
+  // ── 6. BOD TO CITY TREND ─────────────────────────────────
+  const bodPts=safEntries.filter(e=>e.bod_lbs>0)
+    .map((e,i)=>({x:i,y:e.bod_lbs}));
+
+  if(bodPts.length>=3){
+    const r=linReg(bodPts);
+    if(r){
+      const latest=bodPts[bodPts.length-1];
+      let status=latest.y<=650?'ok':latest.y<=800?'warn':'bad';
+      let body=`Current BOD: ${latest.y} lbs/day`, detail='';
+      if(r.slope>1){
+        const pred=predictWhen(bodPts,800);
+        if(pred&&pred.x>latest.x){
+          const entriesUntil=pred.x-latest.x;
+          status='warn';
+          body=`BOD rising — projected to exceed 800 lbs/day in ~${Math.round(entriesUntil)} more entries`;
+          detail=`Current: <strong>${latest.y} lbs/day</strong> · Rate: +${r.slope.toFixed(2)} lbs/entry · Daily permit max: 800 lbs/day`;
+        }
+      } else {
+        detail=`${trendBadge(r.slope,'lbs/day','down')} · Daily max: 800 lbs · Weekly avg max: 650 lbs · Based on ${bodPts.length} entries`;
+      }
+      html+=predCard('BOD sent to city',status,body,detail,`BOD (lbs/day) = COD × (BOD/COD ratio) × flow (MGD) × 8.34<br>Linear regression on lbs/day over all COD test entries<br>Permit max: 800 lbs/day daily · 650 lbs/day weekly avg<br>Solve for x when y = 800 lbs/day`);
+    }
+  } else {
+    html+=predCard('BOD sent to city','info','Need more data','Log at least 3 Daily COD entries with city flow data.');
+  }
+
+  // ── 7. AMMONIA TREND (MBBR health) ───────────────────────
+  const nh3Pts=[
+    ...sysEntries.filter(e=>e.mbbr_eff_ph>0&&e.mbbr_do>0).map((e,i)=>({x:new Date(e.ts).getTime()})),
+    ...mbbrEntries.filter(e=>e.eff_nh3>0).map(e=>({x:new Date(e.date).getTime(),y:e.eff_nh3}))
+  ].filter(p=>p.y).sort((a,b)=>a.x-b.x).map((p,i)=>({x:i,y:p.y}));
+
+  if(nh3Pts.length>=3){
+    const r=linReg(nh3Pts);
+    if(r){
+      const latest=nh3Pts[nh3Pts.length-1];
+      let status=latest.y<1?'ok':latest.y<5?'warn':'bad';
+      let body=`Effluent ammonia: ${latest.y} mg/L`, detail='';
+      if(r.slope>0.05){
+        status='warn';
+        body=`Ammonia rising — Nitrosomonas (AOB) may be stressed`;
+        detail=`Current: <strong>${latest.y} mg/L</strong> · Rate: +${r.slope.toFixed(3)} mg/L/entry · Below 1 mg/L = excellent, 1–5 = acceptable, above 5 = concern`;
+      } else {
+        detail=`${trendBadge(r.slope,'mg/L','down')} · Target: <1 mg/L · Based on ${nh3Pts.length} MBBR entries`;
+      }
+      html+=predCard('Effluent ammonia (nitrification)',status,body,detail,`Linear regression on effluent NH₃ (mg/L) over MBBR log entries<br>Rising trend indicates Nitrosomonas (AOB) stress<br>Target: < 1 mg/L · Concern: > 5 mg/L`);
+    }
+  }
+
+  // ── 8. PRIMARY SAF SLUDGE TREND ──────────────────────────
+  const saf1SludgePts=sysEntries.filter(e=>e.saf1_sludge_pct>0)
+    .map((e,i)=>({x:i,y:e.saf1_sludge_pct}));
+
+  if(saf1SludgePts.length>=3){
+    const r=linReg(saf1SludgePts);
+    if(r&&r.slope>0){
+      const latest=saf1SludgePts[saf1SludgePts.length-1];
+      const pred=predictWhen(saf1SludgePts,90);
+      let status=latest.y>=90?'bad':latest.y>=70?'warn':'ok';
+      let body=`Primary SAF sludge at ${latest.y}%`, detail='';
+      if(pred&&pred.x>latest.x){
+        const entriesUntil=Math.round(pred.x-latest.x);
+        status=entriesUntil<6?'bad':entriesUntil<12?'warn':'ok';
+        body=`Projected to reach 90% in ~${entriesUntil} more entries`;
+        detail=`Current: <strong>${latest.y}%</strong> (${+(2700*latest.y/100).toFixed(0)} gal of 2,700 max) · Accumulation rate: ${r.slope.toFixed(2)}%/entry`;
+      } else {
+        detail=`Current: <strong>${latest.y}%</strong> · Rate: ${trendBadge(r.slope,'%','down')} · Based on ${saf1SludgePts.length} readings`;
+      }
+      html+=predCard('Primary SAF sludge tank',status,body,detail,`Linear regression on sludge % over System Monitor entries<br>Tank capacity: 2,700 gal = 100%<br>Solve: x = (90% − b) ÷ m → entries until 90% full`);
+    }
+  }
+
+  if(!html) html=`<div class="alert a-info">Keep logging data — predictions will appear as patterns emerge across your entries.</div>`;
+
+  el.innerHTML=html;
+}
+
 function openMenu(){
   updateStorageInfo();
   document.getElementById('side-menu').classList.add('open');
@@ -3720,6 +4260,7 @@ function switchUnit(unit){
   if(unit==='mbbr') showTab('input');
   if(unit==='sys') sysShowTab('input');
   if(unit==='sop') document.getElementById('sop-scroll-area').scrollTop=0;
+  if(unit==='pred'){document.getElementById('pred-scroll-area').scrollTop=0;predRun();}
 }
 
 // ── DAILY COD TEST CALCULATOR ─────────────────────────────────
