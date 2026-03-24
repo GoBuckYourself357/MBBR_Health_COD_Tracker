@@ -3150,6 +3150,13 @@ function printFullReport(){
         font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
       }
     }
+    @page table2-page{
+      size:A4 landscape;
+      margin:1.5cm 1.5cm 2cm;
+    }
+    .table2-landscape{
+      page:table2-page;
+    }
     .no-print{display:none}
   }
 </style>
@@ -3594,7 +3601,7 @@ function sysGenerateReport(){
     </table>
   </div>
 
-  <div style="margin-bottom:24px">
+  <div class="table2-landscape" style="page-break-before:always;margin-bottom:24px">
     <div style="font-size:11px;font-weight:700;color:#1D5E3A;text-transform:uppercase;letter-spacing:.08em;border-bottom:1px solid #b0d8c0;padding-bottom:4px;margin-bottom:10px">All entries for ${dateLabel} — Table 2: MBBR · Secondary SAF · Discharge</div>
     <table style="width:100%;border-collapse:collapse;font-size:9px">
       <thead>
@@ -4520,6 +4527,7 @@ function safLoadEntry(i){
   set('bod_ph',   e.bod_ph);                                   set('bod_cod',  e.bod_cod);
   set('city_ph',  e.city_ph);  set('city_turb', e.city_turb); set('city_cod', e.city_cod);
   set('city_tss', e.city_tss); set('city_flow_mgd', e.flow ? +(e.flow*1e6).toFixed(0) : '');  set('city_bod_pct', e.ratio);
+  set('city_sample_L', e.sample_L);
   // Switch to enter tab and calculate
   safShowTab('input');
   safCalculate();
