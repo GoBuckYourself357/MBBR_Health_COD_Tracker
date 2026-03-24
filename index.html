@@ -2905,23 +2905,23 @@ function exportPDF(){
     // Override header for management report
     content='';
     content+=`
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;border-bottom:3px solid #1D9E75;padding-bottom:14px;margin-bottom:20px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;border-bottom:3px solid #1D9E75;padding-bottom:8px;margin-bottom:10px">
         <div>
-          <div style="font-size:24px;font-weight:800;color:#0F6E56;letter-spacing:-.5px">Daily COD Test Report</div>
-          <div style="font-size:13px;color:#555;margin-top:4px">Dairy Wastewater Treatment System</div>
+          <div style="font-size:18px;font-weight:800;color:#0F6E56;letter-spacing:-.5px">Daily COD Test Report</div>
+          <div style="font-size:11px;color:#555;margin-top:2px">Dairy Wastewater Treatment System</div>
         </div>
         <div style="text-align:right">
-          <div style="font-size:13px;font-weight:600;color:#111">${new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'})}</div>
-          <div style="font-size:11px;color:#888;margin-top:2px">${new Date().toLocaleTimeString()}</div>
+          <div style="font-size:11px;font-weight:600;color:#111">${new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'})}</div>
+          <div style="font-size:10px;color:#888;margin-top:2px">${new Date().toLocaleTimeString()}</div>
         </div>
       </div>`;
 
     // ── PERMIT STATUS BANNER ──
     content+=`
-      <div style="background:${all_pass?'#e1f5ee':'#fcebeb'};border:2px solid ${all_pass?'#1D9E75':'#E24B4A'};border-radius:10px;padding:16px;margin-bottom:20px;display:flex;align-items:center;gap:16px">
-        <div style="font-size:40px;line-height:1">${all_pass?'✓':'!'}</div>
+      <div style="background:${all_pass?'#e1f5ee':'#fcebeb'};border:2px solid ${all_pass?'#1D9E75':'#E24B4A'};border-radius:8px;padding:8px 12px;margin-bottom:10px;display:flex;align-items:center;gap:12px">
+        <div style="font-size:28px;line-height:1">${all_pass?'✓':'!'}</div>
         <div>
-          <div style="font-size:16px;font-weight:800;color:${all_pass?'#0F6E56':'#A32D2D'}">${all_pass?'All permit limits met':'Permit limit exceeded'}</div>
+          <div style="font-size:13px;font-weight:800;color:${all_pass?'#0F6E56':'#A32D2D'}">${all_pass?'All permit limits met':'Permit limit exceeded'}</div>
           <div style="font-size:12px;color:${all_pass?'#2D7A5A':'#7A1F1F'};margin-top:4px">
             BOD daily: ${statusBadge(bod_daily_pass,'Pass','FAIL')} &nbsp;
             BOD weekly avg: ${statusBadge(bod_weekly_pass,'Pass','FAIL')} &nbsp;
@@ -2932,51 +2932,51 @@ function exportPDF(){
 
     // ── SAMPLING POINT TABLE ──
     content+=`
-      <div style="margin-bottom:20px">
-        <div style="font-size:11px;font-weight:700;color:#0F6E56;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Sampling results</div>
-        <table style="width:100%;border-collapse:collapse;font-size:13px">
+      <div style="margin-bottom:10px">
+        <div style="font-size:10px;font-weight:700;color:#0F6E56;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">Sampling results</div>
+        <table style="width:100%;border-collapse:collapse;font-size:11px">
           <thead>
             <tr style="background:#f0f9f5">
-              <th style="text-align:left;padding:10px 12px;border:1px solid #c8e6d8;color:#0F6E56;font-size:11px;text-transform:uppercase;letter-spacing:.06em">Sampling point</th>
-              <th style="text-align:center;padding:10px 12px;border:1px solid #c8e6d8;color:#0F6E56;font-size:11px;text-transform:uppercase;letter-spacing:.06em">pH<br><span style="font-weight:400;color:#888">(6.5–9.5)</span></th>
-              <th style="text-align:center;padding:10px 12px;border:1px solid #c8e6d8;color:#0F6E56;font-size:11px;text-transform:uppercase;letter-spacing:.06em">Turbidity<br><span style="font-weight:400;color:#888">(NTU)</span></th>
-              <th style="text-align:center;padding:10px 12px;border:1px solid #c8e6d8;color:#0F6E56;font-size:11px;text-transform:uppercase;letter-spacing:.06em">COD<br><span style="font-weight:400;color:#888">(mg/L)</span></th>
-              <th style="text-align:center;padding:10px 12px;border:1px solid #c8e6d8;color:#0F6E56;font-size:11px;text-transform:uppercase;letter-spacing:.06em">Est. BOD<br><span style="font-weight:400;color:#888">(mg/L)</span></th>
-              <th style="text-align:center;padding:10px 12px;border:1px solid #c8e6d8;color:#0F6E56;font-size:11px;text-transform:uppercase;letter-spacing:.06em">TSS<br><span style="font-weight:400;color:#888">(mg/L)</span></th>
+              <th style="text-align:left;padding:5px 8px;border:1px solid #c8e6d8;color:#0F6E56;font-size:11px;text-transform:uppercase;letter-spacing:.06em">Sampling point</th>
+              <th style="text-align:center;padding:5px 8px;border:1px solid #c8e6d8;color:#0F6E56;font-size:11px;text-transform:uppercase;letter-spacing:.06em">pH<br><span style="font-weight:400;color:#888">(6.5–9.5)</span></th>
+              <th style="text-align:center;padding:5px 8px;border:1px solid #c8e6d8;color:#0F6E56;font-size:11px;text-transform:uppercase;letter-spacing:.06em">Turbidity<br><span style="font-weight:400;color:#888">(NTU)</span></th>
+              <th style="text-align:center;padding:5px 8px;border:1px solid #c8e6d8;color:#0F6E56;font-size:11px;text-transform:uppercase;letter-spacing:.06em">COD<br><span style="font-weight:400;color:#888">(mg/L)</span></th>
+              <th style="text-align:center;padding:5px 8px;border:1px solid #c8e6d8;color:#0F6E56;font-size:11px;text-transform:uppercase;letter-spacing:.06em">Est. BOD<br><span style="font-weight:400;color:#888">(mg/L)</span></th>
+              <th style="text-align:center;padding:5px 8px;border:1px solid #c8e6d8;color:#0F6E56;font-size:11px;text-transform:uppercase;letter-spacing:.06em">TSS<br><span style="font-weight:400;color:#888">(mg/L)</span></th>
             </tr>
           </thead>
           <tbody>
             <tr style="background:#fff8f0">
-              <td style="padding:10px 12px;border:1px solid #e8ddd0;font-weight:600"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#E24B4A;margin-right:8px"></span>BOD — heavy solids</td>
-              <td style="text-align:center;padding:10px 12px;border:1px solid #e8ddd0">${phStatus(bod_ph)}</td>
+              <td style="padding:5px 8px;border:1px solid #e8ddd0;font-weight:600"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#E24B4A;margin-right:8px"></span>BOD — heavy solids</td>
+              <td style="text-align:center;padding:5px 8px;border:1px solid #e8ddd0">${phStatus(bod_ph)}</td>
               <td style="text-align:center;padding:10px 12px;border:1px solid #e8ddd0;color:#888">—</td>
-              <td style="text-align:center;padding:10px 12px;border:1px solid #e8ddd0">${codVal(bod_cod)}</td>
-              <td style="text-align:center;padding:10px 12px;border:1px solid #e8ddd0">${parseFloat(bod_cod)?+(parseFloat(bod_cod)*ratio).toFixed(2):'—'}</td>
+              <td style="text-align:center;padding:5px 8px;border:1px solid #e8ddd0">${codVal(bod_cod)}</td>
+              <td style="text-align:center;padding:5px 8px;border:1px solid #e8ddd0">${parseFloat(bod_cod)?+(parseFloat(bod_cod)*ratio).toFixed(2):'—'}</td>
               <td style="text-align:center;padding:10px 12px;border:1px solid #e8ddd0;color:#aaa">—</td>
             </tr>
             <tr style="background:#fffdf0">
-              <td style="padding:10px 12px;border:1px solid #e8e0c8;font-weight:600"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#EF9F27;margin-right:8px"></spanWW</td>
-              <td style="text-align:center;padding:10px 12px;border:1px solid #e8e0c8">${phStatus(pit_ph)}</td>
-              <td style="text-align:center;padding:10px 12px;border:1px solid #e8e0c8">${turbStatus(pit_turb)}</td>
-              <td style="text-align:center;padding:10px 12px;border:1px solid #e8e0c8">${codVal(pit_cod)}</td>
-              <td style="text-align:center;padding:10px 12px;border:1px solid #e8e0c8">${parseFloat(pit_cod)?+(parseFloat(pit_cod)*ratio).toFixed(2):'—'}</td>
+              <td style="padding:5px 8px;border:1px solid #e8e0c8;font-weight:600"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#EF9F27;margin-right:8px"></spanWW</td>
+              <td style="text-align:center;padding:5px 8px;border:1px solid #e8e0c8">${phStatus(pit_ph)}</td>
+              <td style="text-align:center;padding:5px 8px;border:1px solid #e8e0c8">${turbStatus(pit_turb)}</td>
+              <td style="text-align:center;padding:5px 8px;border:1px solid #e8e0c8">${codVal(pit_cod)}</td>
+              <td style="text-align:center;padding:5px 8px;border:1px solid #e8e0c8">${parseFloat(pit_cod)?+(parseFloat(pit_cod)*ratio).toFixed(2):'—'}</td>
               <td style="text-align:center;padding:10px 12px;border:1px solid #e8e0c8;color:#aaa">—</td>
             </tr>
             <tr style="background:#f0f6ff">
-              <td style="padding:10px 12px;border:1px solid #c8d8e6;font-weight:600"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#378ADD;margin-right:8px"></span>Primary effluent</td>
-              <td style="text-align:center;padding:10px 12px;border:1px solid #c8d8e6">${phStatus(pe_ph)}</td>
-              <td style="text-align:center;padding:10px 12px;border:1px solid #c8d8e6">${turbStatus(pe_turb)}</td>
-              <td style="text-align:center;padding:10px 12px;border:1px solid #c8d8e6">${codVal(pe_cod)}</td>
-              <td style="text-align:center;padding:10px 12px;border:1px solid #c8d8e6">${parseFloat(pe_cod)?+(parseFloat(pe_cod)*ratio).toFixed(2):'—'}</td>
+              <td style="padding:5px 8px;border:1px solid #c8d8e6;font-weight:600"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#378ADD;margin-right:8px"></span>Primary effluent</td>
+              <td style="text-align:center;padding:5px 8px;border:1px solid #c8d8e6">${phStatus(pe_ph)}</td>
+              <td style="text-align:center;padding:5px 8px;border:1px solid #c8d8e6">${turbStatus(pe_turb)}</td>
+              <td style="text-align:center;padding:5px 8px;border:1px solid #c8d8e6">${codVal(pe_cod)}</td>
+              <td style="text-align:center;padding:5px 8px;border:1px solid #c8d8e6">${parseFloat(pe_cod)?+(parseFloat(pe_cod)*ratio).toFixed(2):'—'}</td>
               <td style="text-align:center;padding:10px 12px;border:1px solid #c8d8e6;color:#aaa">—</td>
             </tr>
             <tr style="background:#f0f9f5;font-weight:700">
-              <td style="padding:10px 12px;border:2px solid #1D9E75;color:#0F6E56"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#1D9E75;margin-right:8px"></span>City — final discharge</td>
-              <td style="text-align:center;padding:10px 12px;border:2px solid #1D9E75">${phStatusCity(cy_ph)}</td>
-              <td style="text-align:center;padding:10px 12px;border:2px solid #1D9E75">${turbStatus(cy_turb)}</td>
-              <td style="text-align:center;padding:10px 12px;border:2px solid #1D9E75">${codVal(cy_cod)}</td>
-              <td style="text-align:center;padding:10px 12px;border:2px solid #1D9E75">${parseFloat(cy_cod)?+(parseFloat(cy_cod)*ratio).toFixed(2):'—'}</td>
-              <td style="text-align:center;padding:10px 12px;border:2px solid #1D9E75">${parseFloat(cy_tss)?cy_tss:'—'}</td>
+              <td style="padding:5px 8px;border:2px solid #1D9E75;color:#0F6E56"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#1D9E75;margin-right:8px"></span>City — final discharge</td>
+              <td style="text-align:center;padding:5px 8px;border:2px solid #1D9E75">${phStatusCity(cy_ph)}</td>
+              <td style="text-align:center;padding:5px 8px;border:2px solid #1D9E75">${turbStatus(cy_turb)}</td>
+              <td style="text-align:center;padding:5px 8px;border:2px solid #1D9E75">${codVal(cy_cod)}</td>
+              <td style="text-align:center;padding:5px 8px;border:2px solid #1D9E75">${parseFloat(cy_cod)?+(parseFloat(cy_cod)*ratio).toFixed(2):'—'}</td>
+              <td style="text-align:center;padding:5px 8px;border:2px solid #1D9E75">${parseFloat(cy_tss)?cy_tss:'—'}</td>
             </tr>
           </tbody>
         </table>
@@ -2985,30 +2985,30 @@ function exportPDF(){
     // ── CITY DISCHARGE SUMMARY ──
     const cy_tss_num=parseFloat(cy_tss)||0;
     content+=`
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;margin-bottom:20px">
-        <div style="background:#f5faf8;border:1px solid #c8e6d8;border-radius:8px;padding:12px;text-align:center">
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px;margin-bottom:10px">
+        <div style="background:#f5faf8;border:1px solid #c8e6d8;border-radius:6px;padding:6px 8px;text-align:center">
           <div style="font-size:10px;color:#5d8a78;font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">Flow</div>
-          <div style="font-size:20px;font-weight:800;color:#111">${cy_flow_num||'—'}</div>
+          <div style="font-size:15px;font-weight:800;color:#111">${cy_flow_num||'—'}</div>
           <div style="font-size:11px;color:#888">GPD</div>
         </div>
-        <div style="background:${bod_daily_pass?'#f5faf8':'#fcebeb'};border:1px solid ${bod_daily_pass?'#c8e6d8':'#f5b8b8'};border-radius:8px;padding:12px;text-align:center">
+        <div style="background:${bod_daily_pass?'#f5faf8':'#fcebeb'};border:1px solid ${bod_daily_pass?'#c8e6d8':'#f5b8b8'};border-radius:6px;padding:6px 8px;text-align:center">
           <div style="font-size:10px;color:#5d8a78;font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">BOD to city</div>
-          <div style="font-size:20px;font-weight:800;color:${bod_daily_pass?'#111':'#A32D2D'}">${bod_lbs||'—'}</div>
+          <div style="font-size:15px;font-weight:800;color:${bod_daily_pass?'#111':'#A32D2D'}">${bod_lbs||'—'}</div>
           <div style="font-size:11px;color:#888">lbs/day · limit 800</div>
         </div>
-        <div style="background:${ph_pass?'#f5faf8':'#fcebeb'};border:1px solid ${ph_pass?'#c8e6d8':'#f5b8b8'};border-radius:8px;padding:12px;text-align:center">
+        <div style="background:${ph_pass?'#f5faf8':'#fcebeb'};border:1px solid ${ph_pass?'#c8e6d8':'#f5b8b8'};border-radius:6px;padding:6px 8px;text-align:center">
           <div style="font-size:10px;color:#5d8a78;font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">City pH</div>
-          <div style="font-size:20px;font-weight:800;color:${ph_pass?'#111':'#A32D2D'}">${cy_ph_num||'—'}</div>
+          <div style="font-size:15px;font-weight:800;color:${ph_pass?'#111':'#A32D2D'}">${cy_ph_num||'—'}</div>
           <div style="font-size:11px;color:#888">range 6.5 – 9.5</div>
         </div>
-        <div style="background:#f5faf8;border:1px solid #c8e6d8;border-radius:8px;padding:12px;text-align:center">
+        <div style="background:#f5faf8;border:1px solid #c8e6d8;border-radius:6px;padding:6px 8px;text-align:center">
           <div style="font-size:10px;color:#5d8a78;font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">City TSS</div>
-          <div style="font-size:20px;font-weight:800;color:#111">${cy_tss_num||'—'}</div>
+          <div style="font-size:15px;font-weight:800;color:#111">${cy_tss_num||'—'}</div>
           <div style="font-size:11px;color:#888">mg/L</div>
         </div>
-        <div style="background:#f5faf8;border:1px solid #c8e6d8;border-radius:8px;padding:12px;text-align:center">
+        <div style="background:#f5faf8;border:1px solid #c8e6d8;border-radius:6px;padding:6px 8px;text-align:center">
           <div style="font-size:10px;color:#5d8a78;font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">Sample size</div>
-          <div style="font-size:20px;font-weight:800;color:#111">${val('city_sample_L')||'—'}</div>
+          <div style="font-size:15px;font-weight:800;color:#111">${val('city_sample_L')||'—'}</div>
           <div style="font-size:11px;color:#888">liters</div>
         </div>
       </div>`;
@@ -3016,13 +3016,13 @@ function exportPDF(){
     // ── COD REDUCTION ──
     if(cy_cod_pct!==null){
       content+=`
-        <div style="background:#f5faf8;border:1px solid #c8e6d8;border-radius:8px;padding:14px;margin-bottom:20px">
-          <div style="font-size:11px;font-weight:700;color:#0F6E56;text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">System COD reduction</div>
+        <div style="background:#f5faf8;border:1px solid #c8e6d8;border-radius:8px;padding:8px 10px;margin-bottom:10px">
+          <div style="font-size:10px;font-weight:700;color:#0F6E56;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">System COD reduction</div>
           <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-            ${pit_cod_num?`<div style="text-align:center"><div style="font-size:11px;color:#888"WW</div><div style="font-size:16px;font-weight:700">${pit_cod} mg/L</div></div><div style="color:#aaa;font-size:18px">→</div>`:''}
-            ${parseFloat(pe_cod)?`<div style="text-align:center"><div style="font-size:11px;color:#888">Primary eff.</div><div style="font-size:16px;font-weight:700">${pe_cod} mg/L</div></div><div style="color:#aaa;font-size:18px">→</div>`:''}
-            ${cy_cod_num?`<div style="text-align:center"><div style="font-size:11px;color:#888">City</div><div style="font-size:16px;font-weight:700">${cy_cod} mg/L</div></div>`:''}
-            ${cy_cod_pct!==null?`<div style="margin-left:auto;text-align:center;background:${parseFloat(cy_cod_pct)>=70?'#e1f5ee':parseFloat(cy_cod_pct)>=40?'#faeeda':'#fcebeb'};border-radius:8px;padding:10px 16px"><div style="font-size:11px;color:#888">Overall removal</div><div style="font-size:24px;font-weight:800;color:${parseFloat(cy_cod_pct)>=70?'#0F6E56':parseFloat(cy_cod_pct)>=40?'#854F0B':'#A32D2D'}">${cy_cod_pct}%</div></div>`:''}
+            ${pit_cod_num?`<div style="text-align:center"><div style="font-size:11px;color:#888"WW</div><div style="font-size:13px;font-weight:700">${pit_cod} mg/L</div></div><div style="color:#aaa;font-size:18px">→</div>`:''}
+            ${parseFloat(pe_cod)?`<div style="text-align:center"><div style="font-size:11px;color:#888">Primary eff.</div><div style="font-size:13px;font-weight:700">${pe_cod} mg/L</div></div><div style="color:#aaa;font-size:18px">→</div>`:''}
+            ${cy_cod_num?`<div style="text-align:center"><div style="font-size:11px;color:#888">City</div><div style="font-size:13px;font-weight:700">${cy_cod} mg/L</div></div>`:''}
+            ${cy_cod_pct!==null?`<div style="margin-left:auto;text-align:center;background:${parseFloat(cy_cod_pct)>=70?'#e1f5ee':parseFloat(cy_cod_pct)>=40?'#faeeda':'#fcebeb'};border-radius:8px;padding:10px 16px"><div style="font-size:11px;color:#888">Overall removal</div><div style="font-size:18px;font-weight:800;color:${parseFloat(cy_cod_pct)>=70?'#0F6E56':parseFloat(cy_cod_pct)>=40?'#854F0B':'#A32D2D'}">${cy_cod_pct}%</div></div>`:''}
           </div>
         </div>`;
     }
@@ -3033,17 +3033,17 @@ function exportPDF(){
     const bod_daily_ok = city_bod_lbs_pdf!==null ? city_bod_lbs_pdf<=800 : true;
     const bod_weekly_ok = city_bod_lbs_pdf!==null ? city_bod_lbs_pdf<=650 : true;
     content+=`
-      <div style="background:#f5faf8;border:1px solid #c8e6d8;border-radius:8px;padding:14px;margin-bottom:20px">
-        <div style="font-size:11px;font-weight:700;color:#0F6E56;text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px">Estimated BOD sent to city</div>
+      <div style="background:#f5faf8;border:1px solid #c8e6d8;border-radius:8px;padding:8px 10px;margin-bottom:10px">
+        <div style="font-size:10px;font-weight:700;color:#0F6E56;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Estimated BOD sent to city</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;text-align:center">
           <div>
             <div style="font-size:11px;color:#888;margin-bottom:4px">Concentration</div>
-            <div style="font-size:28px;font-weight:800;color:#111">${cy_cod_num?city_bod_mgL_pdf:'—'}</div>
+            <div style="font-size:18px;font-weight:800;color:#111">${cy_cod_num?city_bod_mgL_pdf:'—'}</div>
             <div style="font-size:12px;color:#888">mg/L</div>
           </div>
           <div>
             <div style="font-size:11px;color:#888;margin-bottom:4px">Mass loading</div>
-            <div style="font-size:28px;font-weight:800;color:${city_bod_lbs_pdf!==null?(bod_daily_ok?'#0F6E56':'#A32D2D'):'#111'}">${city_bod_lbs_pdf!==null?city_bod_lbs_pdf:'—'}</div>
+            <div style="font-size:18px;font-weight:800;color:${city_bod_lbs_pdf!==null?(bod_daily_ok?'#0F6E56':'#A32D2D'):'#111'}">${city_bod_lbs_pdf!==null?city_bod_lbs_pdf:'—'}</div>
             <div style="font-size:12px;color:#888">lbs/day</div>
           </div>
         </div>
@@ -3053,8 +3053,8 @@ function exportPDF(){
         </div>`:''}
       </div>`;
     content+=`
-      <div style="background:#f9f9f9;border:1px solid #ddd;border-radius:8px;padding:12px;margin-bottom:20px">
-        <div style="font-size:11px;font-weight:700;color:#555;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Permit limits — reference</div>
+      <div style="background:#f9f9f9;border:1px solid #ddd;border-radius:6px;padding:6px 10px;margin-bottom:10px">
+        <div style="font-size:10px;font-weight:700;color:#555;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">Permit limits — reference</div>
         <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;font-size:12px">
           <div><span style="color:#888">BOD daily max:</span> <strong>800 lbs/day</strong></div>
           <div><span style="color:#888">BOD weekly avg:</span> <strong>650 lbs/day</strong></div>
@@ -3064,7 +3064,7 @@ function exportPDF(){
 
     // ── SIGNATURE LINE ──
     content+=`
-      <div style="margin-top:30px;display:grid;grid-template-columns:1fr 1fr;gap:40px">
+      <div style="margin-top:12px;display:grid;grid-template-columns:1fr 1fr;gap:40px">
         <div>
           <div style="border-top:1px solid #555;padding-top:6px;font-size:11px;color:#555">Operator signature</div>
         </div>
@@ -4392,7 +4392,7 @@ function safCalculate(){
     return `<td style="text-align:center;font-weight:600;color:${ok?'var(--green2)':'var(--red)'}">${v.toFixed(2)}</td>`;
   }
   document.getElementById('saf-readings-table').innerHTML=`
-    <table style="width:100%;border-collapse:collapse;font-size:13px">
+    <table style="width:100%;border-collapse:collapse;font-size:11px">
       <thead>
         <tr>
           <th style="text-align:left;padding:8px 6px;border-bottom:1px solid var(--border);color:var(--text3);font-size:11px;font-weight:600;text-transform:uppercase">Point</th>
@@ -5009,8 +5009,9 @@ function sysSaveLog(){
     mbbr_vol_gal:sysGv('sys_mbbr_depth')>0?+(sysGv('sys_mbbr_depth')*2756).toFixed(0):0,
     sludge_depth:sysGv('sys_sludge_depth'),
     floc2_pct, floc2_gpd:+(17*floc2_pct/100).toFixed(4), coag2_pct:sysGv('sys_coag2_pct'), coag2_gph:+(26.7*sysGv('sys_coag2_pct')/100).toFixed(4),
-    saf2_froth:sysGv('sys_saf2_froth'), saf2_froth_mv:sysGv('sys_saf2_froth'), saf2_froth_gpd:sysGv('sys_saf2_froth')>=4?+((sysGv('sys_saf2_froth')-4)*1.0625).toFixed(4):0, saf2_froth_gph:sysGv('sys_saf2_froth')>=4?+((sysGv('sys_saf2_froth')-4)*1.0625/24).toFixed(4):0, saf2_eff_ph:sysGv('sys_saf2_eff_ph'),
-    saf2_turb:sysGv('sys_saf2_turb'),
+    saf2_froth:sysGv('sys_saf2_froth'), saf2_froth_mv:sysGv('sys_saf2_froth'), saf2_froth_gpd:sysGv('sys_saf2_froth')>=4?+((sysGv('sys_saf2_froth')-4)*1.0625).toFixed(4):0, saf2_froth_gph:sysGv('sys_saf2_froth')>=4?+((sysGv('sys_saf2_froth')-4)*1.0625/24).toFixed(4):0, saf2_froth_gpm:sysGv('sys_saf2_froth_gpm'), saf2_eff_ph:sysGv('sys_saf2_eff_ph'),
+    saf2_turb:sysGv('sys_saf2_turb'), saf2_eff_flow:sysGv('sys_saf2_eff_flow'),
+    saf2_poly_tube:sysGv('sys_saf2_poly_tube'), saf2_poly_lines:sysGv('sys_saf2_poly_lines'),
     out_flow:sysGv('sys_out_flow'), city_ph:sysGv('sys_city_ph'),
     flume:sysGv('sys_flume_gpm')
   });
