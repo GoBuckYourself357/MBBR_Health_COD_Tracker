@@ -3033,32 +3033,31 @@ function exportPDF(){
     const bod_daily_ok = city_bod_lbs_pdf!==null ? city_bod_lbs_pdf<=800 : true;
     const bod_weekly_ok = city_bod_lbs_pdf!==null ? city_bod_lbs_pdf<=650 : true;
     content+=`
-      <div style="background:#f5faf8;border:1px solid #c8e6d8;border-radius:8px;padding:8px 10px;margin-bottom:10px">
+      <div style="background:#f5faf8;border:1px solid #c8e6d8;border-radius:8px;padding:8px 10px;margin-bottom:8px">
         <div style="font-size:10px;font-weight:700;color:#0F6E56;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Estimated BOD sent to city</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;text-align:center">
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;text-align:center;align-items:center">
           <div>
-            <div style="font-size:11px;color:#888;margin-bottom:4px">Concentration</div>
-            <div style="font-size:18px;font-weight:800;color:#111">${cy_cod_num?city_bod_mgL_pdf:'—'}</div>
-            <div style="font-size:12px;color:#888">mg/L</div>
+            <div style="font-size:10px;color:#888;margin-bottom:2px">Concentration</div>
+            <div style="font-size:16px;font-weight:800;color:#111">${cy_cod_num?city_bod_mgL_pdf:'—'}</div>
+            <div style="font-size:10px;color:#888">mg/L</div>
           </div>
           <div>
-            <div style="font-size:11px;color:#888;margin-bottom:4px">Mass loading</div>
-            <div style="font-size:18px;font-weight:800;color:${city_bod_lbs_pdf!==null?(bod_daily_ok?'#0F6E56':'#A32D2D'):'#111'}">${city_bod_lbs_pdf!==null?city_bod_lbs_pdf:'—'}</div>
-            <div style="font-size:12px;color:#888">lbs/day</div>
+            <div style="font-size:10px;color:#888;margin-bottom:2px">Mass loading</div>
+            <div style="font-size:16px;font-weight:800;color:${city_bod_lbs_pdf!==null?(bod_daily_ok?'#0F6E56':'#A32D2D'):'#111'}">${city_bod_lbs_pdf!==null?city_bod_lbs_pdf:'—'}</div>
+            <div style="font-size:10px;color:#888">lbs/day</div>
           </div>
-        </div>
-        ${city_bod_lbs_pdf!==null?`<div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
-          <span style="background:${bod_daily_ok?'#e1f5ee':'#fcebeb'};color:${bod_daily_ok?'#0F6E56':'#A32D2D'};padding:3px 10px;border-radius:20px;font-size:12px;font-weight:600">${bod_daily_ok?'Under 800 lbs/day':'Over 800 lbs/day'}</span>
-          <span style="background:${bod_weekly_ok?'#e1f5ee':'#faeeda'};color:${bod_weekly_ok?'#0F6E56':'#854F0B'};padding:3px 10px;border-radius:20px;font-size:12px;font-weight:600">${bod_weekly_ok?'Under 650 lbs/day avg':'Over 650 lbs/day avg'}</span>
-        </div>`:''}
-      </div>`;
-    content+=`
-      <div style="background:#f9f9f9;border:1px solid #ddd;border-radius:6px;padding:6px 10px;margin-bottom:10px">
-        <div style="font-size:10px;font-weight:700;color:#555;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">Permit limits — reference</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;font-size:12px">
-          <div><span style="color:#888">BOD daily max:</span> <strong>800 lbs/day</strong></div>
-          <div><span style="color:#888">BOD weekly avg:</span> <strong>650 lbs/day</strong></div>
-          <div><span style="color:#888">pH range:</span> <strong>6.5 – 9.5</strong></div>
+          <div style="font-size:11px;color:#555;text-align:left;padding-left:8px;border-left:1px solid #c8e6d8">
+            <div style="font-size:10px;font-weight:700;color:#555;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">Permit limits</div>
+            <div><span style="color:#888">Daily max:</span> <strong>800 lbs/day</strong></div>
+            <div><span style="color:#888">Weekly avg:</span> <strong>650 lbs/day</strong></div>
+            <div><span style="color:#888">pH range:</span> <strong>6.5 – 9.5</strong></div>
+          </div>
+          <div style="text-align:left;padding-left:8px;border-left:1px solid #c8e6d8">
+            ${city_bod_lbs_pdf!==null?`<div style="display:flex;flex-direction:column;gap:4px">
+              <span style="background:${bod_daily_ok?'#e1f5ee':'#fcebeb'};color:${bod_daily_ok?'#0F6E56':'#A32D2D'};padding:2px 8px;border-radius:20px;font-size:11px;font-weight:600">${bod_daily_ok?'✓ Under 800':'✗ Over 800'}</span>
+              <span style="background:${bod_weekly_ok?'#e1f5ee':'#faeeda'};color:${bod_weekly_ok?'#0F6E56':'#854F0B'};padding:2px 8px;border-radius:20px;font-size:11px;font-weight:600">${bod_weekly_ok?'✓ Under 650 avg':'✗ Over 650 avg'}</span>
+            </div>`:'<span style="font-size:11px;color:#aaa">No data</span>'}
+          </div>
         </div>
       </div>`;
 
