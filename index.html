@@ -1229,7 +1229,7 @@ mark.sop-highlight{background:rgba(239,159,39,.4);border-radius:2px;color:inheri
     <div class="section-label">Primary SAF inspection</div>
     <div class="card" style="margin-bottom:12px">
       <div style="font-size:11px;color:var(--text3);margin-bottom:10px">Tap to toggle — green = acceptable, red = issue</div>
-      <div id="sys-checklist" style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px"></div>
+      <div id="sys-checklist" style="display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:6px"></div>
       <div id="sys-checklist-comment-wrap" style="display:none;margin-top:4px">
         <label style="font-size:11px;color:var(--text3);display:block;margin-bottom:4px">Comments / reason for any failures</label>
         <textarea id="sys_checklist_comment" rows="3" style="width:100%;background:var(--bg3);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:10px;font-size:13px;resize:none;box-sizing:border-box" placeholder="Describe any issues noted..."></textarea>
@@ -1240,7 +1240,7 @@ mark.sop-highlight{background:rgba(239,159,39,.4);border-radius:2px;color:inheri
     <div class="section-label">Secondary SAF inspection</div>
     <div class="card" style="margin-bottom:12px">
       <div style="font-size:11px;color:var(--text3);margin-bottom:10px">Tap to toggle — green = acceptable, red = issue</div>
-      <div id="sys-checklist2" style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px"></div>
+      <div id="sys-checklist2" style="display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:6px"></div>
       <div id="sys-checklist2-comment-wrap" style="display:none;margin-top:4px">
         <label style="font-size:11px;color:var(--text3);display:block;margin-bottom:4px">Comments / reason for any failures</label>
         <textarea id="sys_checklist2_comment" rows="3" style="width:100%;background:var(--bg3);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:10px;font-size:13px;resize:none;box-sizing:border-box" placeholder="Describe any issues noted..."></textarea>
@@ -2905,7 +2905,7 @@ function exportPDF(){
     // Override header for management report
     content='';
     content+=`
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;border-bottom:3px solid #1D9E75;padding-bottom:8px;margin-bottom:10px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;border-bottom:3px solid #1D9E75;padding-bottom:5px;margin-bottom:6px">
         <div>
           <div style="font-size:18px;font-weight:800;color:#0F6E56;letter-spacing:-.5px">Daily COD Test Report</div>
           <div style="font-size:11px;color:#555;margin-top:2px">Dairy Wastewater Treatment System</div>
@@ -2918,7 +2918,7 @@ function exportPDF(){
 
     // ── PERMIT STATUS BANNER ──
     content+=`
-      <div style="background:${all_pass?'#e1f5ee':'#fcebeb'};border:2px solid ${all_pass?'#1D9E75':'#E24B4A'};border-radius:8px;padding:8px 12px;margin-bottom:10px;display:flex;align-items:center;gap:12px">
+      <div style="background:${all_pass?'#e1f5ee':'#fcebeb'};border:2px solid ${all_pass?'#1D9E75':'#E24B4A'};border-radius:8px;padding:5px 10px;margin-bottom:6px;display:flex;align-items:center;gap:10px">
         <div style="font-size:28px;line-height:1">${all_pass?'✓':'!'}</div>
         <div>
           <div style="font-size:13px;font-weight:800;color:${all_pass?'#0F6E56':'#A32D2D'}">${all_pass?'All permit limits met':'Permit limit exceeded'}</div>
@@ -2932,8 +2932,8 @@ function exportPDF(){
 
     // ── SAMPLING POINT TABLE ──
     content+=`
-      <div style="margin-bottom:10px">
-        <div style="font-size:10px;font-weight:700;color:#0F6E56;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">Sampling results</div>
+      <div style="margin-bottom:6px">
+        <div style="font-size:10px;font-weight:700;color:#0F6E56;text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px">Sampling results</div>
         <table style="width:100%;border-collapse:collapse;font-size:11px">
           <thead>
             <tr style="background:#f0f9f5">
@@ -2985,7 +2985,7 @@ function exportPDF(){
     // ── CITY DISCHARGE SUMMARY ──
     const cy_tss_num=parseFloat(cy_tss)||0;
     content+=`
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px;margin-bottom:10px">
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:4px;margin-bottom:6px">
         <div style="background:#f5faf8;border:1px solid #c8e6d8;border-radius:6px;padding:6px 8px;text-align:center">
           <div style="font-size:10px;color:#5d8a78;font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">Flow</div>
           <div style="font-size:15px;font-weight:800;color:#111">${cy_flow_num||'—'}</div>
@@ -3016,8 +3016,8 @@ function exportPDF(){
     // ── COD REDUCTION ──
     if(cy_cod_pct!==null){
       content+=`
-        <div style="background:#f5faf8;border:1px solid #c8e6d8;border-radius:8px;padding:8px 10px;margin-bottom:10px">
-          <div style="font-size:10px;font-weight:700;color:#0F6E56;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">System COD reduction</div>
+        <div style="background:#f5faf8;border:1px solid #c8e6d8;border-radius:8px;padding:6px 10px;margin-bottom:6px">
+          <div style="font-size:10px;font-weight:700;color:#0F6E56;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">System COD reduction</div>
           <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
             ${pit_cod_num?`<div style="text-align:center"><div style="font-size:11px;color:#888"WW</div><div style="font-size:13px;font-weight:700">${pit_cod} mg/L</div></div><div style="color:#aaa;font-size:18px">→</div>`:''}
             ${parseFloat(pe_cod)?`<div style="text-align:center"><div style="font-size:11px;color:#888">Primary eff.</div><div style="font-size:13px;font-weight:700">${pe_cod} mg/L</div></div><div style="color:#aaa;font-size:18px">→</div>`:''}
@@ -3033,8 +3033,8 @@ function exportPDF(){
     const bod_daily_ok = city_bod_lbs_pdf!==null ? city_bod_lbs_pdf<=800 : true;
     const bod_weekly_ok = city_bod_lbs_pdf!==null ? city_bod_lbs_pdf<=650 : true;
     content+=`
-      <div style="background:#f5faf8;border:1px solid #c8e6d8;border-radius:8px;padding:8px 10px;margin-bottom:8px">
-        <div style="font-size:10px;font-weight:700;color:#0F6E56;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Estimated BOD sent to city</div>
+      <div style="background:#f5faf8;border:1px solid #c8e6d8;border-radius:8px;padding:6px 10px;margin-bottom:6px">
+        <div style="font-size:10px;font-weight:700;color:#0F6E56;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">Estimated BOD sent to city</div>
         <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;text-align:center;align-items:center">
           <div>
             <div style="font-size:10px;color:#888;margin-bottom:2px">Concentration</div>
@@ -3063,7 +3063,7 @@ function exportPDF(){
 
     // ── SIGNATURE LINE ──
     content+=`
-      <div style="margin-top:12px;display:grid;grid-template-columns:1fr 1fr;gap:40px">
+      <div style="margin-top:8px;display:grid;grid-template-columns:1fr 1fr;gap:40px">
         <div>
           <div style="border-top:1px solid #555;padding-top:6px;font-size:11px;color:#555">Operator signature</div>
         </div>
