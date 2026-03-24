@@ -3248,7 +3248,7 @@ function exportBackup(){
     stress_events:stressEvents||[],
     sys_monitor_log:sysLog
   };
-  const json=JSON.stringify(backup,null,2);
+  const json=JSON.stringify(backup,null,2).trim();
   const filename='dairy_calc_backup_'+new Date().toISOString().slice(0,10)+'.json';
 
   // Try clipboard first — works in most WebViews including Median
@@ -3291,8 +3291,10 @@ function processPasteImport(){
     errEl.textContent='Nothing pasted yet — long-press in the text box and tap Paste first.';
     errEl.style.display='block'; return;
   }
+  // Strip BOM, invisible chars, and whitespace before parsing
+  const cleaned=text.replace(/^\uFEFF/,'').replace(/^[\s\u200B\u200C\u200D\u00A0]+/,'').replace(/[\s\u200B\u200C\u200D\u00A0]+$/,'');
   try{
-    const backup=JSON.parse(text);
+    const backup=JSON.parse(cleaned);
     if(!backup.version){throw new Error('Invalid backup');}
     // Reuse existing import logic
     document.getElementById('paste-import-box').style.display='none';
@@ -3370,7 +3372,8 @@ function importBackup(event){
   const reader=new FileReader();
   reader.onload=function(e){
     try{
-      const backup=JSON.parse(e.target.result);
+      const raw=e.target.result.replace(/^\uFEFF/,'').replace(/^[\s\u200B\u200C\u200D\u00A0]+/,'').replace(/[\s\u200B\u200C\u200D\u00A0]+$/,'');
+      const backup=JSON.parse(raw);
       if(!backup.version){throw new Error('Invalid backup file');}
 
       // Show confirmation box
