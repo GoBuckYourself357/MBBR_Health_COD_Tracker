@@ -3601,39 +3601,6 @@ function sysGenerateReport(){
     </table>
   </div>
 
-  <div class="table2-landscape" style="page-break-before:always;margin-bottom:24px">
-    <div style="font-size:11px;font-weight:700;color:#1D5E3A;text-transform:uppercase;letter-spacing:.08em;border-bottom:1px solid #b0d8c0;padding-bottom:4px;margin-bottom:10px">All entries for ${dateLabel} — Table 2: MBBR · Secondary SAF · Discharge</div>
-    <table style="width:100%;border-collapse:collapse;font-size:9px">
-      <thead>
-        <tr style="background:#e8f5ee">
-          <th style="padding:4px 5px;text-align:left;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">Time</th>
-          <th style="padding:4px 5px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">MBBR in</th>
-          <th style="padding:4px 5px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">MBBR out</th>
-          <th style="padding:4px 5px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">DO</th>
-          <th style="padding:4px 5px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">Depth ft</th>
-          <th style="padding:4px 5px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">Sludge ft</th>
-          <th style="padding:4px 5px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">Coag2%</th>
-          <th style="padding:4px 5px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">Coag2 GPH</th>
-          <th style="padding:4px 5px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">Floc2%</th>
-          <th style="padding:4px 5px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">Floc2 g/hr</th>
-          <th style="padding:4px 5px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">Froth2 mV</th>
-          <th style="padding:4px 5px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">Froth2 g/hr</th>
-          <th style="padding:4px 5px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">Froth2 GPM</th>
-          <th style="padding:4px 5px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">Poly tube</th>
-          <th style="padding:4px 5px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">Poly lines</th>
-          <th style="padding:4px 5px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">Injectors</th>
-          <th style="padding:4px 5px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">SAF2 pH</th>
-          <th style="padding:4px 5px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">Turb NTU</th>
-          <th style="padding:4px 5px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">SAF2 GPM</th>
-          <th style="padding:4px 5px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">City pH</th>
-          <th style="padding:4px 5px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">Out GPM</th>
-          <th style="padding:4px 5px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">Flume GPM</th>
-        </tr>
-      </thead>
-      <tbody>${logRows2}</tbody>
-    </table>
-  </div>
-
   <div style="page-break-inside:avoid">
     <div style="font-size:11px;font-weight:700;color:#1D5E3A;text-transform:uppercase;letter-spacing:.08em;border-bottom:1px solid #b0d8c0;padding-bottom:4px;margin-bottom:12px">Daily totals & averages — ${entries.length} entries × 2 hours</div>
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:16px">
@@ -3715,6 +3682,39 @@ function sysGenerateReport(){
       <div><div style="border-top:1px solid #555;padding-top:6px;font-size:11px;color:#555">Supervisor review</div></div>
       <div><div style="border-top:1px solid #555;padding-top:6px;font-size:11px;color:#555">Date verified</div></div>
     </div>
+  </div>
+
+  <div class="table2-landscape" style="page-break-before:always;margin-bottom:24px">
+    <div style="font-size:11px;font-weight:700;color:#1D5E3A;text-transform:uppercase;letter-spacing:.08em;border-bottom:1px solid #b0d8c0;padding-bottom:4px;margin-bottom:10px">All entries for ${dateLabel} — Table 2: MBBR · Secondary SAF · Discharge</div>
+    <table style="width:100%;border-collapse:collapse;font-size:9px">
+      <thead>
+        <tr style="background:#e8f5ee">
+          <th style="padding:4px 5px;text-align:left;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">Time</th>
+          <th style="padding:4px 5px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">MBBR in</th>
+          <th style="padding:4px 5px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">MBBR out</th>
+          <th style="padding:4px 5px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">DO</th>
+          <th style="padding:4px 5px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">Depth ft</th>
+          <th style="padding:4px 5px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">Sludge ft</th>
+          <th style="padding:4px 5px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">Coag2%</th>
+          <th style="padding:4px 5px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">Coag2 GPH</th>
+          <th style="padding:4px 5px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">Floc2%</th>
+          <th style="padding:4px 5px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">Floc2 g/hr</th>
+          <th style="padding:4px 5px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">Froth2 mV</th>
+          <th style="padding:4px 5px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">Froth2 g/hr</th>
+          <th style="padding:4px 5px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">Froth2 GPM</th>
+          <th style="padding:4px 5px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">Poly tube</th>
+          <th style="padding:4px 5px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">Poly lines</th>
+          <th style="padding:4px 5px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">Injectors</th>
+          <th style="padding:4px 5px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">SAF2 pH</th>
+          <th style="padding:4px 5px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">Turb NTU</th>
+          <th style="padding:4px 5px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">SAF2 GPM</th>
+          <th style="padding:4px 5px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">City pH</th>
+          <th style="padding:4px 5px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">Out GPM</th>
+          <th style="padding:4px 5px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">Flume GPM</th>
+        </tr>
+      </thead>
+      <tbody>${logRows2}</tbody>
+    </table>
   </div>`;
 
   document.getElementById('pdf-content').innerHTML=overlayContent;
