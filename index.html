@@ -484,6 +484,7 @@ mark.sop-highlight{background:rgba(239,159,39,.4);border-radius:2px;color:inheri
         <div class="field"><label>TSS (mg/L)</label><input type="number" id="eff_tss" value="" step="1" placeholder="0" oninput="sv('inf_tss',this.value)"></div>
         <div class="field"><label>VSS (mg/L)</label><input type="number" id="eff_vss" value="" step="1" placeholder="0" oninput="sv('inf_vss',this.value)"></div>
         <div class="field"><label>Imhoff cone (mL/L)</label><input type="number" id="imhoff" value="" step="0.5" min="0" placeholder="0.00"></div>
+        <div class="field"><label>Foam depth (ft)</label><input type="number" id="foam_depth" value="" step="0.1" min="0" placeholder="0.0"></div>
       </div>
     </div>
     <input type="hidden" id="inf_tss" value="0">
@@ -686,7 +687,7 @@ mark.sop-highlight{background:rgba(239,159,39,.4);border-radius:2px;color:inheri
       <div class="card-title">PAA — peracetic acid</div>
 
       <div class="field-group">
-        <div class="field"><label>PAA residual (mg/L)</label><input type="number" id="paa_residual" value="" placeholder="0.00" step="0.01" min="0" oninput="calcDiag()"></div>
+        <div class="field"><label>Influent PAA (mg/L)</label><input type="number" id="paa_residual" value="" placeholder="0.00" step="0.01" min="0" oninput="calcDiag()"></div>
         <div class="field"><label>Flow at dosing point (GPM)</label><input type="number" id="paa_gpm" value="130" step="1" min="0" oninput="calcDiag()"></div>
       </div>
       <div class="field-group cols1">
@@ -1275,22 +1276,23 @@ mark.sop-highlight{background:rgba(239,159,39,.4);border-radius:2px;color:inheri
     <div class="card" style="margin-bottom:12px">
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
         <div style="width:10px;height:10px;border-radius:50%;background:#378ADD;flex-shrink:0"></div>
-        <span style="font-size:12px;color:var(--text3)">Neutralization · Coag/Floc · Flow · Froth</span>
+        <span style="font-size:12px;color:var(--text3)">Neutralization · Coag (CI 38B) · Flocculant (EC 52) · Froth (Flocaid AO1W)</span>
       </div>
       <div class="field-group">
         <div class="field"><label>Neutralization tank pH</label><input type="number" id="sys_neut_ph" value="" step="0.1" min="0" max="14" placeholder="—"></div>
         <div class="field"><label>Effluent pH → MBBR</label><input type="number" id="sys_saf1_eff_ph" value="" step="0.1" min="0" max="14" placeholder="—"></div>
-        <div class="field"><label>Coag dose (gal/gal)</label><input type="number" id="sys_coag_dose" value="" step="0.000001" min="0" placeholder="0.000000" oninput="sysCalcPrimarySAF()"></div>
+        <div class="field"><label>Coag dose (gal/gal) — CI 38B</label><input type="number" id="sys_coag_dose" value="" step="0.000001" min="0" placeholder="0.000000" oninput="sysCalcPrimarySAF()"></div>
         <div class="field"><label>Coag usage (gal/hr)</label><div class="biodegrad-display" id="sys_coag_gpd">—</div></div>
-        <div class="field"><label>Flocculant dose (gal/gal)</label><input type="number" id="sys_floc1_dose" value="" step="0.000001" min="0" placeholder="0.000000" oninput="sysCalcPrimarySAF()"></div>
+        <div class="field"><label>Flocculant dose (gal/gal) — EC 52</label><input type="number" id="sys_floc1_dose" value="" step="0.000001" min="0" placeholder="0.000000" oninput="sysCalcPrimarySAF()"></div>
         <div class="field"><label>Flocculant usage (gal/hr)</label><div class="biodegrad-display" id="sys_floc1_gpd">—</div></div>
         <div class="field"><label>Flow meter (GPM)</label><input type="number" id="sys_saf1_flow" value="" step="0.1" min="0" placeholder="0.00" oninput="sysCalcPrimarySAF()"></div>
         <div class="field"><label>Sludge tank (%)</label><input type="number" id="sys_saf1_sludge_pct" value="" step="0.1" min="0" max="100" placeholder="0.0" oninput="sysCalcSaf1Sludge()"></div>
         <div class="field"><label>Sludge volume (gal)</label><div class="biodegrad-display" id="sys_saf1_sludge_gal">—</div></div>
         <div class="field"><label>Froth generator (mV)</label><input type="number" id="sys_saf1_froth" value="" step="0.1" min="4" placeholder="4.0" oninput="sysCalcFroth1()"></div>
-        <div class="field"><label>Froth chemical (gal/hr)</label><div class="biodegrad-display" id="sys_saf1_froth_gpd">—</div></div>
+        <div class="field"><label>Froth chemical (gal/hr) — Flocaid AO1W</label><div class="biodegrad-display" id="sys_saf1_froth_gpd">—</div></div>
         <div class="field"><label>Froth dosing rate (GPM)</label><input type="number" id="sys_saf1_froth_gpm" value="" step="0.01" min="0" placeholder="0.00"></div>
-        <div class="field"><label>PAA residual (mg/L)</label><input type="number" id="sys_paa_residual" value="" step="0.01" min="0" placeholder="0.00"></div>
+        <div class="field"><label>Influent PAA (mg/L)</label><input type="number" id="sys_paa_residual" value="" step="0.01" min="0" placeholder="0.00"></div>
+        <div class="field"><label>Peroxyscav pump (mL/hr)</label><input type="number" id="sys_peroxyscav_mlhr" value="" step="0.1" min="0" placeholder="0.0"></div>
       </div>
     </div>
 
@@ -1310,8 +1312,8 @@ mark.sop-highlight{background:rgba(239,159,39,.4);border-radius:2px;color:inheri
         <div class="field"><label>Effluent flow → SAF (GPM)</label><input type="number" id="sys_mbbr_eff_flow" value="" step="0.1" min="0" placeholder="0.00"></div>
         <div class="field"><label>Sludge tank depth (ft)</label><input type="number" id="sys_sludge_depth" value="" step="0.1" min="0" max="12.5" placeholder="—" oninput="sysCalcSludgeTank()"></div>
         <div class="field"><label>Sludge volume (gal)</label><div class="biodegrad-display" id="sys_sludge_vol">—</div></div>
-        <div class="field"><label>SAF2 coag dose (%)</label><input type="number" id="sys_coag2_pct" value="" step="0.1" min="0" max="100" placeholder="0.0" oninput="sysCalcCoag2()"></div>
-        <div class="field"><label>SAF2 coag rate (GPH)</label><div class="biodegrad-display" id="sys_coag2_gph">—</div></div>
+        <div class="field"><label>SAF2 Coag dose (%) — CI 38B</label><input type="number" id="sys_coag2_pct" value="" step="0.1" min="0" max="100" placeholder="0.0" oninput="sysCalcCoag2()"></div>
+        <div class="field"><label>SAF2 Coag rate (GPH)</label><div class="biodegrad-display" id="sys_coag2_gph">—</div></div>
         <div class="field"><label>SAF2 effluent pH</label><input type="number" id="sys_saf2_eff_ph" value="" step="0.1" min="0" max="14" placeholder="—"></div>
         <div class="field"><label>SAF2 turbidity (NTU)</label><input type="number" id="sys_saf2_turb" value="" step="0.1" min="0" placeholder="—"></div>
         <div class="field"><label>SAF2 flow → city (GPM)</label><input type="number" id="sys_saf2_eff_flow" value="" step="0.1" min="0" placeholder="0.00"></div>
@@ -1344,13 +1346,13 @@ mark.sop-highlight{background:rgba(239,159,39,.4);border-radius:2px;color:inheri
     <div class="card" style="margin-bottom:12px">
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
         <div style="width:10px;height:10px;border-radius:50%;background:#9B59B6;flex-shrink:0"></div>
-        <span style="font-size:12px;color:var(--text3)">Flocculant · Froth · Effluent</span>
+        <span style="font-size:12px;color:var(--text3)">Flocculant (EC 52) · Froth (Flocaid AO1W) · Effluent</span>
       </div>
       <div class="field-group">
-        <div class="field"><label>Flocculant dose (%)</label><input type="number" id="sys_floc2_pct" value="" step="0.1" min="0" max="100" placeholder="0.0" oninput="sysCalcFloc2()"></div>
+        <div class="field"><label>Flocculant dose (%) — EC 52</label><input type="number" id="sys_floc2_pct" value="" step="0.1" min="0" max="100" placeholder="0.0" oninput="sysCalcFloc2()"></div>
         <div class="field"><label>Flocculant (gal/day)</label><div class="biodegrad-display" id="sys_floc2_gpd">—</div></div>
         <div class="field"><label>Froth generator (mV)</label><input type="number" id="sys_saf2_froth" value="" step="0.1" min="4" placeholder="4.0" oninput="sysCalcFroth2()"></div>
-        <div class="field"><label>Froth chemical (gal/hr)</label><div class="biodegrad-display" id="sys_saf2_froth_gpd">—</div></div>
+        <div class="field"><label>Froth chemical (gal/hr) — Flocaid AO1W</label><div class="biodegrad-display" id="sys_saf2_froth_gpd">—</div></div>
         <div class="field"><label>Froth dosing rate (GPM)</label><input type="number" id="sys_saf2_froth_gpm" value="" step="0.01" min="0" placeholder="0.00"></div>
         <div class="field"><label>Polymer dilution tube (GPM)</label><input type="number" id="sys_saf2_poly_tube" value="" step="0.01" min="0" placeholder="0.00"></div>
         <div class="field"><label>Polymer dilution lines (GPM)</label><input type="number" id="sys_saf2_poly_lines" value="" step="0.01" min="0" placeholder="0.00"></div>
@@ -1411,6 +1413,12 @@ mark.sop-highlight{background:rgba(239,159,39,.4);border-radius:2px;color:inheri
     <div class="card"><div class="chart-wrap" style="height:220px"><canvas id="sys-dose-chart"></canvas></div></div>
     <div class="section-label">Secondary SAF — turbidity & froth</div>
     <div class="card"><div class="chart-wrap" style="height:220px"><canvas id="sys-saf2-chart"></canvas></div></div>
+    <div class="section-label">Primary SAF chemical usage (gal/hr)</div>
+    <div class="card"><div class="chart-wrap" style="height:220px"><canvas id="sys-chem1-chart"></canvas></div></div>
+    <div class="section-label">Secondary SAF chemical usage</div>
+    <div class="card"><div class="chart-wrap" style="height:220px"><canvas id="sys-chem2-chart"></canvas></div></div>
+    <div class="section-label">Influent PAA & Peroxyscav pump</div>
+    <div class="card"><div class="chart-wrap" style="height:220px"><canvas id="sys-paa-chart"></canvas></div></div>
   </div>
 
   <!-- SYS: NEUT -->
@@ -1418,7 +1426,7 @@ mark.sop-highlight{background:rgba(239,159,39,.4);border-radius:2px;color:inheri
     <div class="section-label">PAA — peracetic acid</div>
     <div class="card" style="margin-bottom:12px">
       <div class="field-group">
-        <div class="field"><label>PAA residual (mg/L)</label><input type="number" id="sys_neut_paa_res" value="" placeholder="0.00" step="0.01" min="0" oninput="sysCalcNeut('paa')"></div>
+        <div class="field"><label>Influent PAA (mg/L)</label><input type="number" id="sys_neut_paa_res" value="" placeholder="0.00" step="0.01" min="0" oninput="sysCalcNeut('paa')"></div>
         <div class="field"><label>Flow at dosing point (GPM)</label><input type="number" id="sys_neut_paa_gpm" value="130" step="1" min="0" oninput="sysCalcNeut('paa')"></div>
       </div>
       <div class="field-group cols1">
@@ -1785,7 +1793,7 @@ function clearInputs(){
     'inf_cod','eff_cod',
     'eff_ph','inf_ph','eff_do','inf_do',
     'eff_alk','inf_alk','eff_p','inf_p',
-    'vol_acids','eff_tss','inf_tss','eff_vss','inf_vss','imhoff'
+    'vol_acids','eff_tss','inf_tss','eff_vss','inf_vss','imhoff','foam_depth'
   ];
   fields.forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
 }
@@ -1832,7 +1840,7 @@ function calcDiag(){
   const paaCls=['b-ok','b-warn','b-warn','b-bad'];
   const pN=neutCalc(paa_res,paa_gpm,paa_neutralizer);
   document.getElementById('paa-result').innerHTML=
-    rr('PAA residual',paa_res,'mg/L',badge(paaLabels[paaSeverity],paaCls[paaSeverity]))+
+    rr('Influent PAA',paa_res,'mg/L',badge(paaLabels[paaSeverity],paaCls[paaSeverity]))+
     rr('Flow',paa_gpm+' GPM','→ '+(pN.flow_gpd.toLocaleString())+' GPD')+
     (paa_neutralizer!=='none'?
       '<div class="divider"></div>'+
@@ -1841,9 +1849,9 @@ function calcDiag(){
       rr('',pN.neut_mL_per_L,'mL/L ('+pN.stockConc+' mg/L stock)')+
       rr('Stoichiometric ratio','1 mg/L PAA : '+pN.ratio+' mg/L '+neutNames[paa_neutralizer],'')
     :'<div class="alert a-warn" style="margin-top:8px">No neutralizer selected. Select an agent to calculate required dose.</div>')+
-    (paa_res>0.5?'<div class="alert a-warn" style="margin-top:8px">PAA residual above 0.5 mg/L is inhibitory to AOB nitrifiers. Dose neutralizer upstream of MBBR and verify residual drops below 0.1 mg/L before contact.</div>':'')+
-    (paa_res>0&&paa_res<=0.1?'<div class="alert a-ok" style="margin-top:8px">PAA residual below inhibitory threshold. Continue monitoring.</div>':'')+
-    (paa_res===0?'<div class="alert a-info" style="margin-top:8px">Enter your tested PAA residual to calculate neutralizer dose.</div>':'');
+    (paa_res>0.5?'<div class="alert a-warn" style="margin-top:8px">Influent PAA above 0.5 mg/L is inhibitory to AOB nitrifiers. Dose neutralizer upstream of MBBR and verify residual drops below 0.1 mg/L before contact.</div>':'')+
+    (paa_res>0&&paa_res<=0.1?'<div class="alert a-ok" style="margin-top:8px">Influent PAA below inhibitory threshold. Continue monitoring.</div>':'')+
+    (paa_res===0?'<div class="alert a-info" style="margin-top:8px">Enter your tested >Influent PAA to calculate neutralizer dose.</div>':'');
 
   // CHLORINE ASSESSMENT
   const cl2Severity=cl2_res<=0.05?0:cl2_res<=0.1?1:cl2_res<=0.5?2:3;
@@ -1918,8 +1926,8 @@ function calcDiag(){
   // 3. Chlorine residual
   if(cl2_res>0) factors.push({name:'Chlorine residual',score:cl2Score,weight:0.12,populated:true});
 
-  // 4. PAA residual
-  if(paa_res>0) factors.push({name:'PAA residual',score:paaScore,weight:0.10,populated:true});
+  // 4. >Influent PAA
+  if(paa_res>0) factors.push({name:'Influent PAA',score:paaScore,weight:0.10,populated:true});
 
   // 5. Nitrite (NO2) — 0 is valid default, include always
   factors.push({name:'Nitrite accumulation',score:no2Score,weight:0.08,populated:true});
@@ -2517,7 +2525,7 @@ function saveToLog(){
     eff_do:gv('eff_do'),temp:gv('temp'),
     eff_alk:gv('eff_alk'),eff_p:gv('eff_p'),vol_acids:gv('vol_acids'),
     inf_tss:gv('inf_tss'),eff_tss:gv('eff_tss'),inf_vss:gv('inf_vss'),eff_vss:gv('eff_vss'),
-    alk:gv('eff_alk'),imhoff:gv('imhoff'),
+    alk:gv('eff_alk'),imhoff:gv('imhoff'),foam_depth:gv('foam_depth'),
     nh3_lbs:lbs(gv('inf_nh3'),flow),no3_lbs:lbs(gv('eff_no3'),flow),
     bod_lbs:ebl,tss_rem:pct(gv('inf_tss'),gv('eff_tss')),
     bod_pass:ebl<=BOD_DAILY,ph_pass:ph>=PH_LO&&ph<=PH_HI&&ph>0
@@ -2732,6 +2740,7 @@ function loadMbbrEntry(i){
   set('inf_vss', e.inf_vss);
   set('eff_vss', e.eff_vss);
   set('imhoff', e.imhoff);
+  set('foam_depth', e.foam_depth);
   // Switch to input tab and recalculate
   showTab('input');
   calculate();
@@ -2788,7 +2797,7 @@ function exportCSV(){
     'COD Inf (mg/L)','COD Eff (mg/L)',
     'BOD Eff est (mg/L)','BOD Discharged (lbs/day)','BOD Permit',
     'pH','pH Permit',
-    'TSS (mg/L)','Eff Alkalinity (mg/L)','Imhoff (mL/L)',
+    'TSS (mg/L)','Eff Alkalinity (mg/L)','Imhoff (mL/L)','Foam depth (ft)',
     'NH3 Loading (lbs/day)','NO3 Loading (lbs/day)',
     'TSS Removal (%)'
   ];
@@ -2799,7 +2808,7 @@ function exportCSV(){
     e.inf_cod,e.eff_cod,
     e.eff_bod,e.bod_lbs,e.bod_pass?'Pass':'FAIL',
     e.eff_ph,e.ph_pass?'Pass':'FAIL',
-    e.eff_tss,e.alk,e.imhoff,
+    e.eff_tss,e.alk,e.imhoff,e.foam_depth||'',
     e.nh3_lbs,e.no3_lbs,
     e.tss_rem
   ].join(','));
@@ -3678,12 +3687,12 @@ function sysGenerateReport(){
       <div>
         <div style="font-size:10px;font-weight:700;color:#1D5E3A;margin-bottom:8px;text-transform:uppercase">Chemical usage totals</div>
         <table style="width:100%;border-collapse:collapse;font-size:12px">
-          ${pRow('Primary SAF coag',fmt(totalCoag),'gal total')}
-          ${pRow('Primary SAF flocculant',fmt(totalFloc1),'gal total')}
-          ${pRow('Primary SAF froth',fmt(totalFroth1),'gal total')}
-          ${pRow('Secondary SAF coag',fmt(totalCoag2),'gal total')}
-          ${pRow('Secondary SAF flocculant',fmt(totalFloc2),'gal total')}
-          ${pRow('Secondary SAF froth',fmt(totalFroth2),'gal total')}
+          ${pRow('Primary SAF coag (CI 38B)',fmt(totalCoag),'gal total')}
+          ${pRow('Primary SAF flocculant (EC 52)',fmt(totalFloc1),'gal total')}
+          ${pRow('Primary SAF froth (Flocaid AO1W)',fmt(totalFroth1),'gal total')}
+          ${pRow('Secondary SAF coag (CI 38B)',fmt(totalCoag2),'gal total')}
+          ${pRow('Secondary SAF flocculant (EC 52)',fmt(totalFloc2),'gal total')}
+          ${pRow('Secondary SAF froth (Flocaid AO1W)',fmt(totalFroth2),'gal total')}
         </table>
       </div>
       <div>
@@ -4684,8 +4693,8 @@ const SYS_PRIMARY_CHECKLIST_ITEMS=[
   {label:'Controls timer operating?'},
   {label:'Cleaning cycle engaging?'},
   {label:'Catch container in place?'},
-  {label:'Coag chemical supply adequate?'},
-  {label:'Coag pump P1401 functioning?'},
+  {label:'CI 38B chemical supply adequate?'},
+  {label:'CI 38B pump P1401 functioning?'},
   {label:'Floc chemical supply adequate?'},
   {label:'Floc pump P1801 functioning?'},
   {label:'Effluent clear at start?', tristate:true},
@@ -4962,7 +4971,7 @@ function sysClearInputs(){
    'sys_neut_ph','sys_coag_dose','sys_floc1_dose','sys_saf1_flow','sys_saf1_eff_ph','sys_saf1_sludge_pct','sys_saf1_froth_gpm','sys_saf1_froth',
    'sys_mbbr_inf_ph','sys_mbbr_eff_ph','sys_mbbr_do','sys_mbbr_depth','sys_mbbr_eff_flow','sys_sludge_depth','sys_blower_psi','sys_blower_filter_psi','sys_blower_temp',
    'sys_floc2_pct','sys_coag2_pct','sys_saf2_froth','sys_saf2_eff_ph','sys_saf2_turb','sys_saf2_eff_flow','sys_saf2_poly_tube','sys_saf2_poly_lines','sys_saf2_froth_gpm',
-   'sys_out_flow','sys_city_ph','sys_flume_gpm'
+   'sys_out_flow','sys_city_ph','sys_flume_gpm','sys_paa_residual','sys_peroxyscav_mlhr'
   ].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   document.getElementById('sys_floc2_gpd').textContent='—';
   sysResetChecklist();
@@ -5135,7 +5144,7 @@ function sysSaveLog(){
     floc1_dose:sysGv('sys_floc1_dose'), floc1_gpd:sysGv('sys_saf1_flow')>0&&sysGv('sys_floc1_dose')>0?+(sysGv('sys_floc1_dose')*sysGv('sys_saf1_flow')*60).toFixed(4):0,
     saf1_flow:sysGv('sys_saf1_flow'), saf1_eff_ph:sysGv('sys_saf1_eff_ph'),
     saf1_sludge_pct:sysGv('sys_saf1_sludge_pct'), saf1_sludge_gal:+(2700*sysGv('sys_saf1_sludge_pct')/100).toFixed(1),
-    saf1_froth:sysGv('sys_saf1_froth'), saf1_froth_mv:sysGv('sys_saf1_froth'), saf1_froth_gpd:sysGv('sys_saf1_froth')>=4?+((sysGv('sys_saf1_froth')-4)*1.0625).toFixed(4):0, saf1_froth_gph:sysGv('sys_saf1_froth')>=4?+((sysGv('sys_saf1_froth')-4)*1.0625/24).toFixed(4):0, saf1_froth_gpm:sysGv('sys_saf1_froth_gpm'), paa_residual:sysGv('sys_paa_residual'),
+    saf1_froth:sysGv('sys_saf1_froth'), saf1_froth_mv:sysGv('sys_saf1_froth'), saf1_froth_gpd:sysGv('sys_saf1_froth')>=4?+((sysGv('sys_saf1_froth')-4)*1.0625).toFixed(4):0, saf1_froth_gph:sysGv('sys_saf1_froth')>=4?+((sysGv('sys_saf1_froth')-4)*1.0625/24).toFixed(4):0, saf1_froth_gpm:sysGv('sys_saf1_froth_gpm'), paa_residual:sysGv('sys_paa_residual'), peroxyscav_mlhr:sysGv('sys_peroxyscav_mlhr'),
     mbbr_inf_ph:sysGv('sys_mbbr_inf_ph'), mbbr_eff_ph:sysGv('sys_mbbr_eff_ph'),
     blower_id:document.getElementById('sys_blower_id')?document.getElementById('sys_blower_id').value:'',
     blower_psi:sysGv('sys_blower_psi'), blower_filter_psi:parseFloat(document.getElementById('sys_blower_filter_psi').value)||0, blower_temp:sysGv('sys_blower_temp'),
@@ -5201,6 +5210,7 @@ function sysLoadEntry(i){
   set('sys_saf1_froth',e.saf1_froth); sysCalcFroth1();
   set('sys_saf1_froth_gpm',e.saf1_froth_gpm);
   set('sys_paa_residual',e.paa_residual);
+  set('sys_peroxyscav_mlhr',e.peroxyscav_mlhr);
   // Restore checklist
   sysCheckState={};
   if(e.checklist_items){
@@ -5322,16 +5332,37 @@ function sysRenderCharts(){
 
   // Dosing
   mk('sys-dose-chart',[
-    {label:'Coag (gal/gal ×10⁻⁵)',data:sysLog.map(e=>(e.coag_dose||0)*1e5),borderColor:'#E24B4A',backgroundColor:'transparent',tension:.3,pointRadius:3,spanGaps:false},
-    {label:'Floc1 (gal/gal ×10⁻⁵)',data:sysLog.map(e=>(e.floc1_dose||0)*1e5),borderColor:'#9B59B6',backgroundColor:'transparent',tension:.3,pointRadius:3,spanGaps:false},
-    {label:'Floc2 (%)',data:sysLog.map(e=>e.floc2_pct||null),borderColor:'#EF9F27',backgroundColor:'transparent',tension:.3,pointRadius:3,spanGaps:false}
+    {label:'CI 38B (gal/gal ×10⁻⁵)',data:sysLog.map(e=>(e.coag_dose||0)*1e5),borderColor:'#E24B4A',backgroundColor:'transparent',tension:.3,pointRadius:3,spanGaps:false},
+    {label:'EC 52 (SAF1) (gal/gal ×10⁻⁵)',data:sysLog.map(e=>(e.floc1_dose||0)*1e5),borderColor:'#9B59B6',backgroundColor:'transparent',tension:.3,pointRadius:3,spanGaps:false},
+    {label:'EC 52 (SAF2) (%)',data:sysLog.map(e=>e.floc2_pct||null),borderColor:'#EF9F27',backgroundColor:'transparent',tension:.3,pointRadius:3,spanGaps:false}
   ],'');
 
   // SAF2
   mk('sys-saf2-chart',[
-    ds('SAF1 froth (mV)','saf1_froth','#378ADD'),
-    ds('SAF2 froth (mV)','saf2_froth','#9B59B6'),
+    ds('Froth — Flocaid AO1W SAF1 (mV)','saf1_froth','#378ADD'),
+    ds('Froth — Flocaid AO1W SAF2 (mV)','saf2_froth','#9B59B6'),
     ds('Turbidity (NTU)','saf2_turb','#EF9F27')
+  ],'');
+
+  // Primary SAF chemical usage
+  mk('sys-chem1-chart',[
+    ds('Coag — CI 38B (gal/hr)','coag_gpd','#E24B4A'),
+    ds('Flocculant — EC 52 (gal/hr)','floc1_gpd','#9B59B6'),
+    ds('Froth — Flocaid AO1W (gal/hr)','saf1_froth_gph','#378ADD')
+  ],'gal/hr');
+
+  // Secondary SAF chemical usage
+  mk('sys-chem2-chart',[
+    ds('Coag — CI 38B SAF2 (GPH)','coag2_gph','#E24B4A'),
+    ds('Flocculant — EC 52 SAF2 (gal/hr)','floc2_gpd','#9B59B6'),
+    ds('Froth — Flocaid AO1W SAF2 (gal/hr)','saf2_froth_gph','#378ADD')
+  ],'gal/hr');
+
+  // PAA & Peroxyscav
+  mk('sys-paa-chart',[
+    ds('Influent PAA (mg/L)','paa_residual','#EF9F27'),
+    ds('Peroxyscav pump (mL/hr)','peroxyscav_mlhr','#1D9E75'),
+    {label:'PAA inhibition threshold',data:sysLog.map(()=>0.5),borderColor:'rgba(226,75,74,.4)',borderDash:[6,4],pointRadius:0}
   ],'');
 }
 
