@@ -3552,10 +3552,11 @@ function sysGenerateReport(){
   function pRow(label,val,unit){return`<tr><td style="padding:5px 8px;color:#222;border-bottom:1px solid #eee">${label}</td><td style="padding:5px 8px;font-weight:600;color:#111;text-align:right;border-bottom:1px solid #eee">${val!==null&&val!==undefined?val:'—'}${unit?' <span style="font-size:10px;color:#444">'+unit+'</span>':''}</td></tr>`;}
 
   // ── BUILD LOG TABLE ──
-  let logRows1='', logRows2='';
+  let logRows1='', logRows2='', logRows3='', logRows4='';
   entries.forEach((e,i)=>{
     const t=new Date(e.ts).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
     const bg=`background:${i%2===0?'#fff':'#f9fdfb'}`;
+    // Table 1: Time · Pit/Storage · Primary SAF pH & dosing
     logRows1+=`<tr style="${bg}">
       <td style="padding:4px 5px;white-space:nowrap;font-weight:600;color:#1D5E3A">${t}</td>
       <td style="padding:4px 5px">${e.pit_vol||'—'}</td>
@@ -3563,12 +3564,18 @@ function sysGenerateReport(){
       <td style="padding:4px 5px">${e.tank2_vol||'—'}</td>
       <td style="padding:4px 5px">${e.storage_ph||'—'}</td>
       <td style="padding:4px 5px">${e.neut_ph||'—'}</td>
+      <td style="padding:4px 5px">${e.saf1_eff_ph||'—'}</td>
       <td style="padding:4px 5px">${e.coag_dose?e.coag_dose.toFixed(6):'—'}</td>
       <td style="padding:4px 5px">${e.coag_gpd||'—'}</td>
       <td style="padding:4px 5px">${e.floc1_dose?e.floc1_dose.toFixed(6):'—'}</td>
       <td style="padding:4px 5px">${e.floc1_gpd||'—'}</td>
       <td style="padding:4px 5px">${e.saf1_flow||'—'}</td>
-      <td style="padding:4px 5px">${e.saf1_eff_ph||'—'}</td>
+      <td style="padding:4px 5px">${e.paa_residual||'—'}</td>
+      <td style="padding:4px 5px">${e.peroxyscav_mlhr||'—'}</td>
+    </tr>`;
+    // Table 2: Time · SAF1 sludge/froth · Blower · MBBR
+    logRows2+=`<tr style="${bg}">
+      <td style="padding:4px 5px;white-space:nowrap;font-weight:600;color:#1D5E3A">${t}</td>
       <td style="padding:4px 5px">${e.saf1_sludge_pct||'—'}</td>
       <td style="padding:4px 5px">${e.saf1_sludge_gal||'—'}</td>
       <td style="padding:4px 5px">${e.saf1_froth||'—'}</td>
@@ -3578,14 +3585,16 @@ function sysGenerateReport(){
       <td style="padding:4px 5px">${e.blower_psi||'—'}</td>
       <td style="padding:4px 5px">${e.blower_filter_psi||'—'}</td>
       <td style="padding:4px 5px">${e.blower_temp||'—'}</td>
-    </tr>`;
-    logRows2+=`<tr style="${bg}">
-      <td style="padding:4px 5px;white-space:nowrap;font-weight:600;color:#1D5E3A">${t}</td>
       <td style="padding:4px 5px">${e.mbbr_inf_ph||'—'}</td>
       <td style="padding:4px 5px">${e.mbbr_eff_ph||'—'}</td>
       <td style="padding:4px 5px">${e.mbbr_do||'—'}</td>
       <td style="padding:4px 5px">${e.mbbr_depth||'—'}</td>
+      <td style="padding:4px 5px">${e.mbbr_eff_flow||'—'}</td>
       <td style="padding:4px 5px">${e.sludge_depth||'—'}</td>
+    </tr>`;
+    // Table 3: Time · Secondary SAF · Discharge
+    logRows3+=`<tr style="${bg}">
+      <td style="padding:4px 5px;white-space:nowrap;font-weight:600;color:#1D5E3A">${t}</td>
       <td style="padding:4px 5px">${e.coag2_pct||'—'}</td>
       <td style="padding:4px 5px">${e.coag2_gph||'—'}</td>
       <td style="padding:4px 5px">${e.floc2_pct||'—'}</td>
@@ -3604,6 +3613,18 @@ function sysGenerateReport(){
       <td style="padding:4px 5px">${e.flume||'—'}</td>
     </tr>`;
   });
+
+  function th(txt){return `<th style="padding:4px 5px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap;font-size:9px">${txt}</th>`;}
+  function thL(txt){return `<th style="padding:4px 5px;text-align:left;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap;font-size:9px">${txt}</th>`;}
+  function tbl(label,headers,rows){
+    return`<div class="table2-landscape" style="page-break-before:always;margin-bottom:16px">
+      <div style="font-size:11px;font-weight:700;color:#1D5E3A;text-transform:uppercase;letter-spacing:.08em;border-bottom:1px solid #b0d8c0;padding-bottom:4px;margin-bottom:8px">${label}</div>
+      <table style="width:100%;border-collapse:collapse;font-size:9px">
+        <thead><tr style="background:#e8f5ee">${headers}</tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>`;
+  }
 
   // ── CALCULATE DAILY TOTALS ──
   const totalCoag=totalChem(entries.map(e=>e.coag_gpd||0));
@@ -3649,153 +3670,17 @@ function sysGenerateReport(){
     </div>
   </div>
 
-  <div style="margin-bottom:16px">
-    <div style="font-size:11px;font-weight:700;color:#1D5E3A;text-transform:uppercase;letter-spacing:.08em;border-bottom:1px solid #b0d8c0;padding-bottom:4px;margin-bottom:10px">All entries for ${dateLabel} — Table 1: Pit · Storage · Primary SAF · Blower</div>
-    <table style="width:100%;border-collapse:collapse;font-size:9px">
-      <thead>
-        <tr style="background:#e8f5ee">
-          <th style="padding:4px 5px;text-align:left;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">Time</th>
-          <th style="padding:4px 5px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">Pit gal</th>
-          <th style="padding:4px 5px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">T1 gal</th>
-          <th style="padding:4px 5px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">T2 gal</th>
-          <th style="padding:4px 5px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">St pH</th>
-          <th style="padding:4px 5px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">Neut pH</th>
-          <th style="padding:4px 5px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">Coag g/g</th>
-          <th style="padding:4px 5px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">Coag g/hr</th>
-          <th style="padding:4px 5px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">Floc g/g</th>
-          <th style="padding:4px 5px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">Floc g/hr</th>
-          <th style="padding:4px 5px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">Flow GPM</th>
-          <th style="padding:4px 5px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">SAF1 pH</th>
-          <th style="padding:4px 5px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">Sludge%</th>
-          <th style="padding:4px 5px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">Sludge gal</th>
-          <th style="padding:4px 5px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">Froth mV</th>
-          <th style="padding:4px 5px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">Froth g/hr</th>
-          <th style="padding:4px 5px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">Froth GPM</th>
-          <th style="padding:4px 5px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">Blower</th>
-          <th style="padding:4px 5px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">PSI</th>
-          <th style="padding:4px 5px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">Flt PSI</th>
-          <th style="padding:4px 5px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">Blwr °F</th>
-        </tr>
-      </thead>
-      <tbody>${logRows1}</tbody>
-    </table>
-  </div>
+  ${tbl('All entries — Table 1: Pit · Storage · Primary SAF pH & dosing',
+    thL('Time')+th('Pit gal')+th('T1 gal')+th('T2 gal')+th('St pH')+th('Neut pH')+th('SAF1 pH')+th('Coag g/g')+th('Coag g/hr')+th('Floc g/g')+th('Floc g/hr')+th('Flow GPM')+th('Inf PAA mg/L')+th('Peroxyscav mL/hr'),
+    logRows1)}
 
-  <div style="page-break-inside:avoid">
-    <div style="font-size:11px;font-weight:700;color:#1D5E3A;text-transform:uppercase;letter-spacing:.08em;border-bottom:1px solid #b0d8c0;padding-bottom:4px;margin-bottom:12px">Daily totals & averages — ${entries.length} entries × 2 hours</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:16px">
-      <div>
-        <div style="font-size:10px;font-weight:700;color:#1D5E3A;margin-bottom:8px;text-transform:uppercase">Chemical usage totals</div>
-        <table style="width:100%;border-collapse:collapse;font-size:12px">
-          ${pRow('Primary SAF coag (CI 38B)',fmt(totalCoag),'gal total')}
-          ${pRow('Primary SAF flocculant (EC 52)',fmt(totalFloc1),'gal total')}
-          ${pRow('Primary SAF froth (Flocaid AO1W)',fmt(totalFroth1),'gal total')}
-          ${pRow('Secondary SAF coag (CI 38B)',fmt(totalCoag2),'gal total')}
-          ${pRow('Secondary SAF flocculant (EC 52)',fmt(totalFloc2),'gal total')}
-          ${pRow('Secondary SAF froth (Flocaid AO1W)',fmt(totalFroth2),'gal total')}
-        </table>
-      </div>
-      <div>
-        <div style="font-size:10px;font-weight:700;color:#1D5E3A;margin-bottom:8px;text-transform:uppercase">pH averages</div>
-        <table style="width:100%;border-collapse:collapse;font-size:12px">
-          ${pRow('Storage',fmt(avgStoragePh),'')}
-          ${pRow('Neutralization tank',fmt(avgNeutPh),'')}
-          ${pRow('SAF1 effluent',fmt(avgSaf1EffPh),'')}
-          ${pRow('MBBR influent',fmt(avgMbbrInfPh),'')}
-          ${pRow('MBBR effluent',fmt(avgMbbrEffPh),'')}
-          ${pRow('SAF2 effluent',fmt(avgSaf2EffPh),'')}
-          ${pRow('City',fmt(avgCityPh),'')}
-        </table>
-      </div>
-      <div>
-        <div style="font-size:10px;font-weight:700;color:#1D5E3A;margin-bottom:8px;text-transform:uppercase">Process averages</div>
-        <table style="width:100%;border-collapse:collapse;font-size:12px">
-          ${pRow('SAF1 flow',fmt(avgSaf1Flow),'GPM avg')}
-          ${pRow('Outlet flow',fmt(avgOutFlow),'GPM avg')}
-          ${pRow('Parshall flume',fmt(avgFlume),'GPM avg')}
-          ${pRow('MBBR DO',fmt(avgDo),'mg/L avg')}
-          ${pRow('MBBR tank depth',fmt(avgMbbrDepth),'ft avg')}
-          ${pRow('MBBR tank volume',avgMbbrVol!==null?parseInt(avgMbbrVol).toLocaleString():'—','gal avg (2,756 gal/ft)')}
-          ${pRow('Sludge depth',fmt(avgSludgeDepth),'ft avg')}
-          ${pRow('Sludge volume',avgSludgeVol!==null?parseInt(avgSludgeVol).toLocaleString():'—','gal avg (max 12.5 ft = 7,960 gal)')}
-          ${pRow('Turbidity',fmt(avgTurb),'NTU avg')}
-        </table>
-      </div>
-    </div>
-    <div style="background:${city_ph_ok?'#c8edd8':'#f5c8c8'};border:2px solid ${city_ph_ok?'#1D9E75':'#A32D2D'};border-radius:8px;padding:12px;display:flex;align-items:center;gap:12px;margin-bottom:16px">
-      <div style="font-size:28px">${city_ph_ok?'✓':'!'}</div>
-      <div>
-        <div style="font-size:13px;font-weight:700;color:${city_ph_ok?'#0A4D2E':'#5A0000'}">City pH — ${city_ph_ok?'Within permit range':'Outside permit range'}</div>
-        <div style="font-size:11px;color:${city_ph_ok?'#1D5E3A':'#7A1F1F'};margin-top:2px">Average city pH: ${fmt(avgCityPh)} · Permit range: 6.5–9.5</div>
-      </div>
-    </div>
-    ${(()=>{
-      const last=entries.slice().reverse().find(e=>e.checklist_items&&e.checklist_items.length);
-      if(!last) return '';
-      const fails=last.checklist_items.filter(i=>i.state==='fail');
-      const oks=last.checklist_items.filter(i=>i.state==='ok');
-      return `<div style="margin-bottom:16px">
-        <div style="font-size:10px;font-weight:700;color:#1D5E3A;text-transform:uppercase;letter-spacing:.08em;border-bottom:1px solid #b0d8c0;padding-bottom:4px;margin-bottom:8px">Primary SAF inspection — last entry of day</div>
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:4px">
-          ${last.checklist_items.map(item=>`<div style="display:flex;align-items:center;gap:5px;padding:4px 6px;border-radius:6px;font-size:10px;background:${item.state==='ok'?'#c8edd8':item.state==='warn'?'#faeeda':item.state==='fail'?'#f5c8c8':'#f0f0f0'};color:${item.state==='ok'?'#0A4D2E':item.state==='warn'?'#5A3000':item.state==='fail'?'#5A0000':'#888'}"><span style="width:7px;height:7px;border-radius:50%;flex-shrink:0;display:inline-block;background:${item.state==='ok'?'#1D9E75':item.state==='warn'?'#BA7517':item.state==='fail'?'#A32D2D':'#ccc'}"></span>${item.label}</div>`).join('')}
-        </div>
-        ${fails.length?`<div style="margin-top:8px;padding:8px 10px;background:#f5c8c8;border-radius:6px;font-size:11px;color:#5A0000;font-weight:600">${fails.length} item${fails.length>1?'s':''} flagged: ${fails.map(f=>f.label).join(' · ')}</div>`:''}
-        ${last.checklist_comment?`<div style="margin-top:6px;padding:8px 10px;background:#f9f9f9;border:1px solid #ddd;border-radius:6px;font-size:11px;color:#333"><strong>Comment:</strong> ${last.checklist_comment}</div>`:''}
-      </div>`;
-    })()
-    }
-    ${(()=>{
-      const last2=entries.slice().reverse().find(e=>e.checklist2_items&&e.checklist2_items.length);
-      if(!last2) return '';
-      const fails2=last2.checklist2_items.filter(i=>i.state==='fail');
-      return `<div style="margin-bottom:16px">
-        <div style="font-size:10px;font-weight:700;color:#1D5E3A;text-transform:uppercase;letter-spacing:.08em;border-bottom:1px solid #b0d8c0;padding-bottom:4px;margin-bottom:8px">Secondary SAF inspection — last entry of day</div>
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:4px">
-          ${last2.checklist2_items.map(item=>`<div style="display:flex;align-items:center;gap:5px;padding:4px 6px;border-radius:6px;font-size:10px;background:${item.state==='ok'?'#c8edd8':item.state==='warn'?'#faeeda':item.state==='fail'?'#f5c8c8':'#f0f0f0'};color:${item.state==='ok'?'#0A4D2E':item.state==='warn'?'#5A3000':item.state==='fail'?'#5A0000':'#888'}"><span style="width:7px;height:7px;border-radius:50%;flex-shrink:0;display:inline-block;background:${item.state==='ok'?'#1D9E75':item.state==='warn'?'#BA7517':item.state==='fail'?'#A32D2D':'#ccc'}"></span>${item.label}</div>`).join('')}
-        </div>
-        ${fails2.length?`<div style="margin-top:8px;padding:8px 10px;background:#f5c8c8;border-radius:6px;font-size:11px;color:#5A0000;font-weight:600">${fails2.length} item${fails2.length>1?'s':''} flagged: ${fails2.map(f=>f.label).join(' · ')}</div>`:''}
-        ${last2.checklist2_comment?`<div style="margin-top:6px;padding:8px 10px;background:#f9f9f9;border:1px solid #ddd;border-radius:6px;font-size:11px;color:#333"><strong>Comment:</strong> ${last2.checklist2_comment}</div>`:''}
-      </div>`;
-    })()}
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:30px;margin-top:24px">
-      <div><div style="border-top:1px solid #555;padding-top:6px;font-size:11px;color:#555">Operator signature</div></div>
-      <div><div style="border-top:1px solid #555;padding-top:6px;font-size:11px;color:#555">Supervisor review</div></div>
-      <div><div style="border-top:1px solid #555;padding-top:6px;font-size:11px;color:#555">Date verified</div></div>
-    </div>
-  </div>
+  ${tbl('All entries — Table 2: SAF1 sludge & froth · Blower · MBBR',
+    thL('Time')+th('Sludge%')+th('Sludge gal')+th('Froth mV')+th('Froth g/hr')+th('Froth GPM')+th('Blower')+th('PSI')+th('Flt PSI')+th('Blwr °F')+th('MBBR in')+th('MBBR out')+th('DO')+th('Depth ft')+th('Eff GPM')+th('Sludge ft'),
+    logRows2)}
 
-  <div class="table2-landscape" style="page-break-before:always;margin-bottom:24px">
-    <div style="font-size:11px;font-weight:700;color:#1D5E3A;text-transform:uppercase;letter-spacing:.08em;border-bottom:1px solid #b0d8c0;padding-bottom:4px;margin-bottom:10px">All entries for ${dateLabel} — Table 2: MBBR · Secondary SAF · Discharge</div>
-    <table style="width:100%;border-collapse:collapse;font-size:9px">
-      <thead>
-        <tr style="background:#e8f5ee">
-          <th style="padding:4px 5px;text-align:left;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">Time</th>
-          <th style="padding:4px 5px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">MBBR in</th>
-          <th style="padding:4px 5px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">MBBR out</th>
-          <th style="padding:4px 5px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">DO</th>
-          <th style="padding:4px 5px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">Depth ft</th>
-          <th style="padding:4px 5px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">Sludge ft</th>
-          <th style="padding:4px 5px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">Coag2%</th>
-          <th style="padding:4px 5px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">Coag2 GPH</th>
-          <th style="padding:4px 5px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">Floc2%</th>
-          <th style="padding:4px 5px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">Floc2 g/hr</th>
-          <th style="padding:4px 5px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">Froth2 mV</th>
-          <th style="padding:4px 5px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">Froth2 g/hr</th>
-          <th style="padding:4px 5px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">Froth2 GPM</th>
-          <th style="padding:4px 5px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">Poly tube</th>
-          <th style="padding:4px 5px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">Poly lines</th>
-          <th style="padding:4px 5px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">Injectors</th>
-          <th style="padding:4px 5px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">SAF2 pH</th>
-          <th style="padding:4px 5px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">Turb NTU</th>
-          <th style="padding:4px 5px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">SAF2 GPM</th>
-          <th style="padding:4px 5px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">City pH</th>
-          <th style="padding:4px 5px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">Out GPM</th>
-          <th style="padding:4px 5px;color:#1D5E3A;border-bottom:2px solid #1D9E75;white-space:nowrap">Flume GPM</th>
-        </tr>
-      </thead>
-      <tbody>${logRows2}</tbody>
-    </table>
-  </div>`;
+  ${tbl('All entries — Table 3: Secondary SAF · Final discharge',
+    thL('Time')+th('Coag2%')+th('Coag2 GPH')+th('Floc2%')+th('Floc2 g/hr')+th('Froth2 mV')+th('Froth2 g/hr')+th('Froth2 GPM')+th('Poly tube')+th('Poly lines')+th('Injectors')+th('SAF2 pH')+th('Turb NTU')+th('SAF2 GPM')+th('City pH')+th('Out GPM')+th('Flume GPM'),
+    logRows3)}`;
 
   document.getElementById('pdf-content').innerHTML=overlayContent;
   document.getElementById('pdf-overlay').style.display='block';
@@ -3856,34 +3741,6 @@ function predConfidence(r2,n){
   if(r2<0.85) return 'Good confidence';
   return 'High confidence';
 }
-
-function predTrendDir(slope,unit){
-  if(Math.abs(slope)<1e-10) return 'Stable';
-  const abs=Math.abs(slope);
-  let rate;
-  if(abs<0.001) rate='very slowly';
-  else if(abs<0.01) rate='slowly';
-  else if(abs<0.1) rate='moderately';
-  else rate='rapidly';
-  return (slope>0?'Rising ':'Falling ')+rate+' ('+slope.toFixed(4)+' '+unit+'/hr)';
-}
-
-function predCard(title, icon, valueStr, valueClass, detail, trend, cardClass){
-  return`<div class="pred-card ${cardClass||''}">
-    <div class="pred-title">${icon} ${title}</div>
-    <div class="pred-value ${valueClass}">${valueStr}</div>
-    <div class="pred-detail">${detail}</div>
-    ${trend?`<div class="pred-trend">${trend}</div>`:''}
-  </div>`;
-}
-
-function predNoData(title, icon, msg){
-  return`<div class="pred-card pred-info">
-    <div class="pred-title">${icon} ${title}</div>
-    <div class="pred-no-data">${msg||'Not enough data yet — need at least 2 log entries to predict.'}</div>
-  </div>`;
-}
-
 
 function predInit(){
   if(document.getElementById('pred-content'))
