@@ -1217,6 +1217,7 @@ mark.sop-highlight{background:rgba(239,159,39,.4);border-radius:2px;color:inheri
     <div class="card" style="margin-bottom:12px">
       <div class="field-group">
         <div class="field" style="grid-column:span 2"><label>Date & time</label><input type="datetime-local" id="sys_timestamp" style="width:100%;padding:11px 12px;border:1px solid var(--border);border-radius:10px;background:var(--bg3);color:var(--text);font-size:15px"></div>
+        <div class="field"><label>Operator initials</label><input type="text" id="sys_operator_initials" maxlength="6" placeholder="e.g. JD" style="text-transform:uppercase;letter-spacing:.1em;font-weight:700;font-size:16px"></div>
       </div>
     </div>
 
@@ -3143,7 +3144,11 @@ function exportPDF(){
 
     // ── SIGNATURE LINE ──
     content+=`
-      <div style="margin-top:8px;display:grid;grid-template-columns:1fr 1fr;gap:40px">
+      <div style="display:grid;grid-template-columns:auto 1fr 1fr;gap:20px;align-items:end;margin-top:8px">
+        <div>
+          <div style="font-size:11px;color:#555;margin-bottom:4px">Operator initials</div>
+          <div style="width:60px;height:36px;border:1px solid #555;border-radius:4px"></div>
+        </div>
         <div>
           <div style="border-top:1px solid #555;padding-top:6px;font-size:11px;color:#555">Operator signature</div>
         </div>
@@ -3559,6 +3564,7 @@ function sysGenerateReport(){
     // Table 1: Time · Pit/Storage · Primary SAF pH & dosing
     logRows1+=`<tr style="${bg}">
       <td style="padding:4px 5px;white-space:nowrap;font-weight:600;color:#1D5E3A">${t}</td>
+      <td style="padding:4px 5px;font-weight:700;color:#0F6E56">${e.operator_initials||'—'}</td>
       <td style="padding:4px 5px">${e.pit_vol||'—'}</td>
       <td style="padding:4px 5px">${e.tank1_vol||'—'}</td>
       <td style="padding:4px 5px">${e.tank2_vol||'—'}</td>
@@ -3667,11 +3673,12 @@ function sysGenerateReport(){
     <div style="text-align:right">
       <div style="font-size:13px;font-weight:600;color:#111">${dateLabel}</div>
       <div style="font-size:11px;color:#888;margin-top:2px">${entries.length} entries · Generated ${new Date().toLocaleString()}</div>
+      ${entries.some(e=>e.operator_initials)?`<div style="margin-top:4px;font-size:12px;color:#555">Operators: <strong>${[...new Set(entries.map(e=>e.operator_initials).filter(Boolean))].join(', ')}</strong></div>`:''}
     </div>
   </div>
 
   ${tbl('All entries — Table 1: Pit · Storage · Primary SAF pH & dosing',
-    thL('Time')+th('Pit gal')+th('T1 gal')+th('T2 gal')+th('St pH')+th('Neut pH')+th('SAF1 pH')+th('Coag g/g')+th('Coag g/hr')+th('Floc g/g')+th('Floc g/hr')+th('Flow GPM')+th('Inf PAA mg/L')+th('Peroxyscav mL/hr'),
+    thL('Time')+th('Init.')+th('Pit gal')+th('T1 gal')+th('T2 gal')+th('St pH')+th('Neut pH')+th('SAF1 pH')+th('Coag g/g')+th('Coag g/hr')+th('Floc g/g')+th('Floc g/hr')+th('Flow GPM')+th('Inf PAA mg/L')+th('Peroxyscav mL/hr'),
     logRows1)}
 
   ${tbl('All entries — Table 2: SAF1 sludge & froth · Blower · MBBR',
@@ -3680,7 +3687,91 @@ function sysGenerateReport(){
 
   ${tbl('All entries — Table 3: Secondary SAF · Final discharge',
     thL('Time')+th('Coag2%')+th('Coag2 GPH')+th('Floc2%')+th('Floc2 g/hr')+th('Froth2 mV')+th('Froth2 g/hr')+th('Froth2 GPM')+th('Poly tube')+th('Poly lines')+th('Injectors')+th('SAF2 pH')+th('Turb NTU')+th('SAF2 GPM')+th('City pH')+th('Out GPM')+th('Flume GPM'),
-    logRows3)}`;
+    logRows3)}
+
+  <div style="page-break-before:always">
+    <div style="font-size:11px;font-weight:700;color:#1D5E3A;text-transform:uppercase;letter-spacing:.08em;border-bottom:1px solid #b0d8c0;padding-bottom:4px;margin-bottom:12px">Daily totals & averages — ${entries.length} entries × 2 hours</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:16px">
+      <div>
+        <div style="font-size:10px;font-weight:700;color:#1D5E3A;margin-bottom:8px;text-transform:uppercase">Chemical usage totals</div>
+        <table style="width:100%;border-collapse:collapse;font-size:12px">
+          ${pRow('Primary SAF coag (CI 38B)',fmt(totalCoag),'gal total')}
+          ${pRow('Primary SAF flocculant (EC 52)',fmt(totalFloc1),'gal total')}
+          ${pRow('Primary SAF froth (Flocaid AO1W)',fmt(totalFroth1),'gal total')}
+          ${pRow('Secondary SAF coag (CI 38B)',fmt(totalCoag2),'gal total')}
+          ${pRow('Secondary SAF flocculant (EC 52)',fmt(totalFloc2),'gal total')}
+          ${pRow('Secondary SAF froth (Flocaid AO1W)',fmt(totalFroth2),'gal total')}
+        </table>
+      </div>
+      <div>
+        <div style="font-size:10px;font-weight:700;color:#1D5E3A;margin-bottom:8px;text-transform:uppercase">pH averages</div>
+        <table style="width:100%;border-collapse:collapse;font-size:12px">
+          ${pRow('Storage',fmt(avgStoragePh),'')}
+          ${pRow('Neutralization tank',fmt(avgNeutPh),'')}
+          ${pRow('SAF1 effluent',fmt(avgSaf1EffPh),'')}
+          ${pRow('MBBR influent',fmt(avgMbbrInfPh),'')}
+          ${pRow('MBBR effluent',fmt(avgMbbrEffPh),'')}
+          ${pRow('SAF2 effluent',fmt(avgSaf2EffPh),'')}
+          ${pRow('City',fmt(avgCityPh),'')}
+        </table>
+      </div>
+      <div>
+        <div style="font-size:10px;font-weight:700;color:#1D5E3A;margin-bottom:8px;text-transform:uppercase">Process averages</div>
+        <table style="width:100%;border-collapse:collapse;font-size:12px">
+          ${pRow('SAF1 flow',fmt(avgSaf1Flow),'GPM avg')}
+          ${pRow('Outlet flow',fmt(avgOutFlow),'GPM avg')}
+          ${pRow('Parshall flume',fmt(avgFlume),'GPM avg')}
+          ${pRow('MBBR DO',fmt(avgDo),'mg/L avg')}
+          ${pRow('MBBR tank depth',fmt(avgMbbrDepth),'ft avg')}
+          ${pRow('MBBR tank volume',avgMbbrVol!==null?parseInt(avgMbbrVol).toLocaleString():'—','gal avg')}
+          ${pRow('Sludge depth',fmt(avgSludgeDepth),'ft avg')}
+          ${pRow('Turbidity',fmt(avgTurb),'NTU avg')}
+        </table>
+      </div>
+    </div>
+    <div style="background:${city_ph_ok?'#c8edd8':'#f5c8c8'};border:2px solid ${city_ph_ok?'#1D9E75':'#A32D2D'};border-radius:8px;padding:10px 12px;display:flex;align-items:center;gap:12px;margin-bottom:12px">
+      <div style="font-size:24px">${city_ph_ok?'✓':'!'}</div>
+      <div>
+        <div style="font-size:13px;font-weight:700;color:${city_ph_ok?'#0A4D2E':'#5A0000'}">City pH — ${city_ph_ok?'Within permit range':'Outside permit range'}</div>
+        <div style="font-size:11px;color:${city_ph_ok?'#1D5E3A':'#7A1F1F'};margin-top:2px">Average city pH: ${fmt(avgCityPh)} · Permit range: 6.5–9.5</div>
+      </div>
+    </div>
+    ${(()=>{
+      const last=entries.slice().reverse().find(e=>e.checklist_items&&e.checklist_items.length);
+      if(!last) return '';
+      const fails=last.checklist_items.filter(i=>i.state==='fail');
+      return `<div style="margin-bottom:12px">
+        <div style="font-size:10px;font-weight:700;color:#1D5E3A;text-transform:uppercase;letter-spacing:.08em;border-bottom:1px solid #b0d8c0;padding-bottom:4px;margin-bottom:8px">Primary SAF inspection — last entry of day</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:4px">
+          ${last.checklist_items.map(item=>`<div style="display:flex;align-items:center;gap:5px;padding:4px 6px;border-radius:6px;font-size:10px;background:${item.state==='ok'?'#c8edd8':item.state==='warn'?'#faeeda':item.state==='fail'?'#f5c8c8':'#f0f0f0'};color:${item.state==='ok'?'#0A4D2E':item.state==='warn'?'#5A3000':item.state==='fail'?'#5A0000':'#888'}"><span style="width:7px;height:7px;border-radius:50%;flex-shrink:0;display:inline-block;background:${item.state==='ok'?'#1D9E75':item.state==='warn'?'#BA7517':item.state==='fail'?'#A32D2D':'#ccc'}"></span>${item.label}</div>`).join('')}
+        </div>
+        ${fails.length?`<div style="margin-top:6px;padding:6px 10px;background:#f5c8c8;border-radius:6px;font-size:11px;color:#5A0000;font-weight:600">${fails.length} item${fails.length>1?'s':''} flagged: ${fails.map(f=>f.label).join(' · ')}</div>`:''}
+        ${last.checklist_comment?`<div style="margin-top:4px;padding:6px 10px;background:#f9f9f9;border:1px solid #ddd;border-radius:6px;font-size:11px;color:#333"><strong>Comment:</strong> ${last.checklist_comment}</div>`:''}
+      </div>`;
+    })()}
+    ${(()=>{
+      const last2=entries.slice().reverse().find(e=>e.checklist2_items&&e.checklist2_items.length);
+      if(!last2) return '';
+      const fails2=last2.checklist2_items.filter(i=>i.state==='fail');
+      return `<div style="margin-bottom:12px">
+        <div style="font-size:10px;font-weight:700;color:#1D5E3A;text-transform:uppercase;letter-spacing:.08em;border-bottom:1px solid #b0d8c0;padding-bottom:4px;margin-bottom:8px">Secondary SAF inspection — last entry of day</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:4px">
+          ${last2.checklist2_items.map(item=>`<div style="display:flex;align-items:center;gap:5px;padding:4px 6px;border-radius:6px;font-size:10px;background:${item.state==='ok'?'#c8edd8':item.state==='warn'?'#faeeda':item.state==='fail'?'#f5c8c8':'#f0f0f0'};color:${item.state==='ok'?'#0A4D2E':item.state==='warn'?'#5A3000':item.state==='fail'?'#5A0000':'#888'}"><span style="width:7px;height:7px;border-radius:50%;flex-shrink:0;display:inline-block;background:${item.state==='ok'?'#1D9E75':item.state==='warn'?'#BA7517':item.state==='fail'?'#A32D2D':'#ccc'}"></span>${item.label}</div>`).join('')}
+        </div>
+        ${fails2.length?`<div style="margin-top:6px;padding:6px 10px;background:#f5c8c8;border-radius:6px;font-size:11px;color:#5A0000;font-weight:600">${fails2.length} item${fails2.length>1?'s':''} flagged: ${fails2.map(f=>f.label).join(' · ')}</div>`:''}
+        ${last2.checklist2_comment?`<div style="margin-top:4px;padding:6px 10px;background:#f9f9f9;border:1px solid #ddd;border-radius:6px;font-size:11px;color:#333"><strong>Comment:</strong> ${last2.checklist2_comment}</div>`:''}
+      </div>`;
+    })()}
+    <div style="display:grid;grid-template-columns:auto 1fr 1fr 1fr;gap:20px;align-items:end;margin-top:20px">
+      <div>
+        <div style="font-size:11px;color:#555;margin-bottom:4px">Operator initials</div>
+        <div style="width:60px;height:36px;border:1px solid #555;border-radius:4px"></div>
+      </div>
+      <div><div style="border-top:1px solid #555;padding-top:6px;font-size:11px;color:#555">Operator signature</div></div>
+      <div><div style="border-top:1px solid #555;padding-top:6px;font-size:11px;color:#555">Supervisor review</div></div>
+      <div><div style="border-top:1px solid #555;padding-top:6px;font-size:11px;color:#555">Date verified</div></div>
+    </div>
+  </div>`;
 
   document.getElementById('pdf-content').innerHTML=overlayContent;
   document.getElementById('pdf-overlay').style.display='block';
@@ -4828,7 +4919,7 @@ function sysClearInputs(){
    'sys_neut_ph','sys_coag_dose','sys_floc1_dose','sys_saf1_flow','sys_saf1_eff_ph','sys_saf1_sludge_pct','sys_saf1_froth_gpm','sys_saf1_froth',
    'sys_mbbr_inf_ph','sys_mbbr_eff_ph','sys_mbbr_do','sys_mbbr_depth','sys_mbbr_eff_flow','sys_sludge_depth','sys_blower_psi','sys_blower_filter_psi','sys_blower_temp',
    'sys_floc2_pct','sys_coag2_pct','sys_saf2_froth','sys_saf2_eff_ph','sys_saf2_turb','sys_saf2_eff_flow','sys_saf2_poly_tube','sys_saf2_poly_lines','sys_saf2_froth_gpm',
-   'sys_out_flow','sys_city_ph','sys_flume_gpm','sys_paa_residual','sys_peroxyscav_mlhr'
+   'sys_out_flow','sys_city_ph','sys_flume_gpm','sys_paa_residual','sys_peroxyscav_mlhr','sys_operator_initials'
   ].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   document.getElementById('sys_floc2_gpd').textContent='—';
   sysResetChecklist();
@@ -4983,12 +5074,13 @@ function sysCalculate(){
 
 function sysSaveLog(){
   const ts=document.getElementById('sys_timestamp').value||new Date().toISOString();
+  const operator_initials=(document.getElementById('sys_operator_initials').value||'').toUpperCase().trim();
   const floc2_pct=sysGv('sys_floc2_pct');
   const chk=sysGetChecklistSummary();
   const chkComment=document.getElementById('sys_checklist_comment')?document.getElementById('sys_checklist_comment').value.trim():'';
   const chk2=sysGetChecklist2Summary();
   sysLog.push({
-    ts, label:new Date(ts).toLocaleString(),
+    ts, label:new Date(ts).toLocaleString(), operator_initials,
     checklist_ok:chk.ok, checklist_fail:chk.fail, checklist_unchecked:chk.unchecked,
     checklist_items:chk.items, checklist_comment:chkComment,
     checklist2_ok:chk2.ok, checklist2_fail:chk2.fail, checklist2_items:chk2.items,
@@ -5058,6 +5150,7 @@ function sysLoadEntry(i){
   const e=sysLog[i]; if(!e)return;
   const set=(id,v)=>{const el=document.getElementById(id);if(el)el.value=v||'';};
   set('sys_timestamp',e.ts);
+  const initEl=document.getElementById('sys_operator_initials');if(initEl)initEl.value=e.operator_initials||'';
   set('sys_pit_vol',e.pit_vol); set('sys_tank1_vol',e.tank1_vol); set('sys_tank2_vol',e.tank2_vol);
   set('sys_storage_ph',e.storage_ph);
   set('sys_neut_ph',e.neut_ph); set('sys_coag_dose',e.coag_dose?e.coag_dose.toFixed(6):'');
