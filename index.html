@@ -2451,9 +2451,13 @@ function saveToLog(){
   const ebl=lbs(effBOD.val,flow),ph=gv('eff_ph');
   logData.push({
     date:new Date().toLocaleString(),flow,
-    eff_nh3:gv('eff_nh3'),eff_no3:gv('eff_no3'),
+    eff_nh3:gv('eff_nh3'),eff_no2:gv('eff_no2'),eff_no3:gv('eff_no3'),eff_tkn:gv('eff_tkn'),
+    inf_nh3:gv('inf_nh3'),inf_no2:gv('inf_no2'),inf_no3:gv('inf_no3'),inf_tkn:gv('inf_tkn'),
     inf_cod:gv('inf_cod'),eff_cod:gv('eff_cod'),eff_bod:effBOD.val,eff_ph:ph,
-    inf_tss:gv('inf_tss'),eff_tss:gv('eff_tss'),alk:gv('eff_alk'),imhoff:gv('imhoff'),
+    eff_do:gv('eff_do'),temp:gv('temp'),
+    eff_alk:gv('eff_alk'),eff_p:gv('eff_p'),vol_acids:gv('vol_acids'),
+    inf_tss:gv('inf_tss'),eff_tss:gv('eff_tss'),inf_vss:gv('inf_vss'),eff_vss:gv('eff_vss'),
+    alk:gv('eff_alk'),imhoff:gv('imhoff'),
     nh3_lbs:lbs(gv('inf_nh3'),flow),no3_lbs:lbs(gv('eff_no3'),flow),
     bod_lbs:ebl,tss_rem:pct(gv('inf_tss'),gv('eff_tss')),
     bod_pass:ebl<=BOD_DAILY,ph_pass:ph>=PH_LO&&ph<=PH_HI&&ph>0
@@ -2637,21 +2641,36 @@ function renderLog(){
 function loadMbbrEntry(i){
   const e=logData[i];
   if(!e) return;
-  const set=(id,v)=>{const el=document.getElementById(id);if(el)el.value=v||'';};
+  const set=(id,v)=>{const el=document.getElementById(id);if(el)el.value=(v!==undefined&&v!==null&&v!=='')?v:'';};
   // Flow
   set('flow_mgd', e.flow);
   sv('flow_gpd', e.flow ? +(e.flow*1e6).toFixed(0) : '');
-  // Nitrogen
-  set('eff_nh3', e.eff_nh3); sv('inf_nh3', e.eff_nh3);
-  set('eff_no3', e.eff_no3); sv('inf_no3', e.eff_no3);
+  // Effluent nitrogen
+  set('eff_nh3', e.eff_nh3); sv('inf_nh3', e.eff_nh3||e.inf_nh3||'');
+  set('eff_no2', e.eff_no2); sv('inf_no2', e.inf_no2||e.eff_no2||'');
+  set('eff_no3', e.eff_no3); sv('inf_no3', e.inf_no3||e.eff_no3||'');
+  set('eff_tkn', e.eff_tkn); sv('inf_tkn', e.inf_tkn||e.eff_tkn||'');
+  // Influent nitrogen
+  set('inf_nh3', e.inf_nh3||e.eff_nh3||'');
+  set('inf_no2', e.inf_no2||'');
+  set('inf_no3', e.inf_no3||'');
+  set('inf_tkn', e.inf_tkn||'');
   // COD
   set('inf_cod', e.inf_cod);
   set('eff_cod', e.eff_cod);
   // Chemistry
-  set('eff_ph', e.eff_ph);   sv('inf_ph', e.eff_ph);
-  set('eff_alk', e.alk);     sv('inf_alk', e.alk);
+  set('eff_ph', e.eff_ph);   sv('inf_ph', e.eff_ph||'');
+  set('eff_alk', e.eff_alk||e.alk||''); sv('inf_alk', e.eff_alk||e.alk||'');
+  set('eff_p', e.eff_p);
+  set('vol_acids', e.vol_acids);
+  // DO & Temp
+  set('eff_do', e.eff_do);
+  set('temp', e.temp);
   // Solids
-  set('eff_tss', e.eff_tss); sv('inf_tss', e.eff_tss);
+  set('inf_tss', e.inf_tss); sv('inf_tss', e.inf_tss||'');
+  set('eff_tss', e.eff_tss); sv('eff_tss', e.eff_tss||'');
+  set('inf_vss', e.inf_vss);
+  set('eff_vss', e.eff_vss);
   set('imhoff', e.imhoff);
   // Switch to input tab and recalculate
   showTab('input');
@@ -4999,7 +5018,7 @@ function sysSaveLog(){
     floc1_dose:sysGv('sys_floc1_dose'), floc1_gpd:sysGv('sys_saf1_flow')>0&&sysGv('sys_floc1_dose')>0?+(sysGv('sys_floc1_dose')*sysGv('sys_saf1_flow')*60).toFixed(4):0,
     saf1_flow:sysGv('sys_saf1_flow'), saf1_eff_ph:sysGv('sys_saf1_eff_ph'),
     saf1_sludge_pct:sysGv('sys_saf1_sludge_pct'), saf1_sludge_gal:+(2700*sysGv('sys_saf1_sludge_pct')/100).toFixed(1),
-    saf1_froth:sysGv('sys_saf1_froth'), saf1_froth_mv:sysGv('sys_saf1_froth'), saf1_froth_gpd:sysGv('sys_saf1_froth')>=4?+((sysGv('sys_saf1_froth')-4)*1.0625).toFixed(4):0, saf1_froth_gph:sysGv('sys_saf1_froth')>=4?+((sysGv('sys_saf1_froth')-4)*1.0625/24).toFixed(4):0,
+    saf1_froth:sysGv('sys_saf1_froth'), saf1_froth_mv:sysGv('sys_saf1_froth'), saf1_froth_gpd:sysGv('sys_saf1_froth')>=4?+((sysGv('sys_saf1_froth')-4)*1.0625).toFixed(4):0, saf1_froth_gph:sysGv('sys_saf1_froth')>=4?+((sysGv('sys_saf1_froth')-4)*1.0625/24).toFixed(4):0, saf1_froth_gpm:sysGv('sys_saf1_froth_gpm'),
     mbbr_inf_ph:sysGv('sys_mbbr_inf_ph'), mbbr_eff_ph:sysGv('sys_mbbr_eff_ph'),
     blower_id:document.getElementById('sys_blower_id')?document.getElementById('sys_blower_id').value:'',
     blower_psi:sysGv('sys_blower_psi'), blower_filter_psi:parseFloat(document.getElementById('sys_blower_filter_psi').value)||0, blower_temp:sysGv('sys_blower_temp'),
@@ -5075,8 +5094,10 @@ function sysLoadEntry(i){
   const ta=document.getElementById('sys_checklist_comment');
   if(ta) ta.value=e.checklist_comment||'';
   set('sys_blower_psi',e.blower_psi); set('sys_blower_filter_psi',e.blower_filter_psi); set('sys_blower_temp',e.blower_temp);
+  const blSel=document.getElementById('sys_blower_id');if(blSel)blSel.value=e.blower_id||'';
   set('sys_mbbr_inf_ph',e.mbbr_inf_ph); set('sys_mbbr_eff_ph',e.mbbr_eff_ph);
-  set('sys_mbbr_do',e.mbbr_do); set('sys_mbbr_depth',e.mbbr_depth); sysCalcMbbrVol(); set('sys_sludge_depth',e.sludge_depth);
+  set('sys_mbbr_do',e.mbbr_do); set('sys_mbbr_depth',e.mbbr_depth); sysCalcMbbrVol();
+  set('sys_mbbr_eff_flow',e.mbbr_eff_flow); set('sys_sludge_depth',e.sludge_depth);
   set('sys_floc2_pct',e.floc2_pct); set('sys_coag2_pct',e.coag2_pct); sysCalcFloc2(); sysCalcCoag2(); sysCalcPrimarySAF();
   set('sys_saf2_froth',e.saf2_froth); sysCalcFroth2(); set('sys_saf2_froth_gpm',e.saf2_froth_gpm); set('sys_saf2_eff_ph',e.saf2_eff_ph); set('sys_saf2_turb',e.saf2_turb); set('sys_saf2_eff_flow',e.saf2_eff_flow);
   set('sys_saf2_poly_tube',e.saf2_poly_tube); set('sys_saf2_poly_lines',e.saf2_poly_lines);
