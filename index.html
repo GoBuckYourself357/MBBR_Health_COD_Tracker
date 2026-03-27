@@ -685,9 +685,8 @@ mark.sop-highlight{background:rgba(239,159,39,.4);border-radius:2px;color:inheri
     <div class="card">
       <div class="card-title">PAA — peracetic acid</div>
 
-      <div style="font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Step 1 — influent titration</div>
       <div class="field-group">
-        <div class="field"><label>PAA residual titrated (mg/L)</label><input type="number" id="paa_residual" value="" placeholder="0.00" step="0.01" min="0" oninput="calcDiag()"></div>
+        <div class="field"><label>PAA residual (mg/L)</label><input type="number" id="paa_residual" value="" placeholder="0.00" step="0.01" min="0" oninput="calcDiag()"></div>
         <div class="field"><label>Flow at dosing point (GPM)</label><input type="number" id="paa_gpm" value="130" step="1" min="0" oninput="calcDiag()"></div>
       </div>
       <div class="field-group cols1">
@@ -701,15 +700,13 @@ mark.sop-highlight{background:rgba(239,159,39,.4);border-radius:2px;color:inheri
         </div>
       </div>
 
-      <div style="height:0.5px;background:var(--border);margin:12px 0 10px"></div>
-      <div style="font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Step 2 — suggested neutralizer dose</div>
       <div id="paa-result"></div>
 
       <div style="height:0.5px;background:var(--border);margin:12px 0 10px"></div>
-      <div style="font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Step 3 — neutralizer pump setting → residual after treatment</div>
+      <div style="font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Current pump setting → residual check</div>
       <div class="field-group">
-        <div class="field"><label>Neutralizer pump output (mL/hr)</label><input type="number" id="paa_pump_ml_min" value="" placeholder="0.00" step="0.1" min="0" oninput="calcNeutResidual('paa')"></div>
-        <div class="field"><label>Neutralizer stock conc (mg/L)</label><input type="number" id="paa_stock_conc" value="300000" step="1" min="1" oninput="calcNeutResidual('paa')"></div>
+        <div class="field"><label>Pump output (mL/hr)</label><input type="number" id="paa_pump_ml_min" value="" placeholder="0.00" step="0.1" min="0" oninput="calcNeutResidual('paa')"></div>
+        <div class="field"><label>Stock concentration (mg/L)</label><input type="number" id="paa_stock_conc" value="300000" step="1" min="1" oninput="calcNeutResidual('paa')"></div>
       </div>
       <div id="paa-pump-result"></div>
     </div>
@@ -717,9 +714,8 @@ mark.sop-highlight{background:rgba(239,159,39,.4);border-radius:2px;color:inheri
     <div class="card">
       <div class="card-title">Chlorine</div>
 
-      <div style="font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Step 1 — influent titration</div>
       <div class="field-group">
-        <div class="field"><label>Cl₂ residual titrated (mg/L)</label><input type="number" id="cl2_residual" value="" placeholder="0.00" step="0.01" min="0" oninput="calcDiag()"></div>
+        <div class="field"><label>Cl₂ residual (mg/L)</label><input type="number" id="cl2_residual" value="" placeholder="0.00" step="0.01" min="0" oninput="calcDiag()"></div>
         <div class="field"><label>Flow at dosing point (GPM)</label><input type="number" id="cl2_gpm" value="130" step="1" min="0" oninput="calcDiag()"></div>
       </div>
       <div class="field-group cols1">
@@ -733,15 +729,13 @@ mark.sop-highlight{background:rgba(239,159,39,.4);border-radius:2px;color:inheri
         </div>
       </div>
 
-      <div style="height:0.5px;background:var(--border);margin:12px 0 10px"></div>
-      <div style="font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Step 2 — suggested neutralizer dose</div>
       <div id="cl2-result"></div>
 
       <div style="height:0.5px;background:var(--border);margin:12px 0 10px"></div>
-      <div style="font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Step 3 — neutralizer pump setting → residual after treatment</div>
+      <div style="font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Current pump setting → residual check</div>
       <div class="field-group">
-        <div class="field"><label>Neutralizer pump output (mL/hr)</label><input type="number" id="cl2_pump_ml_min" value="" placeholder="0.00" step="0.1" min="0" oninput="calcNeutResidual('cl2')"></div>
-        <div class="field"><label>Neutralizer stock conc (mg/L)</label><input type="number" id="cl2_stock_conc" value="300000" step="1" min="1" oninput="calcNeutResidual('cl2')"></div>
+        <div class="field"><label>Pump output (mL/hr)</label><input type="number" id="cl2_pump_ml_min" value="" placeholder="0.00" step="0.1" min="0" oninput="calcNeutResidual('cl2')"></div>
+        <div class="field"><label>Stock concentration (mg/L)</label><input type="number" id="cl2_stock_conc" value="300000" step="1" min="1" oninput="calcNeutResidual('cl2')"></div>
       </div>
       <div id="cl2-pump-result"></div>
     </div>
@@ -1757,16 +1751,18 @@ function calcDiag(){
 
   function neutCalc(residual, gpm, agent){
     const ratio=neutRatios[agent]||0;
-    const neut_conc_mgL=+(residual*ratio).toFixed(2);                        // mg/L neutralizer needed in stream
-    const flow_gpd=gpm*1440;                                                  // GPD
+    const neut_conc_mgL=+(residual*ratio).toFixed(2);                          // mg/L neutralizer needed in stream
+    const flow_gpd=gpm*1440;                                                    // GPD
     const flow_mgd=flow_gpd/1e6;
-    const neut_lbs_day=+(neut_conc_mgL*flow_mgd*8.34).toFixed(2);           // lbs/day
-    const neut_lbs_min=+(neut_lbs_day/1440).toFixed(4);                      // lbs/min
-    const neut_oz_min=+(neut_lbs_min*16).toFixed(2);                         // oz/min
-    // mL of stock per L of stream: (mg/L needed) / (mg/L stock ÷ 1000 = mg/mL)
+    const neut_lbs_day=+(neut_conc_mgL*flow_mgd*8.34).toFixed(2);             // lbs/day
+    const neut_lbs_min=+(neut_lbs_day/1440).toFixed(4);                        // lbs/min
+    const neut_oz_min=+(neut_lbs_min*16).toFixed(2);                           // oz/min
     const stockConc=neutStockMgPerMl[agent]||1000;
-    const neut_mL_per_L=+(neut_conc_mgL/(stockConc/1000)).toFixed(4);       // mL stock / L stream
-    return{ratio,neut_conc_mgL,flow_gpd,flow_mgd,neut_lbs_day,neut_lbs_min,neut_oz_min,neut_mL_per_L,stockConc};
+    const neut_mL_per_L=+(neut_conc_mgL/(stockConc/1000)).toFixed(4);         // mL stock / L stream
+    // mL/hr: stream flow in L/min × mL/L × 60 min/hr
+    const flow_L_per_min=gpm*3.78541;
+    const neut_mL_hr=+(neut_mL_per_L*flow_L_per_min*60).toFixed(1);           // mL/hr pump setting
+    return{ratio,neut_conc_mgL,flow_gpd,flow_mgd,neut_lbs_day,neut_lbs_min,neut_oz_min,neut_mL_per_L,neut_mL_hr,stockConc};
   }
 
   // PAA ASSESSMENT
@@ -1776,15 +1772,13 @@ function calcDiag(){
   const paaCls=['b-ok','b-warn','b-warn','b-bad'];
   const pN=neutCalc(paa_res,paa_gpm,paa_neutralizer);
   document.getElementById('paa-result').innerHTML=
-    rr('PAA residual tested',paa_res,'mg/L',badge(paaLabels[paaSeverity],paaCls[paaSeverity]))+
-    rr('Flow at dosing point',paa_gpm+' GPM','→ '+(pN.flow_gpd.toLocaleString())+' GPD')+
+    rr('PAA residual',paa_res,'mg/L',badge(paaLabels[paaSeverity],paaCls[paaSeverity]))+
+    rr('Flow',paa_gpm+' GPM','→ '+(pN.flow_gpd.toLocaleString())+' GPD')+
     (paa_neutralizer!=='none'?
       '<div class="divider"></div>'+
+      `<div style="background:rgba(29,158,117,.12);border:1px solid rgba(29,158,117,.3);border-radius:8px;padding:8px 12px;margin:6px 0;display:flex;justify-content:space-between;align-items:center"><span style="font-size:12px;font-weight:600;color:var(--text)">→ Set pump to</span><span style="font-size:20px;font-weight:800;color:var(--green2)">${pN.neut_mL_hr} <span style="font-size:12px;font-weight:500;color:var(--text3)">mL/hr</span></span></div>`+
       rr('Neutralizer required',pN.neut_conc_mgL,'mg/L in stream')+
-      rr('',pN.neut_mL_per_L,'mL/L in stream ('+pN.stockConc+' mg/L stock)')+
-      rr('Neutralizer dose rate',pN.neut_lbs_day.toLocaleString(),'lbs/day')+
-      rr('',pN.neut_lbs_min,'lbs/min')+
-      rr('',pN.neut_oz_min,'oz/min')+
+      rr('',pN.neut_mL_per_L,'mL/L ('+pN.stockConc+' mg/L stock)')+
       rr('Stoichiometric ratio','1 mg/L PAA : '+pN.ratio+' mg/L '+neutNames[paa_neutralizer],'')
     :'<div class="alert a-warn" style="margin-top:8px">No neutralizer selected. Select an agent to calculate required dose.</div>')+
     (paa_res>0.5?'<div class="alert a-warn" style="margin-top:8px">PAA residual above 0.5 mg/L is inhibitory to AOB nitrifiers. Dose neutralizer upstream of MBBR and verify residual drops below 0.1 mg/L before contact.</div>':'')+
@@ -1798,15 +1792,13 @@ function calcDiag(){
   const cl2Cls=['b-ok','b-warn','b-warn','b-bad'];
   const cN=neutCalc(cl2_res,cl2_gpm,cl2_neutralizer);
   document.getElementById('cl2-result').innerHTML=
-    rr('Cl₂ residual tested',cl2_res,'mg/L',badge(cl2Labels[cl2Severity],cl2Cls[cl2Severity]))+
-    rr('Flow at dosing point',cl2_gpm+' GPM','→ '+(cN.flow_gpd.toLocaleString())+' GPD')+
+    rr('Cl₂ residual',cl2_res,'mg/L',badge(cl2Labels[cl2Severity],cl2Cls[cl2Severity]))+
+    rr('Flow',cl2_gpm+' GPM','→ '+(cN.flow_gpd.toLocaleString())+' GPD')+
     (cl2_neutralizer!=='none'?
       '<div class="divider"></div>'+
+      `<div style="background:rgba(29,158,117,.12);border:1px solid rgba(29,158,117,.3);border-radius:8px;padding:8px 12px;margin:6px 0;display:flex;justify-content:space-between;align-items:center"><span style="font-size:12px;font-weight:600;color:var(--text)">→ Set pump to</span><span style="font-size:20px;font-weight:800;color:var(--green2)">${cN.neut_mL_hr} <span style="font-size:12px;font-weight:500;color:var(--text3)">mL/hr</span></span></div>`+
       rr('Neutralizer required',cN.neut_conc_mgL,'mg/L in stream')+
-      rr('',cN.neut_mL_per_L,'mL/L in stream ('+cN.stockConc+' mg/L stock)')+
-      rr('Neutralizer dose rate',cN.neut_lbs_day.toLocaleString(),'lbs/day')+
-      rr('',cN.neut_lbs_min,'lbs/min')+
-      rr('',cN.neut_oz_min,'oz/min')+
+      rr('',cN.neut_mL_per_L,'mL/L ('+cN.stockConc+' mg/L stock)')+
       rr('Stoichiometric ratio','1 mg/L Cl₂ : '+cN.ratio+' mg/L '+neutNames[cl2_neutralizer],'')
     :'<div class="alert a-warn" style="margin-top:8px">No neutralizer selected. Select an agent to calculate required dose.</div>')+
     (cl2_res>0.1?'<div class="alert a-bad" style="margin-top:8px">Free chlorine above 0.1 mg/L is inhibitory to nitrifiers. Even brief exposures above 0.5 mg/L can cause significant AOB population loss. Neutralize upstream of MBBR.</div>':'')+
