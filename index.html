@@ -1290,6 +1290,7 @@ mark.sop-highlight{background:rgba(239,159,39,.4);border-radius:2px;color:inheri
         <div class="field"><label>Froth generator (mV)</label><input type="number" id="sys_saf1_froth" value="" step="0.1" min="4" placeholder="4.0" oninput="sysCalcFroth1()"></div>
         <div class="field"><label>Froth chemical (gal/hr)</label><div class="biodegrad-display" id="sys_saf1_froth_gpd">—</div></div>
         <div class="field"><label>Froth dosing rate (GPM)</label><input type="number" id="sys_saf1_froth_gpm" value="" step="0.01" min="0" placeholder="0.00"></div>
+        <div class="field"><label>PAA residual (mg/L)</label><input type="number" id="sys_paa_residual" value="" step="0.01" min="0" placeholder="0.00"></div>
       </div>
     </div>
 
@@ -1412,6 +1413,61 @@ mark.sop-highlight{background:rgba(239,159,39,.4);border-radius:2px;color:inheri
     <div class="card"><div class="chart-wrap" style="height:220px"><canvas id="sys-saf2-chart"></canvas></div></div>
   </div>
 
+  <!-- SYS: NEUT -->
+  <div class="panel" id="sys-panel-neut">
+    <div class="section-label">PAA — peracetic acid</div>
+    <div class="card" style="margin-bottom:12px">
+      <div class="field-group">
+        <div class="field"><label>PAA residual (mg/L)</label><input type="number" id="sys_neut_paa_res" value="" placeholder="0.00" step="0.01" min="0" oninput="sysCalcNeut('paa')"></div>
+        <div class="field"><label>Flow at dosing point (GPM)</label><input type="number" id="sys_neut_paa_gpm" value="130" step="1" min="0" oninput="sysCalcNeut('paa')"></div>
+      </div>
+      <div class="field-group cols1">
+        <div class="field"><label>Neutralization agent</label>
+          <select id="sys_neut_paa_agent" onchange="sysCalcNeut('paa')">
+            <option value="sodium_thiosulfate">Sodium thiosulfate</option>
+            <option value="sodium_bisulfite">Sodium bisulfite</option>
+            <option value="ascorbic_acid">Ascorbic acid</option>
+            <option value="none">None / not neutralized</option>
+          </select>
+        </div>
+      </div>
+      <div id="sys-neut-paa-result" style="margin-top:8px"></div>
+      <div style="height:0.5px;background:var(--border);margin:12px 0 10px"></div>
+      <div style="font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Current pump setting → residual check</div>
+      <div class="field-group">
+        <div class="field"><label>Pump output (mL/hr)</label><input type="number" id="sys_neut_paa_pump" value="" placeholder="0.00" step="0.1" min="0" oninput="sysCalcNeutResidual('paa')"></div>
+        <div class="field"><label>Stock concentration (mg/L)</label><input type="number" id="sys_neut_paa_stock" value="300000" step="1" min="1" oninput="sysCalcNeutResidual('paa')"></div>
+      </div>
+      <div id="sys-neut-paa-pump-result" style="margin-top:8px"></div>
+    </div>
+
+    <div class="section-label">Chlorine</div>
+    <div class="card" style="margin-bottom:12px">
+      <div class="field-group">
+        <div class="field"><label>Cl₂ residual (mg/L)</label><input type="number" id="sys_neut_cl2_res" value="" placeholder="0.00" step="0.01" min="0" oninput="sysCalcNeut('cl2')"></div>
+        <div class="field"><label>Flow at dosing point (GPM)</label><input type="number" id="sys_neut_cl2_gpm" value="130" step="1" min="0" oninput="sysCalcNeut('cl2')"></div>
+      </div>
+      <div class="field-group cols1">
+        <div class="field"><label>Neutralization agent</label>
+          <select id="sys_neut_cl2_agent" onchange="sysCalcNeut('cl2')">
+            <option value="sodium_thiosulfate">Sodium thiosulfate</option>
+            <option value="sodium_bisulfite">Sodium bisulfite</option>
+            <option value="ascorbic_acid">Ascorbic acid</option>
+            <option value="none">None / not neutralized</option>
+          </select>
+        </div>
+      </div>
+      <div id="sys-neut-cl2-result" style="margin-top:8px"></div>
+      <div style="height:0.5px;background:var(--border);margin:12px 0 10px"></div>
+      <div style="font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Current pump setting → residual check</div>
+      <div class="field-group">
+        <div class="field"><label>Pump output (mL/hr)</label><input type="number" id="sys_neut_cl2_pump" value="" placeholder="0.00" step="0.1" min="0" oninput="sysCalcNeutResidual('cl2')"></div>
+        <div class="field"><label>Stock concentration (mg/L)</label><input type="number" id="sys_neut_cl2_stock" value="300000" step="1" min="1" oninput="sysCalcNeutResidual('cl2')"></div>
+      </div>
+      <div id="sys-neut-cl2-pump-result" style="margin-top:8px"></div>
+    </div>
+  </div>
+
   <!-- SYS: LOG -->
   <div class="panel" id="sys-panel-log">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
@@ -1450,6 +1506,10 @@ mark.sop-highlight{background:rgba(239,159,39,.4);border-radius:2px;color:inheri
   <button class="nav-btn" id="sys-nav-trends" onclick="sysShowTab('trends')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="22 20 16 14 10 18 4 12"/><polyline points="4 4 4 20 20 20"/></svg>
     Trends
+  </button>
+  <button class="nav-btn" id="sys-nav-neut" onclick="sysShowTab('neut')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="3"/><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+    Neut
   </button>
   <button class="nav-btn" id="sys-nav-log" onclick="sysShowTab('log')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
@@ -4761,6 +4821,63 @@ function sysUpdateCount(){
   if(el) el.textContent=sysLog.length+' entr'+(sysLog.length===1?'y':'ies')+' saved'+(sysLog.length>0?' — persisted locally':'');
 }
 
+function sysCalcNeut(chem){
+  const neutRatios={sodium_thiosulfate:2.2,sodium_bisulfite:1.5,ascorbic_acid:2.5,none:0};
+  const neutNames={sodium_thiosulfate:'Sodium thiosulfate',sodium_bisulfite:'Sodium bisulfite',ascorbic_acid:'Ascorbic acid',none:'None'};
+  const neutStockMgPerMl={sodium_thiosulfate:300000,sodium_bisulfite:400000,ascorbic_acid:100000,none:1};
+  const res=parseFloat(document.getElementById('sys_neut_'+chem+'_res').value)||0;
+  const gpm=parseFloat(document.getElementById('sys_neut_'+chem+'_gpm').value)||130;
+  const agent=document.getElementById('sys_neut_'+chem+'_agent').value;
+  const el=document.getElementById('sys-neut-'+chem+'-result');
+  if(!el) return;
+  if(res===0){el.innerHTML=`<div class="alert a-info">Enter ${chem==='paa'?'PAA':'Cl₂'} residual to calculate dose.</div>`;return;}
+  if(agent==='none'){el.innerHTML='<div class="alert a-warn">Select a neutralization agent.</div>';return;}
+  const ratio=neutRatios[agent]||1;
+  const neut_conc_mgL=+(res*ratio).toFixed(2);
+  const flow_L_per_min=gpm*3.78541;
+  const stockConc=neutStockMgPerMl[agent]||1000;
+  const neut_mL_per_L=+(neut_conc_mgL/(stockConc/1000)).toFixed(4);
+  const neut_mL_hr=+(neut_mL_per_L*flow_L_per_min*60).toFixed(1);
+  const inh=chem==='paa'?0.5:0.1;
+  const sevLabel=res>inh?'Above inhibition threshold':'Low — monitor';
+  const sevCls=res>inh?'b-bad':'b-warn';
+  el.innerHTML=
+    `<div style="background:rgba(29,158,117,.12);border:1px solid rgba(29,158,117,.3);border-radius:8px;padding:8px 12px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center"><span style="font-size:12px;font-weight:600;color:var(--text)">→ Set pump to</span><span style="font-size:20px;font-weight:800;color:var(--green2)">${neut_mL_hr} <span style="font-size:12px;font-weight:500;color:var(--text3)">mL/hr</span></span></div>`+
+    `<div class="result-row"><span class="rname">Residual</span><span class="rval">${res} mg/L &nbsp;${badge(sevLabel,sevCls)}</span></div>`+
+    `<div class="result-row"><span class="rname">Neutralizer needed</span><span class="rval">${neut_conc_mgL} mg/L · ${neut_mL_per_L} mL/L · ${neut_mL_hr} mL/hr</span></div>`+
+    `<div class="result-row"><span class="rname">Agent</span><span class="rval">${neutNames[agent]} · ratio 1:${ratio}</span></div>`;
+}
+
+function sysCalcNeutResidual(chem){
+  const neutRatios={sodium_thiosulfate:2.2,sodium_bisulfite:1.5,ascorbic_acid:2.5,none:0};
+  const pump_ml_hr=parseFloat(document.getElementById('sys_neut_'+chem+'_pump').value)||0;
+  const stock=parseFloat(document.getElementById('sys_neut_'+chem+'_stock').value)||1;
+  const gpm=parseFloat(document.getElementById('sys_neut_'+chem+'_gpm').value)||130;
+  const res=parseFloat(document.getElementById('sys_neut_'+chem+'_res').value)||0;
+  const agent=document.getElementById('sys_neut_'+chem+'_agent').value;
+  const el=document.getElementById('sys-neut-'+chem+'-pump-result');
+  if(!el) return;
+  if(pump_ml_hr===0){el.innerHTML='<div class="alert a-info">Enter pump output (mL/hr) to check residual.</div>';return;}
+  const pump_ml_min=pump_ml_hr/60;
+  const neut_mg_per_min=pump_ml_min*(stock/1000);
+  const stream_mL_per_min=gpm*3785.41;
+  const neut_conc_mgL=+(neut_mg_per_min/(stream_mL_per_min/1000)).toFixed(2);
+  const ratio=neutRatios[agent]||1;
+  const consumed=+(neut_conc_mgL/ratio).toFixed(2);
+  const remaining=Math.max(0,+(res-consumed).toFixed(2));
+  const inh=chem==='paa'?0.5:0.1;
+  const safe=chem==='paa'?0.1:0.05;
+  const over=remaining>inh, ok=remaining<=safe;
+  const color=over?'var(--red)':ok?'var(--green2)':'var(--amber)';
+  const cls=over?'b-bad':ok?'b-ok':'b-warn';
+  const txt=over?'Above inhibition threshold — increase pump output':ok?'Fully neutralized':'Below inhibition threshold — monitor';
+  el.innerHTML=
+    `<div style="font-size:28px;font-weight:800;color:${color};line-height:1;margin-bottom:6px">${remaining} <span style="font-size:13px;font-weight:400;color:var(--text3)">mg/L remaining</span></div>`+
+    `<div style="margin-bottom:6px">${badge(txt,cls)}</div>`+
+    `<div class="result-row"><span class="rname">Neutralizer dosed</span><span class="rval">${neut_conc_mgL} mg/L in stream</span></div>`+
+    `<div class="result-row"><span class="rname">${chem==='paa'?'PAA':'Cl₂'} consumed</span><span class="rval">${consumed} mg/L</span></div>`;
+}
+
 function sysShowTab(name){
   document.querySelectorAll('#unit-sys .panel').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('#unit-sys .nav-btn').forEach(b=>b.classList.remove('active'));
@@ -5018,7 +5135,7 @@ function sysSaveLog(){
     floc1_dose:sysGv('sys_floc1_dose'), floc1_gpd:sysGv('sys_saf1_flow')>0&&sysGv('sys_floc1_dose')>0?+(sysGv('sys_floc1_dose')*sysGv('sys_saf1_flow')*60).toFixed(4):0,
     saf1_flow:sysGv('sys_saf1_flow'), saf1_eff_ph:sysGv('sys_saf1_eff_ph'),
     saf1_sludge_pct:sysGv('sys_saf1_sludge_pct'), saf1_sludge_gal:+(2700*sysGv('sys_saf1_sludge_pct')/100).toFixed(1),
-    saf1_froth:sysGv('sys_saf1_froth'), saf1_froth_mv:sysGv('sys_saf1_froth'), saf1_froth_gpd:sysGv('sys_saf1_froth')>=4?+((sysGv('sys_saf1_froth')-4)*1.0625).toFixed(4):0, saf1_froth_gph:sysGv('sys_saf1_froth')>=4?+((sysGv('sys_saf1_froth')-4)*1.0625/24).toFixed(4):0, saf1_froth_gpm:sysGv('sys_saf1_froth_gpm'),
+    saf1_froth:sysGv('sys_saf1_froth'), saf1_froth_mv:sysGv('sys_saf1_froth'), saf1_froth_gpd:sysGv('sys_saf1_froth')>=4?+((sysGv('sys_saf1_froth')-4)*1.0625).toFixed(4):0, saf1_froth_gph:sysGv('sys_saf1_froth')>=4?+((sysGv('sys_saf1_froth')-4)*1.0625/24).toFixed(4):0, saf1_froth_gpm:sysGv('sys_saf1_froth_gpm'), paa_residual:sysGv('sys_paa_residual'),
     mbbr_inf_ph:sysGv('sys_mbbr_inf_ph'), mbbr_eff_ph:sysGv('sys_mbbr_eff_ph'),
     blower_id:document.getElementById('sys_blower_id')?document.getElementById('sys_blower_id').value:'',
     blower_psi:sysGv('sys_blower_psi'), blower_filter_psi:parseFloat(document.getElementById('sys_blower_filter_psi').value)||0, blower_temp:sysGv('sys_blower_temp'),
@@ -5082,6 +5199,8 @@ function sysLoadEntry(i){
   set('sys_saf1_flow',e.saf1_flow); set('sys_saf1_eff_ph',e.saf1_eff_ph); set('sys_saf1_froth_gpm',e.saf1_froth_gpm);
   set('sys_saf1_sludge_pct',e.saf1_sludge_pct); sysCalcSaf1Sludge();
   set('sys_saf1_froth',e.saf1_froth); sysCalcFroth1();
+  set('sys_saf1_froth_gpm',e.saf1_froth_gpm);
+  set('sys_paa_residual',e.paa_residual);
   // Restore checklist
   sysCheckState={};
   if(e.checklist_items){
